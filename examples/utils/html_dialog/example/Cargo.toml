@@ -1,0 +1,14 @@
+[package]
+name = "example"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+json = "0.12.4"
+html_dialog = { path = "../html_dialog" }
+whoami = "1.6.1"
+chrono = "0.4.42"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+log = "0.4.28"
+win_dbg_logger = "0.1.0"

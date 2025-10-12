@@ -1,0 +1,24 @@
+[package]
+name = "salt_water"
+version = "0.1.0"
+edition = "2024"
+build = "build.rs"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+cobia = { path = "../../cobia"}
+strum = "0.27"
+strum_macros = "0.27"
+
+[build-dependencies]
+winres = "0.1"
+
+[package.metadata.winres]
+OriginalFilename = "salt_water.dll"
+FileDescription = "Salt Water stand-alone property package"
+ProductVersion = "0.1.0.0"
+ProductName = "Salt Water"
+LegalCopyright = "Copyright © AmsterCHEM 2025"
+

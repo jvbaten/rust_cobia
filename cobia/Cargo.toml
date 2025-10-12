@@ -1,0 +1,18 @@
+[package]
+name = "cobia"
+version = "0.1.0"
+edition = "2024"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cobia_macro = { path = "cobia_macro" }
+bitflags = "2.5.0"
+regex = "1.10.4"
+process_path = "0.1.4"
+fxhash = "0.2.1"
+
+[build-dependencies]
+bindgen = "0.71.1"
+regex = "1.10.4"
+

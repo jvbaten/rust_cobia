@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+members = [
+    "html_dialog",
+    "example",
+]
+
+[profile.release-with-deb-info]
+inherits = "release"
+debug = "full"
+opt-level = 3

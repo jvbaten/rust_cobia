@@ -1,0 +1,15 @@
+[workspace]
+resolver = "2"
+members = [
+    "cobia",
+    "cobia/cobia_macro",
+    "examples/distillation_shortcut_unit",
+    "examples/salt_water",
+    "examples/utils/html_dialog/html_dialog",
+    "examples/utils/html_dialog/example"
+]
+
+[profile.release-with-deb-info]
+inherits = "release"
+debug = "full"
+opt-level = 3

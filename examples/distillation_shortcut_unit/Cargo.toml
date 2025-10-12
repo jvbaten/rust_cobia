@@ -1,0 +1,26 @@
+[package]
+name = "distillation_shortcut_unit"
+version = "0.1.0"
+edition = "2024"
+build = "build.rs"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+chrono = "0.4.41"
+cobia = { path = "../../cobia"}
+json = "0.12.4"
+
+[build-dependencies]
+winres = "0.1"
+
+[package.metadata.winres]
+OriginalFilename = "distillation_shortcut_unit.dll"
+FileDescription = "Distillation Shortcut CAPE-OPEN Unit Operation"
+ProductVersion = "0.1.0.0"
+ProductName = "Salt Water"
+LegalCopyright = "Copyright © AmsterCHEM 2025"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+html_dialog = { path = "../utils/html_dialog/html_dialog"}

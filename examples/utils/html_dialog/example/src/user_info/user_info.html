@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>HTML Dialog Example</title>
+<link rel="stylesheet" href="user_info.css">
+<link rel="icon" type="image/x-icon" href="user_info.png">
+<script src="user_info.js"></script> 
+</head>
+<body onload="on_load()" keypress="onkeypress()">
+    <!-- Tab links -->
+    <div class="tab">
+        <button class="tablinks" id="select_info" onclick="select_tab('info')">Info</button>
+        <button class="tablinks" id="select_about" onclick="select_tab('about')">About</button>
+    </div>
+    <!-- Status -->
+    <div id="info" class="tabcontent">
+        <!-- table has dynamic content-->
+        <table id="user_info"></table>
+    </div>
+    <div id="about" class="tabcontent">
+        <p>This is an example dialog for the html_dialog create.
+        <p>Hit escape to close this dialog.
+    </div>
+    <!-- Button row -->
+    <div class="buttons">
+        <button class="push" onclick="onAgain()">Again</button>
+        <button class="push" onclick="onPhoto()">Photo</button>
+        <div class="button_spacer"></div>
+        <button class="push" onclick="onClose()">Close</button>
+    </div>
+</body>
+</html>

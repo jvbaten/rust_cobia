@@ -1,0 +1,67 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    background-color:white;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    flex-shrink: 0;
+}
+
+    .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 5px 5px;
+        transition: 0.3s;
+    }
+
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+    flex-grow: 1;
+    overflow: auto;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+}
+
+.button_spacer {
+    flex-grow: 1;
+}
+
+.push {
+    flex-shrink: 0;
+    margin: 4px;
+}
+
+.user_info {
+    width: 100%;
+    border: 1px solid black;
+}
+
+.user_content {
+    border: 1px solid black;
+}

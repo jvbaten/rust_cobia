@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Short-cut Distillation Unit</title>
+<link rel="stylesheet" href="gui.css">
+<link rel="icon" type="image/x-icon" href="gui.png">
+<script src="gui.js"></script> 
+</head>
+<body onload="on_load()">
+ <!-- Tab links -->
+<div class="tab">
+  <button class="tablinks" id="select_status" onclick="select_tab('status')">Status</button>
+  <button class="tablinks" id="select_configure" onclick="select_tab('configure')">Configure</button>
+  <button class="tablinks" id="select_ports" onclick="select_tab('ports')">Ports</button>
+  <button class="tablinks" id="select_about" onclick="select_tab('about')">About</button>
+</div>
+<!-- Status -->
+<div id="status" class="tabcontent">
+  Status content
+</div>
+<!-- Configure -->
+<div id="configure" class="tabcontent">
+  <table id="configuretable">
+  <tr class="configureheader"><td class="configureheaderrow" colspan="2">Unit</td></tr>
+  <tr class="configurerow"><td class="configureheader">Name</td><td><input type="text" id='unit_name' class="tabletext" onchange="data_entry('unit_name')"></input></td></tr>
+  <tr class="configurerow"><td class="configureheader">Description</td><td><input type="text" id='unit_description' class="tabletext" onchange="data_entry('unit_description')"></input></td></tr>
+  <tr class="configureheader"><td class="configureheaderrow" colspan="2">Specifications</td></tr>
+  <tr class="configurerow"><td class="configureheader">Light key compound</td><td><select id='light_key_compound' class="tablecombo" onchange="data_entry('light_key_compound')"></select></td></tr>
+  <tr class="configurerow"><td class="configureheader">Heavy key compound</td><td><select id='heavy_key_compound' class="tablecombo" onchange="data_entry('heavy_key_compound')"></select></td></tr>
+  <tr class="configurerow"><td class="configureheader">Light key compound recovery</td><td><input type="text" id='light_key_compound_recovery' class="tabletext" onchange="data_entry('light_key_compound_recovery')"></input></td></tr>
+  <tr class="configurerow"><td class="configureheader">Heavy key compound recovery</td><td><input type="text" id='heavy_key_compound_recovery' class="tabletext" onchange="data_entry('heavy_key_compound_recovery')"></input></td></tr>
+  <tr class="configurerow"><td class="configureheader">Reflux ratio factor</td><td><input type="text" id='reflux_ratio_factor' class="tabletext" onchange="data_entry('reflux_ratio_factor')"></input></td></tr>
+  <tr class="configurerow"><td class="configureheader">Maximum iterations</td><td><input type="text" id='maximum_iterations' class="tabletext" onchange="data_entry('maximum_iterations')"></input></td></tr>
+  <tr class="configurerow"><td class="configureheader">Tolerance</td><td><input type="text" id='convergence_tolerance' class="tabletext" onchange="data_entry('convergence_tolerance')"></input></td></tr>
+  <tr class="configureheader"><td class="configureheaderrow" colspan="2">Results</td></tr>
+  <tr class="configurerow"><td class="configureheader">Number of stages</td><td><input type="text" id='number_of_stages' readonly="true" class="tabletext"></input></td></tr>
+  <tr class="configurerow"><td class="configureheader">Reflux ratio</td><td><input type="text" id='reflux_ratio' readonly="true" class="tabletext"></input></td></tr>
+  <tr class="configurerow"><td class="configureheader">Feed stage location</td><td><input type="text" id='feed_stage_location' readonly="true" class="tabletext"></input></td></tr>
+  </table>
+</div>
+<!-- Ports -->
+<div id="ports" class="tabcontent">
+    <table id="porttable">
+        <tr><td></td><td class="streamheader">Feed</td><td class="streamheader">Distillate</td><td class="streamheader">Bottoms</td></tr>
+    </table>
+</div>
+<!-- About -->
+<div id="about" class="tabcontent">
+    <p>
+        This is an example unit operation implementation
+        featuring a shortcut distillation unit operation
+        using the Fenske-Underwood-Gilliland-Kirkbride
+        approach.
+    </p>
+    <h3 id="fenske">Fenske</h3>
+    <p>
+        The Fenske equation (Fenske, "Fractionation of Straight-Run Pennsylvania Gasoline",
+        Industrial and Engineering Chemistry, Vol. 24: 482, 1932) is used
+        to estimate distillate and bottoms composition and the minimum number
+        of stages.
+    </p>
+    <p>
+        From the slate of components, two components are
+        selected that are called the Light Key (LK)
+        component, and Heavy Key (HK) component. The
+        desired recovery is specified for the LK:
+    </p>
+    <math>
+        <msub><ms>r</ms><mtext>LK</mtext></msub>
+        <mo>=</mo>
+        <mfrac>
+            <msub><ms>f</ms><mrow><mtext>LK</mtext><mo>,</mo><mtext>dist</mtext></mrow></msub>
+            <msub><ms>f</ms><mrow><mtext>LK</mtext><mo>,</mo><mtext>feed</mtext></mrow></msub>
+        </mfrac>
+    </math>
+    <p>and for the heavy component recovery</p>
+    <math>
+        <msub><ms>r</ms><mtext>HK</mtext></msub>
+        <mo>=</mo>
+        <mfrac>
+            <msub><ms>f</ms><mrow><mtext>HK</mtext><mo>,</mo><mtext>bot</mtext></mrow></msub>
+            <msub><ms>f</ms><mrow><mtext>HK</mtext><mo>,</mo><mtext>feed</mtext></mrow></msub>
+        </mfrac>
+    </math>
+    <p>Initial distillate and bottom compositions are estimated.</p>
+    <p>
+        The separation is based on calculation of the
+        relative volatility for each component:
+    </p>
+    <math>
+        <msub><ms>&alpha;</ms><mtext>i</mtext></msub>
+        <mo>=</mo>
+        <mfrac>
+            <msub><ms>K</ms><mtext>i</mtext></msub>
+            <msub><ms>K</ms><mtext>HK</mtext></msub>
+        </mfrac>
+    </math>
+    <p>
+        where the K value for each compound is calculated for the dew point (DP) at
+        distillate conditions, and bubble point (BP) at bottoms conditions, and the
+        average K value is given by
+    </p>
+    <math>
+        <msub><ms>K</ms><mtext>i</mtext></msub>
+        <mo>=</mo>
+        <msqrt>
+            <msub><ms>K</ms><mrow><mtext>i</mtext><mo>,</mo><mtext>DP</mtext><mo>,</mo><mtext>dist</mtext></mrow></msub>
+            <msub><ms>K</ms><mrow><mtext>i</mtext><mo>,</mo><mtext>BP</mtext><mo>,</mo><mtext>bot</mtext></mrow></msub>
+        </msqrt>
+    </math>
+    <p>The minimum number of stages follows from:</p>
+    <math>
+        <msub><ms>N</ms><mtext>min</mtext></msub>
+        <mo>=</mo>
+        <mfrac>
+            <mrow>
+                <mtext>ln</mtext><mo>(</mo>
+                <mfrac>
+                    <mrow>
+                        <msub><ms>f</ms><mrow><mtext>LK</mtext><mo>,</mo><mtext>dist</mtext></mrow></msub>
+                        <msub><ms>f</ms><mrow><mtext>HK</mtext><mo>,</mo><mtext>bot</mtext></mrow></msub>
+                    </mrow>
+                    <mrow>
+                        <msub><ms>f</ms><mrow><mtext>HK</mtext><mo>,</mo><mtext>dist</mtext></mrow></msub>
+                        <msub><ms>f</ms><mrow><mtext>LK</mtext><mo>,</mo><mtext>bot</mtext></mrow></msub>
+                    </mrow>
+                </mfrac>
+                <mo>)</mo>
+            </mrow>
+            <mrow><mtext>ln</mtext><mo>(</mo><msub><ms>&alpha;</ms><mtext>LK</mtext></msub><mo>)</mo></mrow>
+        </mfrac>
+    </math>
+    <p>The bottom component flow rates are:</p>
+    <math>
+        <msub><ms>f</ms><mrow><mtext>i</mtext><mo>,</mo><mtext>bot</mtext></mrow></msub>
+        <mo>=</mo>
+        <mfrac>
+            <msub><ms>f</ms><mrow><mtext>i</mtext><mo>,</mo><mtext>feed</mtext></mrow></msub>
+            <mrow>
+                <mn>1</mn><mo>+</mo>
+                <mo>(</mo><mfrac>
+                    <msub><ms>f</ms><mrow><mtext>HK</mtext><mo>,</mo><mtext>dist</mtext></mrow></msub>
+                    <msub><ms>f</ms><mrow><mtext>HK</mtext><mo>,</mo><mtext>bot</mtext></mrow></msub>
+                </mfrac><mo>)</mo>
+                <mmultiscripts><ms>&alpha;</ms><mtext>i</mtext><msub><ms>N</ms><mtext>min</mtext></msub></mmultiscripts>
+            </mrow>
+        </mfrac>
+    </math>
+    <p>and the distillate component flow rates are:</p>
+    <math>
+        <msub><ms>f</ms><mrow><mtext>i</mtext><mo>,</mo><mtext>dist</mtext></mrow></msub>
+        <mo>=</mo>
+        <msub><ms>f</ms><mrow><mtext>i</mtext><mo>,</mo><mtext>feed</mtext></mrow></msub>
+        <mo>-</mo>
+        <msub><ms>f</ms><mrow><mtext>i</mtext><mo>,</mo><mtext>bot</mtext></mrow></msub>
+    </math>
+    <p>
+        The unit operation operates isobarically, so product pressure equals feed pressure. The distillate
+        product is at the dew point temperature for the distillate composition, and the bottoms
+        product it at the bubble point temperature for the distillate composition.
+    </p>
+    <p>
+        Given the new distillate temperature and composition, and the new bottoms temperature
+        and composition, the K values and relative volatilities are updated, and the above
+        calculation is repeated until converged values are obtained.
+    </p>
+    <h3 id="underwood">Underwood</h3>
+    <p>
+        The Underwood equation (Underwood, "Fractional distillation of
+        multi-component mixtures. Calculation of minimum reflux ratio", J. Inst.
+        Petrol., 32, 614, 1946) is used to estimate the minimum reflux ratio.
+    </p>
+    <p>The minimum reflux ratio is determined from</p>
+    <math>
+        <msub><ms>R</ms><mtext>min</mtext></msub>
+        <mo>=</mo>
+        <mo>&sum;</mo>
+        <mfrac>
+            <mrow>
+                <msub><ms>&alpha;</ms><mtext>i</mtext></msub>
+                <msub><ms>x</ms><mrow><mtext>i</mtext><mo>,</mo><mtext>dist</mtext></mrow></msub>
+            </mrow>
+            <mrow>
+                <msub><ms>&alpha;</ms><mtext>i</mtext></msub>
+                <mo>-</mo>
+                <ms>&theta;</ms>
+            </mrow>
+        </mfrac>
+        <mo>-</mo>
+        <mn>1</mn>
+    </math>
+    <p>where Underwood parameter <math>?</math> is the root of equation</p>
+    <math>
+        <mn>1</mn>
+        <mo>-</mo>
+        <ms>q</ms>
+        <mo>=</mo>
+        <mo>&sum;</mo>
+        <mfrac>
+            <mrow>
+                <msub><ms>&alpha;</ms><mtext>i</mtext></msub>
+                <msub><ms>x</ms><mrow><mtext>i</mtext><mo>,</mo><mtext>feed</mtext></mrow></msub>
+            </mrow>
+            <mrow>
+                <msub><ms>&alpha;</ms><mtext>i</mtext></msub>
+                <mo>-</mo>
+                <ms>&theta;</ms>
+            </mrow>
+        </mfrac>
+    </math>
+    <p>where q is the feed quality, defined as</p>
+    <math>
+        <ms>q</ms>
+        <mo>=</mo>
+        <mfrac>
+            <mrow>
+                <msub><ms>h</ms><mtext>feed,DP</mtext></msub>
+                <mo>-</mo>
+                <msub><ms>h</ms><mtext>feed</mtext></msub>
+            </mrow>
+            <mrow>
+                <msub><ms>h</ms><mtext>feed,DP</mtext></msub>
+                <mo>-</mo>
+                <msub><ms>h</ms><mtext>feed,BP</mtext></msub>
+            </mrow>
+        </mfrac>
+    </math>
+    <p>
+        where <math><msub><ms>h</ms><mtext>feed,DP</mtext></msub></math>
+        is the enthalpy of the vapor phase at the dew point temperature
+        of the feed, and <math><msub><ms>h</ms><mtext>feed,BP</mtext></msub></math>
+        is the enthalpy of the liquid phase at the bubble point temperature
+        of the feed.
+    </p>
+    <p>
+        There are multiple roots for <math><ms>?</ms></math>, and the
+        root that is used is between 1 and <math><msub><ms>?</ms><mtext>LK</mtext></msub></math>.
+        In case there are ? values that are in between 1 and
+        <math><msub><ms>?</ms><mtext>LK</mtext></msub></math>, a
+        warning is issued and the root that is closest to 1 is used.
+    </p>
+    <p>
+        The unit does not check whether for retrograde flash results,
+        which is outside the scope of this example.
+    </p>
+    <h3 id="gilliland">Gilliland</h3>
+    <p>
+        The Gilliland equation (Gilliland, "Estimate the
+        number of theoretical plates as a function of reflux ratio",
+        Ind. Eng. Chem. 32(9): 1220-1223, 1940, doi 10.1021/ie50369a035)
+        is used to estimate the number of stages:
+    </p>
+    <math>
+        <ms>Y</ms>
+        <mo>=</mo>
+        <mn>1</mn>
+        <mo>-</mo>
+        <mtext>exp</mtext>
+        <mo>(</mo>
+        <mo>(</mo>
+        <mfrac>
+            <mrow><mn>1</mn><mo>+</mo><mn>54.4</mn><ms>X</ms></mrow>
+            <mrow><mn>11</mn><mo>+</mo><mn>117.2</mn><ms>X</ms></mrow>
+        </mfrac>
+        <mo>)</mo>
+        <mo>(</mo>
+        <mfrac>
+            <mrow><ms>X</ms><mo>-</mo><mn>1</mn></mrow>
+            <msqrt><ms>X</ms></msqrt>
+        </mfrac>
+        <mo>)</mo>
+        <mo>)</mo>
+    </math>
+    <p>where</p>
+    <math>
+        <ms>Y</ms>
+        <mo>=</mo>
+        <mfrac>
+            <mrow><ms>N</ms><mo>-</mo><msub><ms>N</ms><mtext>min</mtext></msub></mrow>
+            <mrow><ms>N</ms><mo>+</mo><mn>1</mn></mrow>
+        </mfrac>
+    </math>
+    <p>and</p>
+    <math>
+        <ms>X</ms>
+        <mo>=</mo>
+        <mfrac>
+            <mrow><ms>R</ms><mo>-</mo><msub><ms>R</ms><mtext>min</mtext></msub></mrow>
+            <mrow><ms>R</ms><mo>+</mo><mn>1</mn></mrow>
+        </mfrac>
+    </math>
+    <p>
+        The reflux ratio <math>R</math> is determined from the minimum reflux ratio
+        using an adjustable parameter:
+    </p>
+    <math>
+        <ms>R</ms>
+        <mo>=</mo>
+        <ms>k</ms>
+        <msub><ms>R</ms><mtext>min</mtext></msub>
+    </math>
+    <p>where <math>k</math> must exceed 1. The default value for <math>k</math> is 1.15.</p>
+    <h3 id="kirkbride">Kirkbride</h3>
+    <p>
+        The location of the feed stage is estimated from the Kirkbride correlation
+        (Kirkbride,  "Process Design Procedure for Multicomponent Fractionators",
+        Petr. Ref. 23(9), 321, 1944):
+    </p>
+    <math>
+        <mfrac>
+            <msub><ms>N</ms><mtext>top</mtext></msub>
+            <msub><ms>N</ms><mtext>bot</mtext></msub>
+        </mfrac>
+        <mo>=</mo>
+        <msup>
+            <mrow>
+                <mo>[</mo>
+                <mfrac>
+                    <msub><ms>f</ms><mtext>bot</mtext></msub>
+                    <msub><ms>f</ms><mtext>dist</mtext></msub>
+                </mfrac>
+                <mfrac>
+                    <msub><ms>x</ms><mrow><mtext>HK</mtext><mo>,</mo><mtext>feed</mtext></mrow></msub>
+                    <msub><ms>x</ms><mrow><mtext>LK</mtext><mo>,</mo><mtext>feed</mtext></mrow></msub>
+                </mfrac>
+                <msup>
+                    <mrow>
+                        <mo>(</mo>
+                        <mfrac>
+                            <msub><ms>x</ms><mrow><mtext>LK</mtext><mo>,</mo><mtext>bot</mtext></mrow></msub>
+                            <msub><ms>x</ms><mrow><mtext>HK</mtext><mo>,</mo><mtext>dist</mtext></mrow></msub>
+                        </mfrac>
+                        <mo>)</mo>
+                    </mrow>
+                    <mn>2</mn>
+                </msup>
+                <mo>]</mo>
+            </mrow>
+            <mn>0.206</mn>
+        </msup>
+    </math>
+    <p>
+        where
+        <math><ms>f</ms></math>
+        are molar flow rates,
+        <math><ms>x</ms></math>
+        are mole fractions, and the number of trays above the feed
+        <math><msub><ms>N</ms><mtext>top</mtext></msub></math>
+        and the number of trays below the feed
+        <math><msub><ms>N</ms><mtext>bot</mtext></msub></math>
+        sum up to the number of trays <math><ms>N</ms></math>.
+    </p>
+</div>
+<div id="statusbar">
+    working...
+</div>
+</body>
+</html>
