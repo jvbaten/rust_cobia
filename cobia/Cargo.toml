@@ -6,7 +6,7 @@ edition = "2024"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cobia_macro = { path = "cobia_macro" }
+cobia_macro = { path = "cobia_macro", version = "0.1.0" }
 bitflags = "2.5.0"
 regex = "1.10.4"
 process_path = "0.1.4"
