@@ -1,6 +1,6 @@
 [package]
 name = "distillation_shortcut_unit"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 build = "build.rs"
 license = "MIT"
@@ -22,7 +22,7 @@ winres = "0.1"
 [package.metadata.winres]
 OriginalFilename = "distillation_shortcut_unit.dll"
 FileDescription = "Distillation Shortcut CAPE-OPEN Unit Operation"
-ProductVersion = "0.1.0.0"
+ProductVersion = "0.1.1.0"
 ProductName = "Salt Water"
 LegalCopyright = "Copyright © AmsterCHEM 2025"
 

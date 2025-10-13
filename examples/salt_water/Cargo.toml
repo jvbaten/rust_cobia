@@ -1,6 +1,6 @@
 [package]
 name = "salt_water"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 build = "build.rs"
 license = "MIT"
@@ -22,7 +22,7 @@ winres = "0.1"
 [package.metadata.winres]
 OriginalFilename = "salt_water.dll"
 FileDescription = "Salt Water stand-alone property package"
-ProductVersion = "0.1.0.0"
+ProductVersion = "0.1.1.0"
 ProductName = "Salt Water"
 LegalCopyright = "Copyright © AmsterCHEM 2025"
 

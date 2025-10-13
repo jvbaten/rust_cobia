@@ -1,14 +1,15 @@
 [package]
 name = "cobia"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
-license-file = "LICENSE"
+license = "MIT"
 repository = "https://github.com/jvbaten/rust_cobia"
 description = "CAPE-OPEN COBIA binding interface library for rust"
 homepage = "https://www.amsterchem.com/cobiarust.html"
+readme = "README.md"
 
 [dependencies]
-cobia_macro = { path = "cobia_macro", version = "0.1.0" }
+cobia_macro = { path = "cobia_macro", version = "0.1.1" }
 bitflags = "2.5.0"
 regex = "1.10.4"
 process_path = "0.1.4"
