@@ -224,7 +224,7 @@ fn main() {
 		}
 		let code_file = File::open(out_path).unwrap();
 		let out_file_cape_err =
-			File::create(cdir_path.join("..").join("cape_result_value.rs")).unwrap();
+			File::create(out_dir.join("cape_result_value.rs")).unwrap();
 		let re_err = Regex::new(
 			r"^\s*pub\s+const\s+COBIAERR_([A-Za-z_][A-Za-z_0-9]*)\s*:\s*u32\s*=\s*(\d+)\s*;\s*$",
 		)
@@ -448,13 +448,10 @@ impl fmt::Display for {} {{
 					.unwrap();
 			}
 		}
-		//find clang++
-
-
 		//compile code generator program cidl2rs
 		let cidl2rs_path = PathBuf::from("cidl2rs");
-		let cidl2rs_intermediate_path = cidl2rs_path.join("obj");
-		let cidl2rs_binary_path = cidl2rs_path.join("bin");
+		let cidl2rs_intermediate_path = out_dir.join("obj");
+		let cidl2rs_binary_path = out_dir.join("bin");
 		//make object dir
 		fs::create_dir_all(&cidl2rs_intermediate_path).unwrap();
 		//compile cidl2rs.cpp

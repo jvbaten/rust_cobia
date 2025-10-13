@@ -5,6 +5,3 @@ target/
 build/
 bin/
 obj/
-cobia/src/cape_result_value.rs
-cobia/src/cobia_enums.rs
-cobia/src/C/c_binding.rs
