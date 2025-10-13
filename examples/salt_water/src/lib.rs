@@ -31,6 +31,9 @@
 //!
 //! This software uses strum, a set of macros and traits for working with enums and strings easier in Rust, by Peter GlotFelty
 
+//To build documentation: 
+//  cargo doc --no-deps --document-private-items --package salt_water --open
+
 use cobia;
 mod salt_water_calculator;
 mod salt_water_property_package;

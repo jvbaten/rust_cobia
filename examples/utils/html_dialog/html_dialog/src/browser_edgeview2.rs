@@ -750,7 +750,7 @@ impl WebView {
     #[allow(non_snake_case)]
     #[cfg(target_pointer_width = "32")]
     unsafe fn SetWindowLong(window: HWND, index: WINDOW_LONG_PTR_INDEX, value: isize) -> isize {
-        WindowsAndMessaging::SetWindowLongW(window, index, value as _) as _
+        unsafe { WindowsAndMessaging::SetWindowLongW(window, index, value as _) as _ }
     }
     /// Sets window user data for 64-bit platforms.
     #[allow(non_snake_case)]
@@ -762,7 +762,7 @@ impl WebView {
     #[allow(non_snake_case)]
     #[cfg(target_pointer_width = "32")]
     unsafe fn GetWindowLong(window: HWND, index: WINDOW_LONG_PTR_INDEX) -> isize {
-        WindowsAndMessaging::GetWindowLongW(window, index) as _
+        unsafe { WindowsAndMessaging::GetWindowLongW(window, index) as _ }
     }
     /// Gets window user data for 64-bit platforms.
     #[allow(non_snake_case)]

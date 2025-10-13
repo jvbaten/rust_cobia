@@ -341,6 +341,9 @@
 //!
 //! After installation, the unit operation can be used in any CAPE-OPEN compliant flowsheeting environment.
 
+//To build documentation: 
+//  cargo doc --no-deps --document-private-items --package distillation_shortcut_unit --open
+
 use cobia;
 mod shared_unit_data;
 mod distillation_shortcut_unit;

@@ -1,19 +1,101 @@
+//! # Crate cobia - RUST Language binding for CO-LaN's COBIA middleware.
+//!
+//! CAPE-OPEN consists of a series of specifications to expand the range of application of 
+//! process simulation technologies. The CAPE-OPEN specifications specify a set of software interfaces 
+//! that allow plug and play inter-operability between a given process modelling environment (PME) 
+//! and a third-party process modelling component (PMC).
+//! 
+//! The CAPE-OPEN specifications are supported by the non-profit organization CO-LaN: 
+//! [http://www.colan.org](http://www.colan.org)
+//! 
+//! The COBIA middle-ware is a platform independent object model and request broker implementation
+//! to facilitate the inter-operation of CAPE-OPEN compliant PMEs and PMCs.
+//! 
+//! This create provides the following:
+//! - Safe Rust wrappers around the raw C FFI bindings to COBIA's API routines
+//! - Rust based implementation of the CAPE-OPEN data types
+//! - Rust based wrappers around externally implemented CAPE-OPEN data types
+//! - A Rust code generator utility that utilizes COBIA's public type API to generate Rust bindings
+//! - Rust traits representing COBIA interfaces
+//! - Rust native implementations of COBIA based interfaces using objects that provide the Rust traits
+//! - Smart pointers to COBIA objects
+//! - Rust definitions for externall implemented COBIA objects
+//! - Macros to make implementing CAPE-OPEN components in Rust
+//!
+//! # Prerequisites
+//!
+//! To compile against this create, the following prerequisites must be installed:
+//! - The COBIA SDK (available for download from [https://colan.repositoryhosting.com/trac/colan_cobia/downloads](https://colan.repositoryhosting.com/trac/colan_cobia/downloads)
+//! - The required ingredients for bindgen, including a valid CLANG installation, see [https://rust-lang.github.io/rust-bindgen/requirements.html](https://rust-lang.github.io/rust-bindgen/requirements.html)
+//!
+//! This package uses bindgen to generate Rust access to the C-API of COBIA. As with most Rust implementations that
+//! refer to C/C++ code, all external access is unsafe, and marked as such in the cobia crate itself. Typically one
+//! does not need to use the unsafe keyword in implementations that use cobia, with a few exceptions.
+//! 
+//! # Interface implementation considerations
+//!
+//! COBIA is a middle-ware that allows objects implemented in different languages to inter-operate. They 
+//! do so through the use of reference counted interfaces, much like other middle-wares such as COM or CORBA.
+//! 
+//! To allow the Rust compiler to check the life time and validity of pointers, interface pointers are passed by
+//! reference. A Rust object that implements one or more COBIA interface is allocated on the heap by boxing it
+//! as part of its creation. Once the object is boxed, its vTable pointers are initialized to point to the correct
+//! memory location. The boxed object is then converted to a raw pointer; this raw pointer is the interface pointer's
+//! 'me' member, and is used by the raw interface methods to access the Rust object. The raw interface methods 
+//! require Rust traits to be implemented on the Rust object, to provide the actual functionality.
+//! 
+//! Data that requires heap allocations (strings, arrays, ...) are handled a little differently. They too have a 
+//! vTable, but at the design of this crate it was decided not to box the data objects, as the heap allocation
+//! for the object itself may well not be needed and may hamper performance.
+//! 
+//! As a result, it is quite possible, and even likely, for data object implementations to be moved around after
+//! its creation. When passed to a foreign function, the vTable for the data object is created on the fly, pointing
+//! to where the data object is currently located. The reference to the vTable requires a reference to the data object
+//! implementation, so Rust's life span checking is used to ensure that the data object implementation remains valid
+//! during the life span of the vTable, and the vTable remains valid for the duration of the external call.
+//! 
+//! To further leverage Rust's safety features, data objects have In and Out versions. The In version cannot be modified
+//! by the receiver, whereas the intent of the Out version is exactly to be modified. Functions that require an In data
+//! type, can do so by a reference to it. Function that require an Out data type on the other hand, require a mutable reference;
+//! this ensures that an Out data object is not modified unexpectedly.
+//!
+//! # Rust code generation
+//! 
+//! To generate Rust bindings for interfaces described by CAPE-OPEN IDL (either in a .cidl file or a library in the 
+//! COBIA registry), the cidl.exe tool can be used. This tool is part of the current crate. This tool is used during
+//! the build process to generate the bindings for the default cape_open and cape_open_1_2 modules, containing 
+//! all known CAPE-OPEN interfaces in the installed COBIA SDK.
+//! 
+//! The cidl tool can also be used to generate bindings for custom CAPE-OPEN interfaces; this functionality is currently
+//! untested, arising a business case.
+//!
+//! # CAPE-OPEN object implementations
+//! 
+//! To implement a CAPE-OPEN object in rust, one can use the `cape_object_implementation` macro. This macro takes as 
+//! arguments the interfaces that are implemented by the object, as well as some optional constructor details.
+//! 
+//! To implement the entry points for a COBIA dynamic link library, one can use the `pmc_entry_points` macro.
+//!
+//! The reader is directed to the Salt Water Property Package example and the Distillation Shortcut Unit Operation
+//! examples in the repository for further details.
+//! 
+//! Extenally implemented COBIA objects are accessed through smart pointers; an interface specific smart pointer is 
+//! generated for each known COBIA interface, along with the Rust methods that represent the interface methods.
+//! 
+//! # Acknowledgements
+//!
+//! This package uses process_path, to get the path of the currently executing process or dynamic library, (C) Copyright Wesley Wiser and process_path contributors
+//!
+//! This package uses bindgen, to automatically generates Rust FFI bindings to C and C++ libraries, (C) Jyun-Yan You
 
-//todo module documentation
-// //! # My Crate
-// //!
-// //! `my_crate` is a collection of utilities to make performing certain
-// //! calculations more convenient.
-
+//todo: build bindings for custom interfaces using cidl.exe and update above documentation
 //todo: IDL interfaces 
-//todo: Marshal interfaces 
-
-// This package uses process_path, to get the path of the currently executing process or dynamic library, (C) Copyright Wesley Wiser and process_path contributors
-// This package uses bindgen, to automatically generates Rust FFI bindings to C and C++ libraries, (C) Jyun-Yan You
-
-//for a C++ client these are not directly exposed, as they are used via implementation classes that provide this functionality
+//todo: Marshal interfaces (for a C++ client these are not directly exposed, as they are used via implementation classes that provide this functionality)
 //todo: CapeResult cobiaDepersistFromTransitionFormat(ICapeInterface *reader,ICapeInterface **transitionFormat,CapeInteger majorVersion,CapeInteger minorVersion);
 //todo: CapeResult cobiaDepersistPMCFromTransitionFormat(ICapeInterface *PMC, ICapeInterface *reader,CapeInteger majorVersion,CapeInteger minorVersion);
+
+//To build documentation: 
+//  cargo doc --no-deps --package cobia --open
 
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
