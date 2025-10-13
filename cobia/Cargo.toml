@@ -2,7 +2,6 @@
 name = "cobia"
 version = "0.1.0"
 edition = "2024"
-license = "MIT"
 license-file = "LICENSE"
 repository = "https://github.com/jvbaten/rust_cobia"
 description = "CAPE-OPEN COBIA binding interface library for rust"
