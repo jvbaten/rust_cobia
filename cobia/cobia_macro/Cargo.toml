@@ -2,6 +2,11 @@
 name = "cobia_macro"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+license-file = "LICENSE"
+repository = "https://github.com/jvbaten/rust_cobia"
+description = "macros for cobia crate"
+homepage = "https://www.amsterchem.com/cobiarust.html"
 
 [lib]
 proc-macro = true

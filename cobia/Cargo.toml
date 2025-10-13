@@ -2,8 +2,11 @@
 name = "cobia"
 version = "0.1.0"
 edition = "2024"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+license-file = "LICENSE"
+repository = "https://github.com/jvbaten/rust_cobia"
+description = "CAPE-OPEN COBIA binding interface library for rust"
+homepage = "https://www.amsterchem.com/cobiarust.html"
 
 [dependencies]
 cobia_macro = { path = "cobia_macro", version = "0.1.0" }

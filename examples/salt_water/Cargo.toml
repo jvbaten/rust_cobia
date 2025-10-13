@@ -3,6 +3,10 @@ name = "salt_water"
 version = "0.1.0"
 edition = "2024"
 build = "build.rs"
+license = "MIT"
+repository = "https://github.com/jvbaten/rust_cobia"
+description = "cobia example: CAPE-OPEN stand-alone Property Package for salt water"
+homepage = "https://www.amsterchem.com/cobiarust.html"
 
 [lib]
 crate-type = ["cdylib"]
