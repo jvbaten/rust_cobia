@@ -10,7 +10,6 @@ use windows::Win32::Foundation::HWND;
 ///
 /// - **Windows**: Uses `HWND` from the Windows API as the handle type
 ///
-/// ```
 pub struct Window {
     /// Native window handle.
     ///

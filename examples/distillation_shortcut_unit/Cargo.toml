@@ -1,12 +1,15 @@
 [package]
 name = "distillation_shortcut_unit"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 build = "build.rs"
 license = "MIT"
 repository = "https://github.com/jvbaten/rust_cobia"
 description = "cobia example: Distillation Short-cut CAPE-OPEN Unit Operation"
 homepage = "https://www.amsterchem.com/cobiarust.html"
+keywords = ["unit operations", "CAPE OPEN", "shortcut distillation", "chemical engineering", "process simulation"]
+documentation = "https://www.amsterchem.com/rust_cobia_doc/distillation_shortcut_unit/"
+
 
 [lib]
 crate-type = ["cdylib"]
@@ -22,7 +25,7 @@ winres = "0.1"
 [package.metadata.winres]
 OriginalFilename = "distillation_shortcut_unit.dll"
 FileDescription = "Distillation Shortcut CAPE-OPEN Unit Operation"
-ProductVersion = "0.1.1.0"
+ProductVersion = "0.1.2.0"
 ProductName = "Salt Water"
 LegalCopyright = "Copyright © AmsterCHEM 2025"
 

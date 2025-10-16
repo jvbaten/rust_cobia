@@ -1,12 +1,14 @@
 [package]
 name = "salt_water"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 build = "build.rs"
 license = "MIT"
 repository = "https://github.com/jvbaten/rust_cobia"
 description = "cobia example: CAPE-OPEN stand-alone Property Package for salt water"
 homepage = "https://www.amsterchem.com/cobiarust.html"
+keywords = ["property package", "CAPE OPEN", "sea water", "salt water", "chemical engineering", "process simulation"]
+documentation = "https://www.amsterchem.com/rust_cobia_doc/salt_water/"
 
 [lib]
 crate-type = ["cdylib"]
@@ -22,7 +24,7 @@ winres = "0.1"
 [package.metadata.winres]
 OriginalFilename = "salt_water.dll"
 FileDescription = "Salt Water stand-alone property package"
-ProductVersion = "0.1.1.0"
+ProductVersion = "0.1.2.0"
 ProductName = "Salt Water"
 LegalCopyright = "Copyright © AmsterCHEM 2025"
 

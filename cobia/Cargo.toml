@@ -1,15 +1,17 @@
 [package]
 name = "cobia"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/jvbaten/rust_cobia"
 description = "CAPE-OPEN COBIA binding interface library for rust"
 homepage = "https://www.amsterchem.com/cobiarust.html"
 readme = "README.md"
+keywords = ["thermodynamics", "unit operations", "CAPE OPEN", "CO-LaN", "flowsheet", "chemical engineering", "process simulation"]
+documentation = "https://www.amsterchem.com/rust_cobia_doc/cobia/"
 
 [dependencies]
-cobia_macro = { path = "cobia_macro", version = "0.1.1" }
+cobia_macro = { path = "cobia_macro", version = "0.1.2" }
 bitflags = "2.5.0"
 regex = "1.10.4"
 process_path = "0.1.4"

@@ -4,7 +4,7 @@ use crate::*;
 /// A writable COBIA registry key
 ///
 /// This struct is used to write to a COBIA registry key. It is obtained
-/// from a [`CapeRegistryWriter`](crate::CapeRegistryWriter) and can be used to 
+/// from a `CapeRegistryWriter` and can be used to 
 /// create subkeys and write values. It is valid only for the life
 /// span of the CapeRegistryWriter.
 ///

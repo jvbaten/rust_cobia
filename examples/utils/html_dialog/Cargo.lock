@@ -72,7 +72,7 @@ checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 
 [[package]]
 name = "example"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "chrono",
  "html_dialog",
@@ -102,7 +102,7 @@ dependencies = [
 
 [[package]]
 name = "html_dialog"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "json",
  "log",

@@ -105,7 +105,7 @@ pub enum HtmlDialogResourceType<E> {
 /// through the HtmlDialogHandler interface.
 ///
 /// # Type Parameters
-/// * `T` - The handler type implementing HtmlDialogHandler<E>
+/// * `T` - The handler type implementing `HtmlDialogHandler<E>`
 /// * `E` - The event enumeration for dialog interactions
 pub struct HtmlDialog<T, E> where T: HtmlDialogHandler<E> {
     /// Map of URL paths to resources
