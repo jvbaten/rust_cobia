@@ -7,6 +7,7 @@ repository = "https://github.com/jvbaten/rust_cobia"
 description = "macros for cobia crate"
 homepage = "https://www.amsterchem.com/cobiarust.html"
 readme = "README.md"
+documentation = "https://www.amsterchem.com/rust_cobia_doc/cobia_macro/"
 
 [lib]
 proc-macro = true

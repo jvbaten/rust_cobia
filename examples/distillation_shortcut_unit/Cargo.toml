@@ -7,7 +7,7 @@ license = "MIT"
 repository = "https://github.com/jvbaten/rust_cobia"
 description = "cobia example: Distillation Short-cut CAPE-OPEN Unit Operation"
 homepage = "https://www.amsterchem.com/cobiarust.html"
-keywords = ["unit operations", "CAPE OPEN", "shortcut distillation", "chemical engineering", "process simulation"]
+keywords = ["unit-operations", "CAPE OPEN", "shortcut-distillation", "chemical-engineering", "process-simulation"]
 documentation = "https://www.amsterchem.com/rust_cobia_doc/distillation_shortcut_unit/"
 
 

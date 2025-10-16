@@ -7,7 +7,7 @@ license = "MIT"
 repository = "https://github.com/jvbaten/rust_cobia"
 description = "cobia example: CAPE-OPEN stand-alone Property Package for salt water"
 homepage = "https://www.amsterchem.com/cobiarust.html"
-keywords = ["property package", "CAPE OPEN", "sea water", "salt water", "chemical engineering", "process simulation"]
+keywords = ["property-package", "CAPE OPEN", "sea-water", "salt-water", "process-simulation"]
 documentation = "https://www.amsterchem.com/rust_cobia_doc/salt_water/"
 
 [lib]
