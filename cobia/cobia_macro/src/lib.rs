@@ -715,6 +715,9 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 			}
 		}
 
+		unsafe impl #genericdef Send for #structname #genericref {}
+		unsafe impl #genericdef Sync for #structname #genericref {}
+
 	}
 	.into()
 }

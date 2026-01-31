@@ -176,6 +176,11 @@ impl<Element:Copy+Clone,InterfacType> Default for CapeArrayVec<Element,InterfacT
     }
 }
 
+/// Allow marshaling between threads
+unsafe impl<Element:Copy+Clone,InterfacType> Send for CapeArrayVec<Element,InterfacType> {}
+/// Allow marshaling between threads
+unsafe impl<Element:Copy+Clone,InterfacType> Sync for CapeArrayVec<Element,InterfacType> {}
+
 impl<Element:Copy+Clone,InterfacType> std::ops::Index<usize> for CapeArrayVec<Element,InterfacType> {
 
 	type Output = Element;

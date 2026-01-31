@@ -81,6 +81,20 @@
 //! 
 //! Extenally implemented COBIA objects are accessed through smart pointers; an interface specific smart pointer is 
 //! generated for each known COBIA interface, along with the Rust methods that represent the interface methods.
+//!
+//! # Thread safety
+//! 
+//! Smart pointer types and object wrappers in this package are marked Send and Sync, thereby assuming that the underlying raw 
+//! pointers to external COBIA or CAPE-OPEN objects are used in correpondence with the appropriate COBIA threading model. 
+//! For example, CAPE-OPEN objects may not be accessed concurrently (this holds for example for any PME object, or any 
+//! Primary PMC Object and all its contained objects). COBIA PMCs that are marked as restricted threaded, or are 
+//! created with the allow-restricted threaded creation flag, may not be used from any thread other than the
+//! thread in which it was created. It is up to the implementation that uses this package to obey COBIA threading
+//! model rules.
+//! 
+//! Iterators and other secondary objects are not marked Send and Sync, nor are wrappers around externally implemented
+//! data types. Typically these are accessed only within the current calling context, and therefore likely contained 
+//! to the current thread. The life time to incoming data type implementations is constrained by the calling context.
 //! 
 //! # Acknowledgements
 //!

@@ -58,7 +58,7 @@ impl<'a> UnitDialogHandler<'a> {
         dlg.add("/streams".into(),HtmlDialogResourceType::Info(UnitDialogEvent::Streams));
         dlg.add("/status".into(),HtmlDialogResourceType::Info(UnitDialogEvent::GetStatus));
         dlg.add("/data_entry".into(),HtmlDialogResourceType::Info(UnitDialogEvent::DataEntry));
-        #[cfg(target_os = "windows")] let parent= Some((parent as *mut core::ffi::c_void).into());
+        #[cfg(target_os = "windows")] let parent= Some((parent.h_wnd as *mut core::ffi::c_void).into());
         dlg.set_parent(parent,true);
         dlg
     }

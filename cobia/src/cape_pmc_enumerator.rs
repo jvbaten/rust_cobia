@@ -203,6 +203,11 @@ impl CapePMCEnumerator {
 
 }
 
+/// Allow marshaling between threads
+unsafe impl Send for CapePMCEnumerator {}
+/// Allow marshaling between threads
+unsafe impl Sync for CapePMCEnumerator {}
+
 /// Release pointer
 ///
 /// ICapePMCEnumerator derives from ICobiaBase, which contains

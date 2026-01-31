@@ -12,6 +12,9 @@ use std::path::Path;
 /// Values are not written to the registry until commit() is
 /// called.
 ///
+/// This class is typically used only locally, and not marked
+/// Send or Sync.
+///
 /// # Example
 ///
 /// ```

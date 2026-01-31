@@ -16,6 +16,9 @@ pub struct CapeWindowId {
 	cocoa_window_ptr: Option<*mut std::os::raw::c_void>, //COCOA window pointer
 }
 
+unsafe impl Send for CapeWindowId{}
+unsafe impl Sync for CapeWindowId{}
+
 impl CapeWindowId {
 	pub fn new() -> CapeWindowId {
 		CapeWindowId {

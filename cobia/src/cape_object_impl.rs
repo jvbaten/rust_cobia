@@ -23,6 +23,9 @@ pub struct CapeObjectData {
 	interface_map: std::collections::HashMap<CapeUUID, *mut C::ICapeInterface>,
 }
 
+unsafe impl Send for CapeObjectData {}
+unsafe impl Sync for CapeObjectData {}
+
 /// This trait is implemented by all CAPE-OPEN objects.
 ///
 /// It is not typically needed to implement this trait directly, but rather to use the

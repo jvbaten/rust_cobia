@@ -413,6 +413,9 @@ pub struct CapeRegistryKey {
 	pub(crate) interface: *mut C::ICapeRegistryKey,
 }
 
+unsafe impl Send for CapeRegistryKey {}
+unsafe impl Sync for CapeRegistryKey {}
+
 impl CapeRegistryKey {
 
 	/// Get a reference to the root key

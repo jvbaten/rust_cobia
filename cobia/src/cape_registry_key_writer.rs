@@ -10,6 +10,9 @@ use crate::*;
 ///
 /// Values are not written to the registry until CapeRegistryWriter::commit() is
 /// called.
+///
+/// The registry writer is typically used only locally and is not 
+/// marked Send or Sync.
 
 pub struct CapeRegistryKeyWriter<'a> {
 	pub(crate) interface: *mut C::ICapeRegistryKeyWriter,

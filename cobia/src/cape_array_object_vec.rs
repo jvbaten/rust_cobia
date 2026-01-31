@@ -195,6 +195,11 @@ impl<ElementImpl,ElementInterface> std::ops::IndexMut<usize> for CapeArrayObject
 	}
 }
 
+/// Allow marshaling between threads
+unsafe impl<ElementImpl,ElementInterface> Send for CapeArrayObjectVec<ElementImpl,ElementInterface> {}
+/// Allow marshaling between threads
+unsafe impl<ElementImpl,ElementInterface> Sync for CapeArrayObjectVec<ElementImpl,ElementInterface> {}
+
 /// Vector based CapeArrayStringOut implementation
 ///
 /// ICapeArrayString is passed as data container between CAPE-OPEN functions. 

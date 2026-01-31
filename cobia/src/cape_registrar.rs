@@ -6,6 +6,8 @@ use crate::*;
 /// A CapeRegistrar object is passed to the `registration_details` function
 /// of the `CapePMC` trait implementation. It is used to register the component
 /// in the COBIA registry.
+///
+/// Typically used only locally, so no Send and Sync traits are implemented.
 
 pub struct CapeRegistrar {
 	/// Pointer to the ICapePMCRegistrar interface

@@ -7,6 +7,9 @@ use crate::*;
 /// an error interface for any call that results COBIAERR_CAPEOPENERROR.
 ///
 /// This is a smart pointer to manage the error object and call its members.
+///
+/// This class it not marked Send or Sync because the validity of the underlying
+/// error is typically short and local.
 
 pub struct CapeError {
 	pub(crate) interface: *mut C::ICapeError,
@@ -20,7 +23,7 @@ impl CapeError {
 	/// are managed through the COBIAError object, which also manages
 	/// the CapeError based errors raised by CAPE-OPEN objects.
 	///
-	/// # Arguments
+	/// # Argumentss
 	///
 	/// * `interface` - A pointer to an ICapeError interface
 	///
