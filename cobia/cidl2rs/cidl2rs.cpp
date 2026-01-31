@@ -216,6 +216,7 @@ struct MethodArgumentInfo {
 	std::string from_raw_conversion;
 	std::string init_value;
 	std::string cobia_module_name;
+	std::string doc;
 	bool need_raw_conversion{false};
 	bool need_unpack_rust_conversion{false};
 	MethodArgumentInfo()=default;
@@ -368,12 +369,20 @@ struct MethodArgumentInfo {
 				is_retval=true;
 			} else if (att_name==COBIATEXT("orphan")) {
 				//ignore, used for marshaling
+			} else if (att_name==COBIATEXT("doc")) {
+				//doc
+				CapeStringImpl doc_val;
+				arg.AttributeValue(ConstCapeString(COBIATEXT("doc")),doc_val);
+				doc=ToUTF8(doc_val.c_str()).c_str();
 			} else {
 				std::string message="invalid attribute '";
 				message+=ToUTF8(att_name.c_str()).c_str();
 				message+='\'';
 				throw std::runtime_error(message);
 			}
+		}
+		if (doc.empty()) {
+			doc=name+" parameter";
 		}
 		if (!(is_in^is_out)) {
 			throw std::runtime_error("argument must be [in] or [out]");
@@ -838,16 +847,22 @@ int main(int argc,char* argv[]) {
 				auto enm=lib.Enumeration(enum_index);
 				if (enm.Count()<2) continue; //no bit fields
 				bool is_bit_field=true;
+				int next_value=1;
 				for (int item_index=0;item_index<enm.Count()&&is_bit_field;item_index++) {
 					auto val=enm.ItemValue(item_index);
 					if (val==0) {
-						is_bit_field=false;
+						//zero value does not count
 					} else {
 						//see if power of two
-						if ((val&(val-1))!=0) {
+						if (val!=next_value) {
 							is_bit_field=false;
+							break;
 						}
+						next_value<<=1;
 					}
+				}
+				if (next_value<8) { //1, 2
+					is_bit_field=false;
 				}
 				if (is_bit_field) {
 					CapeStringImpl name;
@@ -859,14 +874,24 @@ int main(int argc,char* argv[]) {
 				code<<"use bitflags::bitflags;\n";
 			}
 		}
+		ConstCapeString attr_doc(COBIATEXT("doc"));
+		CapeStringImpl doc_val;
+		code<<"\n//library ID\n";
 		//library ID
-		code<<"\n//library ID\n"
-			  "pub const LIBRARY_ID:CapeUUID="<<lib.Uuid()<<";\n";
+		if (lib.HasAttribute(attr_doc)) {
+			lib.AttributeValue(attr_doc,doc_val);
+			code<<"\n/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n";
+		}
+		code<<"pub const LIBRARY_ID:CapeUUID="<<lib.Uuid()<<";\n";
 		//category IDs
 		if (lib.CategoryIDCount()>0) {
 			code<<"\n//Category IDs\n";
 			for (int category_index=0;category_index<lib.CategoryIDCount();category_index++) {
 				auto cat=lib.CategoryID(category_index);
+				if (cat.HasAttribute(attr_doc)) {
+					cat.AttributeValue(attr_doc,doc_val);
+					code<<"\n/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n";
+				}
 				code<<"pub const CATEGORYID_";
 				CapeStringImpl _cat_name;
 				cat.Name(_cat_name);
@@ -882,10 +907,11 @@ int main(int argc,char* argv[]) {
 			code<<"\n//Interface IDs\n";
 			for (int interface_index=0;interface_index<lib.InterfaceCount();interface_index++) {
 				auto iface=lib.Interface(interface_index);
-				code<<"pub const ";
 				CapeStringImpl _iface_name;
 				iface.Name(_iface_name);
 				std::string iface_name=ToUTF8(_iface_name.c_str()).c_str();
+				code<<"\n/// UUID for "<<iface_name<<"\n";
+				code<<"pub const ";
 				for (auto& c:iface_name) {
 					code<<static_cast<char>(std::toupper(c));
 				}
@@ -901,30 +927,53 @@ int main(int argc,char* argv[]) {
 				enm.Name(_enm_name);
 				std::string enm_name=ToUTF8(_enm_name.c_str()).c_str();
 				if (bitfields.contains(_enm_name)) {
-					code<<"bitflags! {\n"
-						<<"\t#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]\n"
+					code<<"\nbitflags! {\n\n"
+						"\t/// "<<enm_name<<"\n"
+						"\t///\n"
+						"\t/// "<<enm_name<<" enumeration\n"
+						"\t///\n";
+						if (enm.HasAttribute(attr_doc)) {
+							enm.AttributeValue(attr_doc,doc_val);
+							code<<"\t/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n\n";
+						}
+					code<<"\t#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]\n"
 						<<"\tpub struct "<<enm_name<<": u32 {\n";
 					for (int item_index=0;item_index<enm.Count();item_index++) {
+						auto enmv=enm.Item(item_index);
+						int value=enmv.Value();
 						CapeStringImpl _item_name;
-						enm.ItemName(item_index,_item_name);
+						enmv.Name(_item_name);
+						if (enmv.HasAttribute(attr_doc)) {
+							enmv.AttributeValue(attr_doc,doc_val);
+							code<<"\t\t/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n";
+						}
 						std::string item_name=MakeCamelCase(ToUTF8(_item_name.c_str()).c_str());
-						code<<"\t\t"<<item_name<<" = "<<enm.ItemValue(item_index)<<",\n";
+						code<<"\t\tconst "<<item_name<<" = "<<value<<";\n";
 					}
 					code<<"\t}\n"
 					    <<"}\n\n";
 				} else {
-					code<<"///"<<enm_name<<"\n"
+					code<<"\n/// "<<enm_name<<"\n"
 						"///\n"
-						"///"<<enm_name<<" enumeration\n"
-						"///\n"
-						"#[repr(i32)]\n"
+						"/// "<<enm_name<<" enumeration\n"
+						"///\n";
+					if (enm.HasAttribute(attr_doc)) {
+						enm.AttributeValue(attr_doc,doc_val);
+						code<<"/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n\n";
+					}
+					code<<"#[repr(i32)]\n"
 						"#[derive(Debug,PartialEq,Eq,Clone,Copy)]\n"
 						"pub enum "<<enm_name<<" {\n";
 					for (int item_index=0;item_index<enm.Count();item_index++) {
+						auto enmv=enm.Item(item_index);
 						CapeStringImpl _item_name;
-						enm.ItemName(item_index,_item_name);
+						enmv.Name(_item_name);
 						std::string item_name=MakeCamelCase(ToUTF8(_item_name.c_str()).c_str());
-						code<<"\t"<<item_name<<" = "<<enm.ItemValue(item_index)<<",\n";
+						if (enmv.HasAttribute(attr_doc)) {
+							enmv.AttributeValue(attr_doc,doc_val);
+							code<<"\t/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n";
+						}
+						code<<"\t"<<item_name<<" = "<<enmv.Value()<<",\n";
 					}
 					code<<"}\n"
 					    <<"\n"
@@ -938,14 +987,14 @@ int main(int argc,char* argv[]) {
 						"\t/// # Examples\n"
 						"\t///\n"
 						"\t/// ```\n"
-						"\t///use cobia::*;\n"
-						"\t///use "<<this_module_name<<"::"<<enm_name<<";\n";
+						"\t/// use cobia::*;\n"
+						"\t/// use "<<this_module_name<<"::"<<enm_name<<";\n";
 					for (int enum_index_1=0;enum_index_1<enm.Count();enum_index_1++) {
 						CapeStringImpl _item_name;
 						enm.ItemName(enum_index_1,_item_name);
 						std::string item_name=MakeCamelCase(ToUTF8(_item_name.c_str()).c_str());
-						code<<"\t///let v"<<enum_index_1<<"="<<enm_name<<"::from("<<enm.ItemValue(enum_index_1)<<");\n";
-						code<<"\t///assert_eq!(v"<<enum_index_1<<".unwrap(),"<<enm_name<<"::"<<item_name<<");\n";
+						code<<"\t/// let v"<<enum_index_1<<"="<<enm_name<<"::from("<<enm.ItemValue(enum_index_1)<<");\n";
+						code<<"\t/// assert_eq!(v"<<enum_index_1<<".unwrap(),"<<enm_name<<"::"<<item_name<<");\n";
 					}
 					code<<"\t/// ```\n"
 						"\tpub fn from(value: i32) -> Option<"<<enm_name<<"> {\n"
@@ -976,7 +1025,7 @@ int main(int argc,char* argv[]) {
 					}
 					code<<"\t\t}\n"
 						"\t}\n"
-						"\t///get an iterator\n"
+						"\t/// get an iterator\n"
 						"\t///\n"
 						"\t/// # Examples\n"
 						"\t///\n"
@@ -1036,11 +1085,15 @@ int main(int argc,char* argv[]) {
 				iface.Name(_iface_name);
 				std::string iface_name=ToUTF8(_iface_name.c_str()).c_str();
 				//interface definition
-				code<<"///"<<iface_name<<"\n"
+				code<<"\n/// "<<iface_name<<"\n"
 					"///\n"
-					"///"<<iface_name<<" interface\n"
-					"///\n"
-					"pub trait "<<iface_name;
+					"/// "<<iface_name<<" interface\n"
+					"///\n";
+				if (iface.HasAttribute(attr_doc)) {
+					iface.AttributeValue(attr_doc,doc_val);
+					code<<"/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n///\n\n";
+				}
+				code<<"pub trait "<<iface_name;
 				if (iface.TemplateArgCount()>0) {
 					//template arguments
 					code<<'<';
@@ -1077,21 +1130,22 @@ int main(int argc,char* argv[]) {
 							CapeStringImpl _long_name;
 							method.AttributeValue(attribute_index,_long_name);
 							method_name=ToUTF8(_long_name.c_str()).c_str();
-						} else {
+						} else if (att_name!=COBIATEXT("doc")) {
 							//print error and exit
 							std::cerr<<"Error: Method "<<method_name<<" of interface "<<iface_name<<" has invalid attribute "<<ToUTF8(att_name.c_str()).c_str()<<'\n';
 							return 1;
 						}
 					}
 					std::string method_name_snake_case=to_snake_case(method_name);
-					code<<"\tfn "<<method_name_snake_case<<"(&mut self";
-					if (method.ReturnType().Type()!=IDL::CapeIDLDataType::IDLDataType_CapeResult) {
-						//print error and exit
-						std::cerr<<"Error: Method "<<method_name<<" of interface "<<iface_name<<" does not return a CAPERESULT\n";
-						return 1;
+					if (method.HasAttribute(attr_doc)) {
+						method.AttributeValue(attr_doc,doc_val);
+						code<<"\n\t/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n\t///\n";
+					} else {
+						code<<"\n\t/// "<<method_name_snake_case<<" method\n\t///\n";
 					}
-					std::vector<std::string> retval_types;
+					//doc for arguments and return value
 					std::vector<MethodArgumentInfo>& args=method_args[method_index];
+					std::vector<MethodArgumentInfo*> in_args,out_args;
 					args.resize(method.ArgumentCount());
 					for (int argument_index=0;argument_index<method.ArgumentCount();argument_index++) {
 						auto arg=method.Argument(argument_index);
@@ -1104,6 +1158,65 @@ int main(int argc,char* argv[]) {
 							std::cerr<<"Error: argument "<<ToUTF8(_arg_name.c_str()).c_str()<<" of method "<<method_name<<" of interface "<<iface_name<<": "<<exception.what()<<'\n';
 							return 1;
 						}
+						// - all [out] interfaces go as return values
+						// - data interfaces always are input.
+						// - basic data types are only return value if [retval]
+						bool is_out=false;
+						if (arg_info.is_retval&&arg_info.is_basic_data_type) {
+							is_out=true;
+						} else if (arg_info.is_interface) {
+							is_out=arg_info.is_interface;
+						} 
+						if (is_out) {
+							out_args.push_back(&arg_info);
+						} else {
+							in_args.push_back(&arg_info);
+						}
+					}
+					if (!in_args.empty()) {
+						code<<"\t///\n"
+							"\t/// # Arguments\n";
+						for (auto in_arg:in_args) {
+							code<<"\t/// * `"<<in_arg->name<<"` - "<<in_arg->doc<<"\n";
+						}
+					}
+					//return value doc
+					code<<"\t///\n"
+						"\t/// # Returns\n"
+						"\t/// * Result<";
+					if (out_args.size()==1) {
+						//not as tuple
+						code<<'\''<<out_args[0]->name<<'\'';
+					} else {
+						//empty or multiple values as tuple
+						code<<'(';
+						for (size_t retval_index=0;retval_index<out_args.size();retval_index++) {
+							if (retval_index) {
+								code<<',';
+							}
+							code<<'`'<<out_args[retval_index]->name<<'`';
+						}
+						code<<')';
+					}
+					code<<",COBIAError> - Ok if successful, Err if there was an error\n";
+					if (!out_args.empty()) {
+						code<<"\t///\n"
+							"\t/// where\n"
+							"\t///\n";
+						for (auto &out_arg:out_args) {
+							code<<"\t/// * `"<<out_arg->name<<"` - "<<out_arg->doc<<"\n";
+						}
+					}
+					code<<"\tfn "<<method_name_snake_case<<"(&mut self";
+					if (method.ReturnType().Type()!=IDL::CapeIDLDataType::IDLDataType_CapeResult) {
+						//print error and exit
+						std::cerr<<"Error: Method "<<method_name<<" of interface "<<iface_name<<" does not return a CAPERESULT\n";
+						return 1;
+					}
+					std::vector<std::string> retval_types;
+					for (int argument_index=0;argument_index<method.ArgumentCount();argument_index++) {
+						auto arg=method.Argument(argument_index);
+						MethodArgumentInfo& arg_info=args[argument_index];
 						// - all [out] interfaces go as return values
 						// - data interfaces always are input.
 						// - basic data types are only return value if [retval]
@@ -1170,12 +1283,15 @@ int main(int argc,char* argv[]) {
 					templ_args_short+='>';
 				}
 				code<<"}\n\n"
+					"/// COBIA interface implementation for "<<iface_name<<"\n\n"
 					"pub trait "<<iface_name<<"Impl"<<templ_args_long<<" : "<<iface_name<<templ_args_short<<" {\n"
+					"\t/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro\n"
 					"\ttype T: ICapeInterfaceImpl+"<<iface_name<<"Impl"<<templ_args_short<<";\n"
 					"\n"
+					"\t/// Cast to interface pointer, implemented by the object typically implemented by the `cape_object_implementation` macro\n"
 					"\tfn as_interface_pointer(&mut self) -> *mut "<<cobia_module_name<<"::C::ICapeInterface;\n"
 					"\n"
-					"\t///prepare "<<native_namespace<<'_'<<iface_name<<" interface and return as generic ICapeInterface pointer\n"
+					"\t/// prepare "<<native_namespace<<'_'<<iface_name<<" interface and return as generic ICapeInterface pointer\n"
 					"\tfn init_interface() -> "<<cobia_module_name<<"::C::ICapeInterface {\n"<<
 					"\t\t"<<cobia_module_name<<"::C::ICapeInterface {\n"
 					"\t\t\tme: std::ptr::null_mut(),\n"
@@ -1184,6 +1300,7 @@ int main(int argc,char* argv[]) {
 					"\t\t}\n"
 					"\t}\n"
 					"\t\n"
+					"\t/// Initialize the interface pointer and add it to the interface table of the object implementing `ICapeInterfaceImpl`, typically through the `cape_object_implementation` macro\n"
 					"\tfn init<Timpl: "<<iface_name<<"Impl"<<templ_args_short<<"+ICapeInterfaceImpl>(u: &mut Timpl) {\n"
 					"\t\tlet iface: *mut "<<cobia_module_name<<"::C::"<<native_namespace<<'_'<<iface_name<<" =\n"
 					"\t\t\tu.as_interface_pointer() as *mut "<<native_module<<"::"<<native_namespace<<'_'<<iface_name<<";\n"
@@ -1215,14 +1332,19 @@ int main(int argc,char* argv[]) {
 							CapeStringImpl _long_name;
 							method.AttributeValue(attribute_index,_long_name);
 							method_name=ToUTF8(_long_name.c_str()).c_str();
-						} else {
+						} else if (att_name!=COBIATEXT("doc")) {
 							//print error and exit
 							std::cerr<<"Error: Method "<<method_name<<" of interface "<<iface_name<<" has invalid attribute "<<ToUTF8(att_name.c_str()).c_str()<<'\n';
 							return 1;
 						}
 					}
 					native_method_names[method_index]=MakeNativeMethodName(method_name);
-					code<<"\textern \"C\" fn "<<native_method_names[method_index]<<"(me: *mut std::ffi::c_void";
+					code<<"\t/// Interface function pointer for "<<iface_name<<"::"<<method_name<<"\n"
+						"\t///\n"
+						"\t/// # Safety\n"
+						"\t///\n"
+						"\t/// This is an extern \"C\" function called from native code. Do not call directly.\n"
+						 "\textern \"C\" fn "<<native_method_names[method_index]<<"(me: *mut std::ffi::c_void";
 					std::vector<MethodArgumentInfo>& args=method_args[method_index];
 					std::vector<std::string> non_null_arg_names;
 					for (MethodArgumentInfo &arg_info:args) {
@@ -1402,7 +1524,8 @@ int main(int argc,char* argv[]) {
 						"\n";
 				}
 				//VTable definition
-				code<<"\tconst VTABLE: "<<native_module<<"::"<<lib_name<<'_'<<iface_name<<"_VTable =\n"
+				code<<"\t/// VTable for "<<iface_name<<" interface\n"
+					"\tconst VTABLE: "<<native_module<<"::"<<lib_name<<'_'<<iface_name<<"_VTable =\n"
 					"\t\t"<<native_module<<"::"<<lib_name<<'_'<<iface_name<<"_VTable {\n"
 					"\t\t\tbase: "<<cobia_module_name<<"::C::ICapeInterface_VTable {\n"
 					"\t\t\t\taddReference: Some(Self::T::raw_add_reference),\n"
@@ -1428,7 +1551,7 @@ int main(int argc,char* argv[]) {
 							CapeStringImpl _long_name;
 							method.AttributeValue(attribute_index,_long_name);
 							method_name=ToUTF8(_long_name.c_str()).c_str();
-						} else {
+						} else if (att_name!=COBIATEXT("doc")){
 							//print error and exit
 							std::cerr<<"Error: Method "<<method_name<<" of interface "<<iface_name<<" has invalid attribute "<<ToUTF8(att_name.c_str()).c_str()<<'\n';
 							return 1;
@@ -1454,8 +1577,16 @@ int main(int argc,char* argv[]) {
 				for (char& c:upper_case_iface_name) {
 					c=static_cast<char>(std::toupper(c));
 				}
-				code<<"#[cape_smart_pointer("<<upper_case_iface_name<<"_UUID)]\n"
+				code<<"/// Smart pointer for "<<iface_name<<"\n"
+					"///\n"
+					"/// This provides rust-callable functions for an externally implemented "<<iface_name<<" interface\n";
+				if (iface.HasAttribute(attr_doc)) {
+					iface.AttributeValue(attr_doc,doc_val);
+					code<<"/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n///\n";
+				}
+				code<<"\n#[cape_smart_pointer("<<upper_case_iface_name<<"_UUID)]\n"
 					"pub struct "<<smart_pointer_name<<templ_args_long<<" {\n"
+					"\t/// Pointer to the native "<<iface_name<<" interface\n"
 					"\t"<<pubcrate<<" interface: *mut "<<native_module<<"::"<<native_namespace<<"_"<<iface_name<<",\n";
 				std::vector<std::string> template_phantom_names;
 				template_phantom_names.reserve(iface.TemplateArgCount());
@@ -1466,7 +1597,8 @@ int main(int argc,char* argv[]) {
 					template_phantom_names.emplace_back();
 					std::string &phantom_name=template_phantom_names.back();
 					phantom_name="phantom_"+to_snake_case(template_name);
-					code<<'\t'<<phantom_name<<" : PhantomData<"<<template_name<<">,\n";
+					code<<"\t/// Phantom data for type template argument "<<template_name<<"\n"
+						<<'\t'<<phantom_name<<" : PhantomData<"<<template_name<<">,\n";
 				}
 				code<<"}\n"
 					"\n"
@@ -1494,7 +1626,7 @@ int main(int argc,char* argv[]) {
 							method.AttributeValue(attribute_index,_long_name);
 							method_name=ToUTF8(_long_name.c_str()).c_str();
 							raw_method_name=method_name;
-						} else {
+						} else if (att_name!=COBIATEXT("doc")) {
 							//print error and exit
 							std::cerr<<"Error: Method "<<method_name<<" of interface "<<iface_name<<" has invalid attribute "<<ToUTF8(att_name.c_str()).c_str()<<'\n';
 							return 1;
@@ -1511,6 +1643,76 @@ int main(int argc,char* argv[]) {
 						}
 					}
 					//header
+					if (method.HasAttribute(attr_doc)) {
+						method.AttributeValue(attr_doc,doc_val);
+						code<<"\n\t/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n\t///\n";
+					} else {
+						code<<"\n\t/// "<<snake_case_method_name<<" method\n\t///\n";
+					}
+					//doc for arguments and return value
+					std::vector<MethodArgumentInfo>& args=method_args[method_index];
+					std::vector<MethodArgumentInfo*> in_args,out_args;
+					args.resize(method.ArgumentCount());
+					for (int argument_index=0;argument_index<method.ArgumentCount();argument_index++) {
+						auto arg=method.Argument(argument_index);
+						MethodArgumentInfo& arg_info=args[argument_index];
+						try {
+							arg_info=MethodArgumentInfo{arg,iface,resolver,lib_name,cobia_module_name,native_module,native_namespace};
+						} catch (std::exception &exception) {
+							CapeStringImpl _arg_name;
+							arg.Name(_arg_name);
+							std::cerr<<"Error: argument "<<ToUTF8(_arg_name.c_str()).c_str()<<" of method "<<method_name<<" of interface "<<iface_name<<": "<<exception.what()<<'\n';
+							return 1;
+						}
+						// - all [out] interfaces go as return values
+						// - data interfaces always are input.
+						// - basic data types are only return value if [retval]
+						bool is_out=false;
+						if (arg_info.is_retval&&arg_info.is_basic_data_type) {
+							is_out=true;
+						} else if (arg_info.is_interface) {
+							is_out=arg_info.is_interface;
+						} 
+						if (is_out) {
+							out_args.push_back(&arg_info);
+						} else {
+							in_args.push_back(&arg_info);
+						}
+					}
+					if (!in_args.empty()) {
+						code<<"\t///\n"
+							"\t/// # Arguments\n";
+						for (auto in_arg:in_args) {
+							code<<"\t/// * `"<<in_arg->name<<"` - "<<in_arg->doc<<"\n";
+						}
+					}
+					//return value doc
+					code<<"\t///\n"
+						"\t/// # Returns\n"
+						"\t/// * Result<";
+					if (out_args.size()==1) {
+						//not as tuple
+						code<<'\''<<out_args[0]->name<<'\'';
+					} else {
+						//empty or multiple values as tuple
+						code<<'(';
+						for (size_t retval_index=0;retval_index<out_args.size();retval_index++) {
+							if (retval_index) {
+								code<<',';
+							}
+							code<<'`'<<out_args[retval_index]->name<<'`';
+						}
+						code<<')';
+					}
+					code<<",COBIAError> - Ok if successful, Err if there was an error\n";
+					if (!out_args.empty()) {
+						code<<"\t///\n"
+							"\t/// where\n"
+							"\t///\n";
+						for (auto &out_arg:out_args) {
+							code<<"\t/// * `"<<out_arg->name<<"` - "<<out_arg->doc<<"\n";
+						}
+					}
 					code<<"\tpub fn "<<snake_case_method_name;
 					std::string arg_list;
 					bool first_arg=true;
