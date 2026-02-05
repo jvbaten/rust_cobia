@@ -266,13 +266,13 @@ impl CapeStringProviderIn for CapeStringConstNoCase {
 /// Class to store a platform dependent string encoding for use in case
 /// insensitive hash maps or for use of case insensitive comparisons.
 ///
-/// For COBIA, strings go over the pipeline as null terminated.
-/// For most platsforms, COBIA requires UTF-8 encoding.
+/// For COBIA, strings go over the pipeline
+///  as null terminated. For Windows, COBIA requires UTF-16 encoding.
 ///
-/// The CapeStringHashKey implementation uses a `CapeStringConstNoCase` to store,
-/// owned string data, or allows reference to data provided by any 
-/// class that implements CapeStringConstProvider, so that a copy of 
-/// the data is not needed for hash lookups.
+/// The CapeStringHashKey implementation uses a `CapeStringConstNoCase` 
+/// to store, owned string data, or allows reference to data provided 
+/// by any class that implements CapeStringConstProvider, so that 
+/// a copy of the data is not needed for hash lookups.
 ///
 /// A convenience class [`CapeOpenMap`] is defined, that uses the 
 /// more performant hasher in the FxHasmap class and wraps members
@@ -280,21 +280,32 @@ impl CapeStringProviderIn for CapeStringConstNoCase {
 ///
 /// Note that this type cannot serve as a cape string provider, as
 /// this would require a mutable interface pointer.
+///
+/// # Safety
+///
+/// The borrowed variant of this type contains a raw pointer to data that is not 
+/// owned by this type. The life span of this data must be guaranteed to be longer
+/// than the life span of the key. The CapeStringHashKey does not contain 
+/// a life time parameter for the data, as this severly impedes the use of 
+/// get_mut() and other mutable methods of the hash map.
+///
+/// To ensure that errors are not easily made, the CapeStringHashKey is not
+/// public, and the public methods for inserting and lookup use the key 
+/// content instead.
 
 #[derive(Debug)]
-pub enum CapeStringHashKey<'a> {
+pub(crate) enum CapeStringHashKey {
 	Owned(CapeStringConstNoCase),
-	Borrowed(*const C::CapeCharacter, C::CapeSize,std::marker::PhantomData<&'a ()>),
+	Borrowed(*const C::CapeCharacter, C::CapeSize),
 }
-
 
 //Borrewed keys have a local, limited time span 
 //and are not shared between threads; Owned keys 
 //are constant and safe to share
-unsafe impl<'a> Send for CapeStringHashKey<'a> {}
-unsafe impl<'a> Sync for CapeStringHashKey<'a> {} 
+unsafe impl Send for CapeStringHashKey {}
+unsafe impl Sync for CapeStringHashKey {} 
 
-impl<'a> CapeStringHashKey<'a> {
+impl CapeStringHashKey {
 
 	///Construct from string that owns the data
 	///
@@ -322,25 +333,21 @@ impl<'a> CapeStringHashKey<'a> {
 	///
 	/// * `c` - A string constant reference 
 	///
-	pub fn from_string_constant<'b,T:CapeStringConstProvider>(c: &'b T) -> CapeStringHashKey<'b> {
+	/// # Safety
+	/// 
+	/// This returns a borrowed key without life time checking; must only be used
+	/// internally in CapeOpenMap methods.
+	pub fn borrowed_from_string_constant<T:CapeStringConstProvider>(c: &T) -> CapeStringHashKey {
 		let (ptr,len)=c.as_capechar_const_with_length();
-		CapeStringHashKey::Borrowed(ptr,len,std::default::Default::default())
+		CapeStringHashKey::Borrowed(ptr,len)
 	}
 	///Return as string
-	///
-	/// # Examples
-	///
-	/// ```
-	/// use cobia;
-	/// let s=cobia::CapeStringHashKey::from_string("idealGasEnthalpy");
-	/// assert_eq!(s.as_string(),"idealgasenthalpy"); //note that CapeStringConstNoCase stores strings in lower case
-	/// ```
 	pub fn as_string(&self) -> String {
 		let (ptr,len)=match self {
 			CapeStringHashKey::Owned(str_no_case) => {
 				str_no_case.as_capechar_const_with_length()
 			}
-			CapeStringHashKey::Borrowed(ptr,len,_) => {
+			CapeStringHashKey::Borrowed(ptr,len) => {
 				(*ptr,*len)
 			}
 		};
@@ -354,7 +361,7 @@ impl<'a> CapeStringHashKey<'a> {
 
 }
 
-impl<'a> std::fmt::Display for CapeStringHashKey<'a> {
+impl std::fmt::Display for CapeStringHashKey {
 	/// Formats the CapeStringConstNoCase error using the given formatter.
 	///
 	/// # Examples
@@ -369,7 +376,7 @@ impl<'a> std::fmt::Display for CapeStringHashKey<'a> {
 			CapeStringHashKey::Owned(str_no_case) => {
 				str_no_case.as_capechar_const_with_length()
 			}
-			CapeStringHashKey::Borrowed(ptr,len,_) => {
+			CapeStringHashKey::Borrowed(ptr,len) => {
 				(*ptr,*len)
 			}
 		};
@@ -382,7 +389,7 @@ impl<'a> std::fmt::Display for CapeStringHashKey<'a> {
 	}
 }
 
-impl<'a> PartialEq for CapeStringHashKey<'a> {
+impl PartialEq for CapeStringHashKey {
 	fn eq(&self, other: &Self) -> bool {
 		//optimize for owned vs borrowed, owned strings are already in lower case
 		match self {
@@ -391,7 +398,7 @@ impl<'a> PartialEq for CapeStringHashKey<'a> {
 					CapeStringHashKey::Owned(other_data) => {
 						data==other_data //both are already lower case
 					}
-					CapeStringHashKey::Borrowed(other_ptr,other_len,_) => {
+					CapeStringHashKey::Borrowed(other_ptr,other_len) => {
 						let (my_ptr,my_len)=data.as_capechar_const_with_length();
 						let my_slice=unsafe{std::slice::from_raw_parts(my_ptr as *const u8,my_len as usize)};
 						let my_str=String::from_utf8_lossy(my_slice);
@@ -414,7 +421,7 @@ impl<'a> PartialEq for CapeStringHashKey<'a> {
 					}
 				}
 			},
-			CapeStringHashKey::Borrowed(my_ptr,my_len,_) => {
+			CapeStringHashKey::Borrowed(my_ptr,my_len) => {
 				let my_slice=unsafe{std::slice::from_raw_parts(*my_ptr as *const u8,*my_len as usize)};
 				let my_str=String::from_utf8_lossy(my_slice);
 				let mut my_it=my_str.chars();
@@ -437,7 +444,7 @@ impl<'a> PartialEq for CapeStringHashKey<'a> {
 							}
 						}
 					}
-					CapeStringHashKey::Borrowed(other_ptr,other_len,_) => {
+					CapeStringHashKey::Borrowed(other_ptr,other_len) => {
 						let other_slice=unsafe{std::slice::from_raw_parts(*other_ptr as *const u8,*other_len as usize)};
 						let other_str=String::from_utf8_lossy(other_slice);
 						let mut other_it=other_str.chars();
@@ -460,9 +467,9 @@ impl<'a> PartialEq for CapeStringHashKey<'a> {
 	}
 }
 
-impl<'a> Eq for CapeStringHashKey<'a> {}
+impl Eq for CapeStringHashKey {}
 
-impl<'a> std::hash::Hash for CapeStringHashKey<'a> {
+impl std::hash::Hash for CapeStringHashKey {
 	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
 		match self {
 			CapeStringHashKey::Owned(data) => {
@@ -474,7 +481,7 @@ impl<'a> std::hash::Hash for CapeStringHashKey<'a> {
 					c.hash(state); //already lower case
 				}
 			}
-			CapeStringHashKey::Borrowed(my_ptr,my_len,_) => {
+			CapeStringHashKey::Borrowed(my_ptr,my_len) => {
 				let slice=unsafe{std::slice::from_raw_parts(*my_ptr as *const u8,*my_len as usize)};
 				let str=String::from_utf8_lossy(slice);
 				let it=str.chars();

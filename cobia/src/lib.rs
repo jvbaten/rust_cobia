@@ -147,7 +147,6 @@ mod cape_string_impl;
 pub use cape_string_impl::CapeStringImpl;
 mod cape_string_const;
 pub use cape_string_const::CapeStringConstNoCase;
-pub use cape_string_const::CapeStringHashKey;
 mod cape_string_map;
 pub use cape_string_map::CapeOpenMap;
 mod cape_array_vec;

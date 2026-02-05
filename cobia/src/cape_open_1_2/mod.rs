@@ -858,7 +858,7 @@ bitflags! {
 ///
 /// CapePhaseStatus enumeration
 ///
-/// Enumeration that indicates the status of a phase in a material object; meaning only useful in context of phase equilibrium calculation.
+/// Enumeration that indicates the status of a Phase in a Material Object; meaning only useful in context of phase equilibrium calculation.
 
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
@@ -2288,7 +2288,7 @@ pub trait ICapeParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the parameter is in a valid state, false otherwise
+	/// * `is_ok` - True if the parameter is in a valid state, False otherwise
 	fn validate(&mut self,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Resets the parameter to its default value.
@@ -2545,7 +2545,7 @@ impl CapeParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the parameter is in a valid state, false otherwise
+	/// * `is_ok` - True if the parameter is in a valid state, False otherwise
 	pub fn validate<TypeOfMessage:CapeStringProviderOut>(&self,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -2661,7 +2661,7 @@ pub trait ICapeRealParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:CapeReal,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -3003,7 +3003,7 @@ impl CapeRealParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfMessage:CapeStringProviderOut>(&self,value:CapeReal,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -3093,7 +3093,7 @@ pub trait ICapeIntegerParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:CapeInteger,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -3393,7 +3393,7 @@ impl CapeIntegerParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfMessage:CapeStringProviderOut>(&self,value:CapeInteger,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -3465,7 +3465,7 @@ pub trait ICapeStringParameter {
 	///
 	/// where
 	///
-	/// * `restricted` - True if the parameter value is restricted to the option list, false otherwise
+	/// * `restricted` - True if the parameter value is restricted to the option list, False otherwise
 	fn get_restricted_to_list(&mut self) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for the parameter.
@@ -3480,7 +3480,7 @@ pub trait ICapeStringParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:&CapeStringIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -3757,7 +3757,7 @@ impl CapeStringParameter {
 	///
 	/// where
 	///
-	/// * `restricted` - True if the parameter value is restricted to the option list, false otherwise
+	/// * `restricted` - True if the parameter value is restricted to the option list, False otherwise
 	pub fn get_restricted_to_list(&self) -> Result<CapeBoolean,COBIAError> {
 		let mut restricted:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -3782,7 +3782,7 @@ impl CapeStringParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfValue:CapeStringProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -3850,7 +3850,7 @@ pub trait ICapeBooleanParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:CapeBoolean,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -4066,7 +4066,7 @@ impl CapeBooleanParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfMessage:CapeStringProviderOut>(&self,value:CapeBoolean,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -4364,7 +4364,7 @@ pub trait ICapeArrayRealParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate_element(&mut self,position:&CapeArrayIntegerIn,value:CapeReal,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for the array parameter.
@@ -4379,7 +4379,7 @@ pub trait ICapeArrayRealParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:&CapeArrayRealIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -4833,7 +4833,7 @@ impl CapeArrayRealParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate_element<TypeOfPosition:CapeArrayIntegerProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,position:&TypeOfPosition,value:CapeReal,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -4858,7 +4858,7 @@ impl CapeArrayRealParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfValue:CapeArrayRealProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -4973,7 +4973,7 @@ pub trait ICapeArrayIntegerParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate_element(&mut self,position:&CapeArrayIntegerIn,value:CapeInteger,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for the array parameter.
@@ -4988,7 +4988,7 @@ pub trait ICapeArrayIntegerParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:&CapeArrayIntegerIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -5400,7 +5400,7 @@ impl CapeArrayIntegerParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate_element<TypeOfPosition:CapeArrayIntegerProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,position:&TypeOfPosition,value:CapeInteger,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -5425,7 +5425,7 @@ impl CapeArrayIntegerParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfValue:CapeArrayIntegerProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -5519,7 +5519,7 @@ pub trait ICapeArrayStringParameter {
 	///
 	/// where
 	///
-	/// * `restricted` - True if the parameter element value is restricted to the option list, false otherwise
+	/// * `restricted` - True if the parameter element value is restricted to the option list, False otherwise
 	fn get_restricted_to_list(&mut self) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for an element of the array parameter at the specified position.
@@ -5535,7 +5535,7 @@ pub trait ICapeArrayStringParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate_element(&mut self,position:&CapeArrayIntegerIn,value:&CapeStringIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for the array parameter.
@@ -5550,7 +5550,7 @@ pub trait ICapeArrayStringParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:&CapeArrayStringIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -5936,7 +5936,7 @@ impl CapeArrayStringParameter {
 	///
 	/// where
 	///
-	/// * `restricted` - True if the parameter element value is restricted to the option list, false otherwise
+	/// * `restricted` - True if the parameter element value is restricted to the option list, False otherwise
 	pub fn get_restricted_to_list(&self) -> Result<CapeBoolean,COBIAError> {
 		let mut restricted:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -5962,7 +5962,7 @@ impl CapeArrayStringParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate_element<TypeOfPosition:CapeArrayIntegerProviderIn,TypeOfValue:CapeStringProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,position:&TypeOfPosition,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -5987,7 +5987,7 @@ impl CapeArrayStringParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfValue:CapeArrayStringProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -6080,7 +6080,7 @@ pub trait ICapeArrayBooleanParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate_element(&mut self,position:&CapeArrayIntegerIn,value:CapeBoolean,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for the array parameter.
@@ -6095,7 +6095,7 @@ pub trait ICapeArrayBooleanParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:&CapeArrayBooleanIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -6423,7 +6423,7 @@ impl CapeArrayBooleanParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate_element<TypeOfPosition:CapeArrayIntegerProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,position:&TypeOfPosition,value:CapeBoolean,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -6448,7 +6448,7 @@ impl CapeArrayBooleanParameter {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfValue:CapeArrayBooleanProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -6652,7 +6652,7 @@ pub trait ICapeRealParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:CapeReal,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -6918,7 +6918,7 @@ impl CapeRealParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfMessage:CapeStringProviderOut>(&self,value:CapeReal,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -6987,7 +6987,7 @@ pub trait ICapeIntegerParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:CapeInteger,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -7211,7 +7211,7 @@ impl CapeIntegerParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfMessage:CapeStringProviderOut>(&self,value:CapeInteger,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -7263,7 +7263,7 @@ pub trait ICapeStringParameterSpecification {
 	///
 	/// where
 	///
-	/// * `restricted` - True if the parameter value is restricted to the option list, false otherwise
+	/// * `restricted` - True if the parameter value is restricted to the option list, False otherwise
 	fn get_restricted_to_list(&mut self) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for the parameter.
@@ -7278,7 +7278,7 @@ pub trait ICapeStringParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:&CapeStringIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -7478,7 +7478,7 @@ impl CapeStringParameterSpecification {
 	///
 	/// where
 	///
-	/// * `restricted` - True if the parameter value is restricted to the option list, false otherwise
+	/// * `restricted` - True if the parameter value is restricted to the option list, False otherwise
 	pub fn get_restricted_to_list(&self) -> Result<CapeBoolean,COBIAError> {
 		let mut restricted:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -7503,7 +7503,7 @@ impl CapeStringParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfValue:CapeStringProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -7550,7 +7550,7 @@ pub trait ICapeBooleanParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:CapeBoolean,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -7690,7 +7690,7 @@ impl CapeBooleanParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfMessage:CapeStringProviderOut>(&self,value:CapeBoolean,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -7943,7 +7943,7 @@ pub trait ICapeArrayRealParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate_element(&mut self,position:&CapeArrayIntegerIn,value:CapeReal,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for the array parameter.
@@ -7958,7 +7958,7 @@ pub trait ICapeArrayRealParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:&CapeArrayRealIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -8253,7 +8253,7 @@ impl CapeArrayRealParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate_element<TypeOfPosition:CapeArrayIntegerProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,position:&TypeOfPosition,value:CapeReal,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -8278,7 +8278,7 @@ impl CapeArrayRealParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfValue:CapeArrayRealProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -8348,7 +8348,7 @@ pub trait ICapeArrayIntegerParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate_element(&mut self,position:&CapeArrayIntegerIn,value:CapeInteger,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for the array parameter.
@@ -8363,7 +8363,7 @@ pub trait ICapeArrayIntegerParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:&CapeArrayIntegerIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -8616,7 +8616,7 @@ impl CapeArrayIntegerParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate_element<TypeOfPosition:CapeArrayIntegerProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,position:&TypeOfPosition,value:CapeInteger,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -8641,7 +8641,7 @@ impl CapeArrayIntegerParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfValue:CapeArrayIntegerProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -8693,7 +8693,7 @@ pub trait ICapeArrayStringParameterSpecification {
 	///
 	/// where
 	///
-	/// * `restricted` - True if the parameter element value is restricted to the option list, false otherwise
+	/// * `restricted` - True if the parameter element value is restricted to the option list, False otherwise
 	fn get_restricted_to_list(&mut self) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for an element of the array parameter at the specified position.
@@ -8709,7 +8709,7 @@ pub trait ICapeArrayStringParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate_element(&mut self,position:&CapeArrayIntegerIn,value:&CapeStringIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for the array parameter.
@@ -8724,7 +8724,7 @@ pub trait ICapeArrayStringParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:&CapeArrayStringIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -8952,7 +8952,7 @@ impl CapeArrayStringParameterSpecification {
 	///
 	/// where
 	///
-	/// * `restricted` - True if the parameter element value is restricted to the option list, false otherwise
+	/// * `restricted` - True if the parameter element value is restricted to the option list, False otherwise
 	pub fn get_restricted_to_list(&self) -> Result<CapeBoolean,COBIAError> {
 		let mut restricted:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -8978,7 +8978,7 @@ impl CapeArrayStringParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate_element<TypeOfPosition:CapeArrayIntegerProviderIn,TypeOfValue:CapeStringProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,position:&TypeOfPosition,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -9003,7 +9003,7 @@ impl CapeArrayStringParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfValue:CapeArrayStringProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -9051,7 +9051,7 @@ pub trait ICapeArrayBooleanParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate_element(&mut self,position:&CapeArrayIntegerIn,value:CapeBoolean,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Validates the given value for the array parameter.
@@ -9066,7 +9066,7 @@ pub trait ICapeArrayBooleanParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	fn validate(&mut self,value:&CapeArrayBooleanIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -9235,7 +9235,7 @@ impl CapeArrayBooleanParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate_element<TypeOfPosition:CapeArrayIntegerProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,position:&TypeOfPosition,value:CapeBoolean,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -9260,7 +9260,7 @@ impl CapeArrayBooleanParameterSpecification {
 	///
 	/// where
 	///
-	/// * `is_ok` - True if the value is valid, false otherwise
+	/// * `is_ok` - True if the value is valid, False otherwise
 	pub fn validate<TypeOfValue:CapeArrayBooleanProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,value:&TypeOfValue,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_ok:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -10184,14 +10184,14 @@ impl CapeCOSEUtilities {
 
 pub trait ICapeThermoMaterial {
 
-	/// Removes all stored property values.
+	/// Remove all stored Physical Property values.
 	///
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn clear_all_props(&mut self) -> Result<(),COBIAError>;
 
-	/// Copies all properties from another Material Object into this Material Object.
+	/// Copies all the stored Physical Properties, Phase presence and Phase status from the source Material Object to the current Material Object.
 	///
 	///
 	/// # Returns
@@ -10199,7 +10199,7 @@ pub trait ICapeThermoMaterial {
 	///
 	/// where
 	///
-	/// * `source` - The source Material Object to copy properties from
+	/// * `source` - Material Object from which to copy
 	fn copy_from_material(&mut self,source:CapeThermoMaterial) -> Result<(),COBIAError>;
 
 	/// Creates a new Material Object instance with the same configuration as the current Material Object.
@@ -10213,11 +10213,11 @@ pub trait ICapeThermoMaterial {
 	/// * `material_object` - A new Material Object instance
 	fn create_material(&mut self) -> Result<CapeThermoMaterial,COBIAError>;
 
-	/// Gets overall property values for the material.
+	/// Gets Physical Property values for the overall mixture.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to get
+	/// * `property` - The identifier of the property
 	/// * `basis` - The basis for the property value
 	/// * `results` - The property value
 	///
@@ -10229,31 +10229,31 @@ pub trait ICapeThermoMaterial {
 	///
 	///
 	/// # Arguments
-	/// * `temperature` - Temperature of the overall mixture, in K
-	/// * `pressure` - Pressure of the overall mixture, in Pa
-	/// * `composition` - Composition of the overall mixture, in mol/mol
+	/// * `temperature` - Temperature, in K
+	/// * `pressure` - Pressure, in Pa
+	/// * `composition` - Composition, in mol/mol
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_overall_tpfraction(&mut self,temperature:&mut CapeReal,pressure:&mut CapeReal,composition:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Gets the list of present phases and their status.
+	/// Gets the present Phases and their statuses.
 	///
 	///
 	/// # Arguments
-	/// * `phase_labels` - The list of present phase labels
-	/// * `phase_status` - The status of each present phase
+	/// * `phase_labels` - The phase labels
+	/// * `phase_status` - The Phase statuses
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_present_phases(&mut self,phase_labels:&mut CapeArrayStringOut,phase_status:&mut CapeArrayEnumerationOut<CapePhaseStatus>) -> Result<(),COBIAError>;
 
-	/// Gets single phase property value for the specified phase.
+	/// Gets Physical Property values for the specified Phase.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to get
-	/// * `phase_label` - The phase for which to get the property
+	/// * `property` - The identifier of the property
+	/// * `phase_label` - The phase label
 	/// * `basis` - The basis for the property value
 	/// * `results` - The property value
 	///
@@ -10261,25 +10261,25 @@ pub trait ICapeThermoMaterial {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_single_phase_prop(&mut self,property:&CapeStringIn,phase_label:&CapeStringIn,basis:&CapeStringIn,results:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Gets temperature, pressure, and composition for the specified phase.
+	/// Gets temperature, pressure, and composition for the specified Phase.
 	///
 	///
 	/// # Arguments
-	/// * `phase_label` - The phase for which to get the properties
-	/// * `temperature` - Temperature of the specified phase, in K
-	/// * `pressure` - Pressure of the specified phase, in Pa
-	/// * `composition` - Composition of the specified phase, in mol/mol
+	/// * `phase_label` - The phase label
+	/// * `temperature` - Temperature, in K
+	/// * `pressure` - Pressure, in Pa
+	/// * `composition` - Composition, in mol/mol
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_tpfraction(&mut self,phase_label:&CapeStringIn,temperature:&mut CapeReal,pressure:&mut CapeReal,composition:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Gets two phase property value for the specified phase pair.
+	/// Gets Physical Property values for the specified pair of Phases
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to get
-	/// * `phase_labels` - The two phase labels for which to get the property
+	/// * `property` - The identifier of the two-phase property
+	/// * `phase_labels` - The two phase labels
 	/// * `basis` - The basis for the property value
 	/// * `results` - The property value
 	///
@@ -10287,11 +10287,11 @@ pub trait ICapeThermoMaterial {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_two_phase_prop(&mut self,property:&CapeStringIn,phase_labels:&CapeArrayStringIn,basis:&CapeStringIn,results:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Sets overall property values for the material.
+	/// Sets Physical Property values for the overall mixture.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to set
+	/// * `property` - The identifier of the property
 	/// * `basis` - The basis for the property value
 	/// * `values` - The property value
 	///
@@ -10299,37 +10299,37 @@ pub trait ICapeThermoMaterial {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn set_overall_prop(&mut self,property:&CapeStringIn,basis:&CapeStringIn,values:&CapeArrayRealIn) -> Result<(),COBIAError>;
 
-	/// Sets the phases present in the material and their status, prior to a phase equilibrium calculation these are the phases allowed to take part in the phase equilibrium.
+	/// Sets the present Phases and their statuses.
 	///
 	///
 	/// # Arguments
-	/// * `phase_labels` - The list of present phase labels
-	/// * `phase_status` - The status of each present phase
+	/// * `phase_labels` - The phase labels
+	/// * `phase_status` - The Phase statuses
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn set_present_phases(&mut self,phase_labels:&CapeArrayStringIn,phase_status:&CapeArrayEnumerationIn<CapePhaseStatus>) -> Result<(),COBIAError>;
 
-	/// Sets single phase property value for the specified phase.
+	/// Sets Physical Property values for the specified Phase.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to set
-	/// * `phase_label` - The phase for which to set the property
-	/// * `basis` - The basis for the property value
+	/// * `property` - The identifier of the property
+	/// * `phase_label` - The phase label
+	/// * `basis` - The basis of the property value
 	/// * `values` - The property value
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn set_single_phase_prop(&mut self,property:&CapeStringIn,phase_label:&CapeStringIn,basis:&CapeStringIn,values:&CapeArrayRealIn) -> Result<(),COBIAError>;
 
-	/// Sets two phase property value for the specified phase pair.
+	/// Sets Physical Property values for the specified pair of Phases
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to set
-	/// * `phase_labels` - The two phase labels for which to set the property
-	/// * `basis` - The basis for the property value
+	/// * `property` - The identifier of the two-phase property
+	/// * `phase_labels` - The two phase labels
+	/// * `basis` - The basis of the property value
 	/// * `values` - The property value
 	///
 	/// # Returns
@@ -10688,7 +10688,7 @@ pub struct CapeThermoMaterial {
 impl CapeThermoMaterial {
 
 
-	/// Removes all stored property values.
+	/// Remove all stored Physical Property values.
 	///
 	///
 	/// # Returns
@@ -10704,7 +10704,7 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Copies all properties from another Material Object into this Material Object.
+	/// Copies all the stored Physical Properties, Phase presence and Phase status from the source Material Object to the current Material Object.
 	///
 	///
 	/// # Returns
@@ -10712,7 +10712,7 @@ impl CapeThermoMaterial {
 	///
 	/// where
 	///
-	/// * `source` - The source Material Object to copy properties from
+	/// * `source` - Material Object from which to copy
 	pub fn copy_from_material(&self,source:&CapeThermoMaterial) -> Result<(),COBIAError> {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).CopyFromMaterial.unwrap())((*self.interface).me,source.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoMaterial)
@@ -10745,11 +10745,11 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Gets overall property values for the material.
+	/// Gets Physical Property values for the overall mixture.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to get
+	/// * `property` - The identifier of the property
 	/// * `basis` - The basis for the property value
 	/// * `results` - The property value
 	///
@@ -10770,9 +10770,9 @@ impl CapeThermoMaterial {
 	///
 	///
 	/// # Arguments
-	/// * `temperature` - Temperature of the overall mixture, in K
-	/// * `pressure` - Pressure of the overall mixture, in Pa
-	/// * `composition` - Composition of the overall mixture, in mol/mol
+	/// * `temperature` - Temperature, in K
+	/// * `pressure` - Pressure, in Pa
+	/// * `composition` - Composition, in mol/mol
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -10787,12 +10787,12 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Gets the list of present phases and their status.
+	/// Gets the present Phases and their statuses.
 	///
 	///
 	/// # Arguments
-	/// * `phase_labels` - The list of present phase labels
-	/// * `phase_status` - The status of each present phase
+	/// * `phase_labels` - The phase labels
+	/// * `phase_status` - The Phase statuses
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -10807,12 +10807,12 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Gets single phase property value for the specified phase.
+	/// Gets Physical Property values for the specified Phase.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to get
-	/// * `phase_label` - The phase for which to get the property
+	/// * `property` - The identifier of the property
+	/// * `phase_label` - The phase label
 	/// * `basis` - The basis for the property value
 	/// * `results` - The property value
 	///
@@ -10829,14 +10829,14 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Gets temperature, pressure, and composition for the specified phase.
+	/// Gets temperature, pressure, and composition for the specified Phase.
 	///
 	///
 	/// # Arguments
-	/// * `phase_label` - The phase for which to get the properties
-	/// * `temperature` - Temperature of the specified phase, in K
-	/// * `pressure` - Pressure of the specified phase, in Pa
-	/// * `composition` - Composition of the specified phase, in mol/mol
+	/// * `phase_label` - The phase label
+	/// * `temperature` - Temperature, in K
+	/// * `pressure` - Pressure, in Pa
+	/// * `composition` - Composition, in mol/mol
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -10851,12 +10851,12 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Gets two phase property value for the specified phase pair.
+	/// Gets Physical Property values for the specified pair of Phases
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to get
-	/// * `phase_labels` - The two phase labels for which to get the property
+	/// * `property` - The identifier of the two-phase property
+	/// * `phase_labels` - The two phase labels
 	/// * `basis` - The basis for the property value
 	/// * `results` - The property value
 	///
@@ -10873,11 +10873,11 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Sets overall property values for the material.
+	/// Sets Physical Property values for the overall mixture.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to set
+	/// * `property` - The identifier of the property
 	/// * `basis` - The basis for the property value
 	/// * `values` - The property value
 	///
@@ -10894,12 +10894,12 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Sets the phases present in the material and their status, prior to a phase equilibrium calculation these are the phases allowed to take part in the phase equilibrium.
+	/// Sets the present Phases and their statuses.
 	///
 	///
 	/// # Arguments
-	/// * `phase_labels` - The list of present phase labels
-	/// * `phase_status` - The status of each present phase
+	/// * `phase_labels` - The phase labels
+	/// * `phase_status` - The Phase statuses
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -10914,13 +10914,13 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Sets single phase property value for the specified phase.
+	/// Sets Physical Property values for the specified Phase.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to set
-	/// * `phase_label` - The phase for which to set the property
-	/// * `basis` - The basis for the property value
+	/// * `property` - The identifier of the property
+	/// * `phase_label` - The phase label
+	/// * `basis` - The basis of the property value
 	/// * `values` - The property value
 	///
 	/// # Returns
@@ -10936,13 +10936,13 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Sets two phase property value for the specified phase pair.
+	/// Sets Physical Property values for the specified pair of Phases
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to set
-	/// * `phase_labels` - The two phase labels for which to set the property
-	/// * `basis` - The basis for the property value
+	/// * `property` - The identifier of the two-phase property
+	/// * `phase_labels` - The two phase labels
+	/// * `basis` - The basis of the property value
 	/// * `values` - The property value
 	///
 	/// # Returns
@@ -10969,7 +10969,7 @@ impl CapeThermoMaterial {
 
 pub trait ICapeThermoMaterialContext {
 
-	/// Sets the Material Object to be used by the object.
+	/// Sets the Material Object to be used.
 	///
 	///
 	/// # Returns
@@ -10977,10 +10977,10 @@ pub trait ICapeThermoMaterialContext {
 	///
 	/// where
 	///
-	/// * `material` - The Material Object to be used by the object
+	/// * `material` - The Material Object to be used
 	fn set_material(&mut self,material:CapeThermoMaterial) -> Result<(),COBIAError>;
 
-	/// Unsets the Material Object from the object.
+	/// Unsets the Material Object.
 	///
 	///
 	/// # Returns
@@ -11081,7 +11081,7 @@ pub struct CapeThermoMaterialContext {
 impl CapeThermoMaterialContext {
 
 
-	/// Sets the Material Object to be used by the object.
+	/// Sets the Material Object to be used.
 	///
 	///
 	/// # Returns
@@ -11089,7 +11089,7 @@ impl CapeThermoMaterialContext {
 	///
 	/// where
 	///
-	/// * `material` - The Material Object to be used by the object
+	/// * `material` - The Material Object to be used
 	pub fn set_material(&self,material:&CapeThermoMaterial) -> Result<(),COBIAError> {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).SetMaterial.unwrap())((*self.interface).me,material.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoMaterial)
@@ -11101,7 +11101,7 @@ impl CapeThermoMaterialContext {
 	}
 
 
-	/// Unsets the Material Object from the object.
+	/// Unsets the Material Object.
 	///
 	///
 	/// # Returns
@@ -11123,50 +11123,50 @@ impl CapeThermoMaterialContext {
 ///
 /// ICapeThermoCompounds interface
 ///
-/// Interface implemented by CAPE-OPEN Compound Servers such as a Material Object or a Property Package.
+/// Interface implemented by any CAPE-OPEN object that exposes Compounds.
 ///
 
 pub trait ICapeThermoCompounds {
 
-	/// Gets constant property values for the specified compounds.
+	/// Gets values of constant Properties for the specified Compounds.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The properties to get
-	/// * `comp_ids` - The compound IDs for which to get the properties, or empty to get the properties for all compounds
-	/// * `contains_missing_values` - Indicates whether any of the requested property values were missing
-	/// * `prop_vals` - The property values for the first property, then the second property, and so on
+	/// * `props` - The identifiers of the properties
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
+	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_compound_constant(&mut self,props:&CapeArrayStringIn,comp_ids:&CapeArrayStringIn,contains_missing_values:&mut CapeBoolean,prop_vals:&mut CapeArrayValueOut) -> Result<(),COBIAError>;
 
-	/// Gets the list of compounds in the Compound Server.
+	/// Gets the list of Compounds and some basic information.
 	///
 	///
 	/// # Arguments
-	/// * `comp_ids` - The compound IDs of the compounds
-	/// * `formulae` - The chemical formulae of the compounds, in Hills format
-	/// * `names` - The names of the compounds
-	/// * `boil_temps` - The normal boiling points of the compounds, in K
-	/// * `molwts` - The relative molecular weights of the compounds
-	/// * `casnos` - The CAS registry numbers of the compounds
+	/// * `comp_ids` - The compound identifiers of the Compounds
+	/// * `formulae` - The chemical formulae of the Compounds, in Hills format
+	/// * `names` - The names of the Compounds
+	/// * `boil_temps` - The normal boiling points of the Compounds, in K
+	/// * `molwts` - The relative molecular weights of the Compounds
+	/// * `casnos` - The CAS registry numbers of the Compounds
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_compound_list(&mut self,comp_ids:&mut CapeArrayStringOut,formulae:&mut CapeArrayStringOut,names:&mut CapeArrayStringOut,boil_temps:&mut CapeArrayRealOut,molwts:&mut CapeArrayRealOut,casnos:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
-	/// Gets the list of constant properties supported by the Compound Server.
+	/// Gets the list of supported constant properties.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of constant properties supported by the Compound Server
+	/// * `props` - The list of supported constant properties 
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_const_prop_list(&mut self,props:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
-	/// Gets the number of compounds in the Compound Server.
+	/// Gets the number of Compounds.
 	///
 	///
 	/// # Returns
@@ -11174,52 +11174,52 @@ pub trait ICapeThermoCompounds {
 	///
 	/// where
 	///
-	/// * `num` - The number of compounds in the Compound Server
+	/// * `num` - The number of Compounds
 	fn get_num_compounds(&mut self) -> Result<CapeInteger,COBIAError>;
 
-	/// Gets pressure-dependent property values for the specified compounds at the given pressure.
+	/// Gets pressure-dependent property values for the specified Compounds at the given pressure.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The properties to get
-	/// * `pressure` - The pressure at which to get the properties, in Pa
-	/// * `comp_ids` - The compound IDs for which to get the properties, or empty to get the properties for all compounds
-	/// * `contains_missing_values` - Indicates whether any of the requested property values were missing
-	/// * `prop_vals` - The property values for the first property, then the second property, and so on
+	/// * `props` - The identifiers of the properties
+	/// * `pressure` - Pressure, in Pa
+	/// * `comp_ids` - The compound identifiers for which to get the properties, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
+	/// * `prop_vals` - The property values for the first property, then for the second property, and so on
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_pdependent_property(&mut self,props:&CapeArrayStringIn,pressure:CapeReal,comp_ids:&CapeArrayStringIn,contains_missing_values:&mut CapeBoolean,prop_vals:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Gets the list of pressure-dependent properties supported by the Compound Server.
+	/// Gets the list of supported pressure-dependent properties supported.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of pressure-dependent properties supported by the Compound Server
+	/// * `props` - The list of supported pressure-dependent properties
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_pdependent_prop_list(&mut self,props:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
-	/// Gets temperature-dependent property values for the specified compounds at the given temperature.
+	/// Gets temperature-dependent property values for the specified Compounds at the given temperature.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The properties to get
-	/// * `temperature` - The temperature at which to get the properties, in K
-	/// * `comp_ids` - The compound IDs for which to get the properties, or empty to get the properties for all compounds
-	/// * `contains_missing_values` - Indicates whether any of the requested property values were missing
-	/// * `prop_vals` - The property values for the first property, then the second property, and so on
+	/// * `props` - The identifiers of the properties
+	/// * `temperature` - Temperature, in K
+	/// * `comp_ids` - The compound identifiers for which to get the properties, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
+	/// * `prop_vals` - The property values for the first property, then for the second property, and so on
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_tdependent_property(&mut self,props:&CapeArrayStringIn,temperature:CapeReal,comp_ids:&CapeArrayStringIn,contains_missing_values:&mut CapeBoolean,prop_vals:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Gets the list of temperature-dependent properties supported by the Compound Server.
+	/// Gets the list of supported temperature-dependent properties.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of temperature-dependent properties supported by the Compound Server
+	/// * `props` - The list of supported temperature-dependent properties
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11480,7 +11480,7 @@ pub trait ICapeThermoCompoundsImpl : ICapeThermoCompounds {
 /// Smart pointer for ICapeThermoCompounds
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoCompounds interface
-/// Interface implemented by CAPE-OPEN Compound Servers such as a Material Object or a Property Package.
+/// Interface implemented by any CAPE-OPEN object that exposes Compounds.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOCOMPOUNDS_UUID)]
@@ -11492,14 +11492,14 @@ pub struct CapeThermoCompounds {
 impl CapeThermoCompounds {
 
 
-	/// Gets constant property values for the specified compounds.
+	/// Gets values of constant Properties for the specified Compounds.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The properties to get
-	/// * `comp_ids` - The compound IDs for which to get the properties, or empty to get the properties for all compounds
-	/// * `contains_missing_values` - Indicates whether any of the requested property values were missing
-	/// * `prop_vals` - The property values for the first property, then the second property, and so on
+	/// * `props` - The identifiers of the properties
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
+	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11514,16 +11514,16 @@ impl CapeThermoCompounds {
 	}
 
 
-	/// Gets the list of compounds in the Compound Server.
+	/// Gets the list of Compounds and some basic information.
 	///
 	///
 	/// # Arguments
-	/// * `comp_ids` - The compound IDs of the compounds
-	/// * `formulae` - The chemical formulae of the compounds, in Hills format
-	/// * `names` - The names of the compounds
-	/// * `boil_temps` - The normal boiling points of the compounds, in K
-	/// * `molwts` - The relative molecular weights of the compounds
-	/// * `casnos` - The CAS registry numbers of the compounds
+	/// * `comp_ids` - The compound identifiers of the Compounds
+	/// * `formulae` - The chemical formulae of the Compounds, in Hills format
+	/// * `names` - The names of the Compounds
+	/// * `boil_temps` - The normal boiling points of the Compounds, in K
+	/// * `molwts` - The relative molecular weights of the Compounds
+	/// * `casnos` - The CAS registry numbers of the Compounds
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11538,11 +11538,11 @@ impl CapeThermoCompounds {
 	}
 
 
-	/// Gets the list of constant properties supported by the Compound Server.
+	/// Gets the list of supported constant properties.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of constant properties supported by the Compound Server
+	/// * `props` - The list of supported constant properties 
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11557,7 +11557,7 @@ impl CapeThermoCompounds {
 	}
 
 
-	/// Gets the number of compounds in the Compound Server.
+	/// Gets the number of Compounds.
 	///
 	///
 	/// # Returns
@@ -11565,7 +11565,7 @@ impl CapeThermoCompounds {
 	///
 	/// where
 	///
-	/// * `num` - The number of compounds in the Compound Server
+	/// * `num` - The number of Compounds
 	pub fn get_num_compounds(&self) -> Result<CapeInteger,COBIAError> {
 		let mut num:CapeInteger=0;
 		let result_code = unsafe {
@@ -11578,15 +11578,15 @@ impl CapeThermoCompounds {
 	}
 
 
-	/// Gets pressure-dependent property values for the specified compounds at the given pressure.
+	/// Gets pressure-dependent property values for the specified Compounds at the given pressure.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The properties to get
-	/// * `pressure` - The pressure at which to get the properties, in Pa
-	/// * `comp_ids` - The compound IDs for which to get the properties, or empty to get the properties for all compounds
-	/// * `contains_missing_values` - Indicates whether any of the requested property values were missing
-	/// * `prop_vals` - The property values for the first property, then the second property, and so on
+	/// * `props` - The identifiers of the properties
+	/// * `pressure` - Pressure, in Pa
+	/// * `comp_ids` - The compound identifiers for which to get the properties, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
+	/// * `prop_vals` - The property values for the first property, then for the second property, and so on
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11601,11 +11601,11 @@ impl CapeThermoCompounds {
 	}
 
 
-	/// Gets the list of pressure-dependent properties supported by the Compound Server.
+	/// Gets the list of supported pressure-dependent properties supported.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of pressure-dependent properties supported by the Compound Server
+	/// * `props` - The list of supported pressure-dependent properties
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11620,15 +11620,15 @@ impl CapeThermoCompounds {
 	}
 
 
-	/// Gets temperature-dependent property values for the specified compounds at the given temperature.
+	/// Gets temperature-dependent property values for the specified Compounds at the given temperature.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The properties to get
-	/// * `temperature` - The temperature at which to get the properties, in K
-	/// * `comp_ids` - The compound IDs for which to get the properties, or empty to get the properties for all compounds
-	/// * `contains_missing_values` - Indicates whether any of the requested property values were missing
-	/// * `prop_vals` - The property values for the first property, then the second property, and so on
+	/// * `props` - The identifiers of the properties
+	/// * `temperature` - Temperature, in K
+	/// * `comp_ids` - The compound identifiers for which to get the properties, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
+	/// * `prop_vals` - The property values for the first property, then for the second property, and so on
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11643,11 +11643,11 @@ impl CapeThermoCompounds {
 	}
 
 
-	/// Gets the list of temperature-dependent properties supported by the Compound Server.
+	/// Gets the list of supported temperature-dependent properties.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of temperature-dependent properties supported by the Compound Server
+	/// * `props` - The list of supported temperature-dependent properties
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11668,12 +11668,12 @@ impl CapeThermoCompounds {
 ///
 /// ICapeThermoPhases interface
 ///
-/// Interface implemented by CAPE-OPEN Thermodynamic Phase Servers such as a Material Object or a Property Package.
+/// Interface implemented by any CAPE-OPEN object that exposes Phases.
 ///
 
 pub trait ICapeThermoPhases {
 
-	/// Gets the number of phases in the Phase Server.
+	/// Gets the number of supported Phases.
 	///
 	///
 	/// # Returns
@@ -11681,28 +11681,28 @@ pub trait ICapeThermoPhases {
 	///
 	/// where
 	///
-	/// * `num` - The number of phases in the Phase Server
+	/// * `num` - The number of supported Phases
 	fn get_num_phases(&mut self) -> Result<CapeInteger,COBIAError>;
 
-	/// Gets information about a specific phase.
+	/// Gets information about a specific Phase.
 	///
 	///
 	/// # Arguments
-	/// * `phase_label` - The label of the phase to get information for
-	/// * `phase_attribute` - The attribute to get
-	/// * `value` - The value of the requested attribute
+	/// * `phase_label` - The label of the Phase
+	/// * `phase_attribute` - The identifier of the attribute
+	/// * `value` - The attribute value
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_phase_info(&mut self,phase_label:&CapeStringIn,phase_attribute:&CapeStringIn,value:&mut CapeValueOut) -> Result<(),COBIAError>;
 
-	/// Gets the list of phases supported by Phase Server.
+	/// Gets the list of supported Phases and some basic information.
 	///
 	///
 	/// # Arguments
-	/// * `phase_labels` - The labels of the phases
-	/// * `state_of_aggregation` - The states of aggregation of the phases
-	/// * `key_compound_id` - The compound IDs of the key compounds of the phases
+	/// * `phase_labels` - The labels of the Phases
+	/// * `state_of_aggregation` - The states of aggregation of the Phases
+	/// * `key_compound_id` - The compound identifiers of the key Compounds (or UNDEFINED) for each Phase
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11826,7 +11826,7 @@ pub trait ICapeThermoPhasesImpl : ICapeThermoPhases {
 /// Smart pointer for ICapeThermoPhases
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoPhases interface
-/// Interface implemented by CAPE-OPEN Thermodynamic Phase Servers such as a Material Object or a Property Package.
+/// Interface implemented by any CAPE-OPEN object that exposes Phases.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOPHASES_UUID)]
@@ -11838,7 +11838,7 @@ pub struct CapeThermoPhases {
 impl CapeThermoPhases {
 
 
-	/// Gets the number of phases in the Phase Server.
+	/// Gets the number of supported Phases.
 	///
 	///
 	/// # Returns
@@ -11846,7 +11846,7 @@ impl CapeThermoPhases {
 	///
 	/// where
 	///
-	/// * `num` - The number of phases in the Phase Server
+	/// * `num` - The number of supported Phases
 	pub fn get_num_phases(&self) -> Result<CapeInteger,COBIAError> {
 		let mut num:CapeInteger=0;
 		let result_code = unsafe {
@@ -11859,13 +11859,13 @@ impl CapeThermoPhases {
 	}
 
 
-	/// Gets information about a specific phase.
+	/// Gets information about a specific Phase.
 	///
 	///
 	/// # Arguments
-	/// * `phase_label` - The label of the phase to get information for
-	/// * `phase_attribute` - The attribute to get
-	/// * `value` - The value of the requested attribute
+	/// * `phase_label` - The label of the Phase
+	/// * `phase_attribute` - The identifier of the attribute
+	/// * `value` - The attribute value
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11880,13 +11880,13 @@ impl CapeThermoPhases {
 	}
 
 
-	/// Gets the list of phases supported by Phase Server.
+	/// Gets the list of supported Phases and some basic information.
 	///
 	///
 	/// # Arguments
-	/// * `phase_labels` - The labels of the phases
-	/// * `state_of_aggregation` - The states of aggregation of the phases
-	/// * `key_compound_id` - The compound IDs of the key compounds of the phases
+	/// * `phase_labels` - The labels of the Phases
+	/// * `state_of_aggregation` - The states of aggregation of the Phases
+	/// * `key_compound_id` - The compound identifiers of the key Compounds (or UNDEFINED) for each Phase
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11907,79 +11907,79 @@ impl CapeThermoPhases {
 ///
 /// ICapeThermoPropertyRoutine interface
 ///
-/// Interface implemented by CAPE-OPEN Property Calculators, such as a Material Object or a Property Package.
+/// Interface implemented by any CAPE-OPEN component that calculates Physical Properties.
 ///
 
 pub trait ICapeThermoPropertyRoutine {
 
-	/// Calculates log fugacity coefficients and/or their derivatives for the specified phase.
+	/// Calculates log fugacity coefficients and/or their derivatives of a Phase.
 	///
 	///
 	/// # Arguments
-	/// * `phase_label` - The phase label for which to calculate the fugacity coefficients
-	/// * `temperature` - The temperature at which to calculate the fugacity coefficients, in K
-	/// * `pressure` - The pressure at which to calculate the fugacity coefficients, in Pa
-	/// * `mole_fraction` - The mole fraction composition at which to calculate the fugacity coefficients, in mol/mol
-	/// * `f_flags` - Flags indicating which fugacity coefficients and/or derivatives to calculate
-	/// * `ln_phi` - The log fugacity coefficients, if the CAPE_LOG_FUGACITY_COEFFICIENTS is specified
-	/// * `ln_phi_dt` - The temperature derivatives of log fugacity coefficients, if the CAPE_T_DERIVATIVE is specified
-	/// * `ln_phi_dp` - The pressure derivatives of log fugacity coefficients, if the CAPE_P_DERIVATIVE is specified
-	/// * `ln_phi_dn` - The mole number derivatives (for a total number of moles of 1) of log fugacity coefficients, if the CAPE_MOLE_NUMBERS_DERIVATIVES is specified
+	/// * `phase_label` - The phase label
+	/// * `temperature` - The temperature, in K
+	/// * `pressure` - The pressure, in Pa
+	/// * `mole_fraction` - The composition, in mol/mol
+	/// * `f_flags` - Flags indicating which fugacity coefficients and/or derivatives to calculate, bits defined by CapeCalculationCode
+	/// * `ln_phi` - The log fugacity coefficients, calculated if fFlags contains CAPE_LOG_FUGACITY_COEFFICIENTS
+	/// * `ln_phi_dt` - The temperature derivatives of log fugacity coefficients, calculated if fFlags contains CAPE_T_DERIVATIVE
+	/// * `ln_phi_dp` - The pressure derivatives of log fugacity coefficients, calculated if fFlags contains CAPE_P_DERIVATIVE
+	/// * `ln_phi_dn` - The mole number derivatives (for a total number of moles of 1) of log fugacity coefficients, calculated if fFlags contains CAPE_MOLE_NUMBERS_DERIVATIVES
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn calc_and_get_ln_phi(&mut self,phase_label:&CapeStringIn,temperature:CapeReal,pressure:CapeReal,mole_fraction:&CapeArrayRealIn,f_flags:CapeInteger,ln_phi:&mut CapeArrayRealOut,ln_phi_dt:&mut CapeArrayRealOut,ln_phi_dp:&mut CapeArrayRealOut,ln_phi_dn:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Calculates single phase property values for the specified phase.
+	/// Calculates single phase property values for the specified Phase.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of properties to calculate
-	/// * `phase_label` - The phase label for which to calculate the properties
+	/// * `props` - The identifiers of the properties to calculate
+	/// * `phase_label` - The phase label
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn calc_single_phase_prop(&mut self,props:&CapeArrayStringIn,phase_label:&CapeStringIn) -> Result<(),COBIAError>;
 
-	/// Calculates two phase property values for the specified phase pair.
+	/// Calculates two-phase property values for the specified Phase pair.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of properties to calculate
-	/// * `phase_labels` - The two phase labels for which to calculate the properties
+	/// * `props` - The identifiers of the properties to calculate
+	/// * `phase_labels` - Labels of the two Phases in the Phase pair
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn calc_two_phase_prop(&mut self,props:&CapeArrayStringIn,phase_labels:&CapeArrayStringIn) -> Result<(),COBIAError>;
 
-	/// Checks if a single phase property is supported for the specified phase.
+	/// Checks if a single Phase property is supported for the specified Phase.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to check
-	/// * `phase_label` - The phase label for which to check whether the property is supported
+	/// * `property` - The identifier of the property
+	/// * `phase_label` - The phase label
 	///
 	/// # Returns
 	/// * Result<'valid',COBIAError> - Ok if successful, Err if there was an error
 	///
 	/// where
 	///
-	/// * `valid` - True if the property is supported for the specified phase, false otherwise
+	/// * `valid` - True if the property is supported for the specified Phase, False otherwise
 	fn check_single_phase_prop_spec(&mut self,property:&CapeStringIn,phase_label:&CapeStringIn) -> Result<CapeBoolean,COBIAError>;
 
-	/// Checks if a two phase property is supported for the specified phase pair.
+	/// Checks if a two phase property is supported for the specified Phase pair.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to check
-	/// * `phase_labels` - The two phase labels for which to check whether the property is supported
+	/// * `property` - The identifier of the property
+	/// * `phase_labels` - Labels of the two Phases in the Phase pair
 	///
 	/// # Returns
 	/// * Result<'valid',COBIAError> - Ok if successful, Err if there was an error
 	///
 	/// where
 	///
-	/// * `valid` - True if the property is supported for the specified phase pair, false otherwise
+	/// * `valid` - True if the property is supported for the specified Phase pair, False otherwise
 	fn check_two_phase_prop_spec(&mut self,property:&CapeStringIn,phase_labels:&CapeArrayStringIn) -> Result<CapeBoolean,COBIAError>;
 
 	/// Gets the list of single phase properties supported by the Property Calculator.
@@ -12204,7 +12204,7 @@ pub trait ICapeThermoPropertyRoutineImpl : ICapeThermoPropertyRoutine {
 /// Smart pointer for ICapeThermoPropertyRoutine
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoPropertyRoutine interface
-/// Interface implemented by CAPE-OPEN Property Calculators, such as a Material Object or a Property Package.
+/// Interface implemented by any CAPE-OPEN component that calculates Physical Properties.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOPROPERTYROUTINE_UUID)]
@@ -12216,19 +12216,19 @@ pub struct CapeThermoPropertyRoutine {
 impl CapeThermoPropertyRoutine {
 
 
-	/// Calculates log fugacity coefficients and/or their derivatives for the specified phase.
+	/// Calculates log fugacity coefficients and/or their derivatives of a Phase.
 	///
 	///
 	/// # Arguments
-	/// * `phase_label` - The phase label for which to calculate the fugacity coefficients
-	/// * `temperature` - The temperature at which to calculate the fugacity coefficients, in K
-	/// * `pressure` - The pressure at which to calculate the fugacity coefficients, in Pa
-	/// * `mole_fraction` - The mole fraction composition at which to calculate the fugacity coefficients, in mol/mol
-	/// * `f_flags` - Flags indicating which fugacity coefficients and/or derivatives to calculate
-	/// * `ln_phi` - The log fugacity coefficients, if the CAPE_LOG_FUGACITY_COEFFICIENTS is specified
-	/// * `ln_phi_dt` - The temperature derivatives of log fugacity coefficients, if the CAPE_T_DERIVATIVE is specified
-	/// * `ln_phi_dp` - The pressure derivatives of log fugacity coefficients, if the CAPE_P_DERIVATIVE is specified
-	/// * `ln_phi_dn` - The mole number derivatives (for a total number of moles of 1) of log fugacity coefficients, if the CAPE_MOLE_NUMBERS_DERIVATIVES is specified
+	/// * `phase_label` - The phase label
+	/// * `temperature` - The temperature, in K
+	/// * `pressure` - The pressure, in Pa
+	/// * `mole_fraction` - The composition, in mol/mol
+	/// * `f_flags` - Flags indicating which fugacity coefficients and/or derivatives to calculate, bits defined by CapeCalculationCode
+	/// * `ln_phi` - The log fugacity coefficients, calculated if fFlags contains CAPE_LOG_FUGACITY_COEFFICIENTS
+	/// * `ln_phi_dt` - The temperature derivatives of log fugacity coefficients, calculated if fFlags contains CAPE_T_DERIVATIVE
+	/// * `ln_phi_dp` - The pressure derivatives of log fugacity coefficients, calculated if fFlags contains CAPE_P_DERIVATIVE
+	/// * `ln_phi_dn` - The mole number derivatives (for a total number of moles of 1) of log fugacity coefficients, calculated if fFlags contains CAPE_MOLE_NUMBERS_DERIVATIVES
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12243,12 +12243,12 @@ impl CapeThermoPropertyRoutine {
 	}
 
 
-	/// Calculates single phase property values for the specified phase.
+	/// Calculates single phase property values for the specified Phase.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of properties to calculate
-	/// * `phase_label` - The phase label for which to calculate the properties
+	/// * `props` - The identifiers of the properties to calculate
+	/// * `phase_label` - The phase label
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12263,12 +12263,12 @@ impl CapeThermoPropertyRoutine {
 	}
 
 
-	/// Calculates two phase property values for the specified phase pair.
+	/// Calculates two-phase property values for the specified Phase pair.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of properties to calculate
-	/// * `phase_labels` - The two phase labels for which to calculate the properties
+	/// * `props` - The identifiers of the properties to calculate
+	/// * `phase_labels` - Labels of the two Phases in the Phase pair
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12283,19 +12283,19 @@ impl CapeThermoPropertyRoutine {
 	}
 
 
-	/// Checks if a single phase property is supported for the specified phase.
+	/// Checks if a single Phase property is supported for the specified Phase.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to check
-	/// * `phase_label` - The phase label for which to check whether the property is supported
+	/// * `property` - The identifier of the property
+	/// * `phase_label` - The phase label
 	///
 	/// # Returns
 	/// * Result<'valid',COBIAError> - Ok if successful, Err if there was an error
 	///
 	/// where
 	///
-	/// * `valid` - True if the property is supported for the specified phase, false otherwise
+	/// * `valid` - True if the property is supported for the specified Phase, False otherwise
 	pub fn check_single_phase_prop_spec<TypeOfProperty:CapeStringProviderIn,TypeOfPhaseLabel:CapeStringProviderIn>(&self,property:&TypeOfProperty,phase_label:&TypeOfPhaseLabel) -> Result<CapeBoolean,COBIAError> {
 		let mut valid:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -12308,19 +12308,19 @@ impl CapeThermoPropertyRoutine {
 	}
 
 
-	/// Checks if a two phase property is supported for the specified phase pair.
+	/// Checks if a two phase property is supported for the specified Phase pair.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The property to check
-	/// * `phase_labels` - The two phase labels for which to check whether the property is supported
+	/// * `property` - The identifier of the property
+	/// * `phase_labels` - Labels of the two Phases in the Phase pair
 	///
 	/// # Returns
 	/// * Result<'valid',COBIAError> - Ok if successful, Err if there was an error
 	///
 	/// where
 	///
-	/// * `valid` - True if the property is supported for the specified phase pair, false otherwise
+	/// * `valid` - True if the property is supported for the specified Phase pair, False otherwise
 	pub fn check_two_phase_prop_spec<TypeOfProperty:CapeStringProviderIn,TypeOfPhaseLabels:CapeArrayStringProviderIn>(&self,property:&TypeOfProperty,phase_labels:&TypeOfPhaseLabels) -> Result<CapeBoolean,COBIAError> {
 		let mut valid:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -12394,7 +12394,7 @@ pub trait ICapeThermoEquilibriumRoutine {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn calc_equilibrium(&mut self,specification1:&CapeArrayStringIn,specification2:&CapeArrayStringIn,solution_type:&CapeStringIn) -> Result<(),COBIAError>;
 
-	/// Checks if the specified phase equilibrium specifications are supported, using the present phases on the current Material Object.
+	/// Checks if the specified phase equilibrium specifications are supported, using the present Phases on the current Material Object.
 	///
 	///
 	/// # Arguments
@@ -12407,7 +12407,7 @@ pub trait ICapeThermoEquilibriumRoutine {
 	///
 	/// where
 	///
-	/// * `is_supported` - True if the specified phase equilibrium specification is supported, false otherwise
+	/// * `is_supported` - True if the specified phase equilibrium specification is supported, False otherwise
 	fn check_equilibrium_spec(&mut self,specification1:&CapeArrayStringIn,specification2:&CapeArrayStringIn,solution_type:&CapeStringIn) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -12530,7 +12530,7 @@ impl CapeThermoEquilibriumRoutine {
 	}
 
 
-	/// Checks if the specified phase equilibrium specifications are supported, using the present phases on the current Material Object.
+	/// Checks if the specified phase equilibrium specifications are supported, using the present Phases on the current Material Object.
 	///
 	///
 	/// # Arguments
@@ -12543,7 +12543,7 @@ impl CapeThermoEquilibriumRoutine {
 	///
 	/// where
 	///
-	/// * `is_supported` - True if the specified phase equilibrium specification is supported, false otherwise
+	/// * `is_supported` - True if the specified phase equilibrium specification is supported, False otherwise
 	pub fn check_equilibrium_spec<TypeOfSpecification1:CapeArrayStringProviderIn,TypeOfSpecification2:CapeArrayStringProviderIn,TypeOfSolutionType:CapeStringProviderIn>(&self,specification1:&TypeOfSpecification1,specification2:&TypeOfSpecification2,solution_type:&TypeOfSolutionType) -> Result<CapeBoolean,COBIAError> {
 		let mut is_supported:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -12965,7 +12965,7 @@ pub trait ICapeUnit {
 	///
 	/// where
 	///
-	/// * `is_valid` - True if the Unit Operation is valid, false otherwise
+	/// * `is_valid` - True if the Unit Operation is valid, False otherwise
 	fn validate(&mut self,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -13184,7 +13184,7 @@ impl CapeUnit {
 	///
 	/// where
 	///
-	/// * `is_valid` - True if the Unit Operation is valid, false otherwise
+	/// * `is_valid` - True if the Unit Operation is valid, False otherwise
 	pub fn validate<TypeOfMessage:CapeStringProviderOut>(&self,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_valid:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -15326,7 +15326,7 @@ pub trait ICapePersist {
 	///
 	///
 	/// # Arguments
-	/// * `clear_dirty` - Clears the dirty flag after persistence if true
+	/// * `clear_dirty` - Clears the dirty flag after persistence if True
 	///
 	/// # Returns
 	/// * Result<'writer',COBIAError> - Ok if successful, Err if there was an error
@@ -15355,7 +15355,7 @@ pub trait ICapePersist {
 	///
 	/// where
 	///
-	/// * `dirty` - True if the object's data has been modified since the last save or load operation, false otherwise
+	/// * `dirty` - True if the object's data has been modified since the last save or load operation, False otherwise
 	fn get_is_dirty(&mut self) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -15484,7 +15484,7 @@ impl CapePersist {
 	///
 	///
 	/// # Arguments
-	/// * `clear_dirty` - Clears the dirty flag after persistence if true
+	/// * `clear_dirty` - Clears the dirty flag after persistence if True
 	///
 	/// # Returns
 	/// * Result<'writer',COBIAError> - Ok if successful, Err if there was an error
@@ -15531,7 +15531,7 @@ impl CapePersist {
 	///
 	/// where
 	///
-	/// * `dirty` - True if the object's data has been modified since the last save or load operation, false otherwise
+	/// * `dirty` - True if the object's data has been modified since the last save or load operation, False otherwise
 	pub fn get_is_dirty(&self) -> Result<CapeBoolean,COBIAError> {
 		let mut dirty:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -15601,7 +15601,7 @@ pub trait ICapeReport {
 	///
 	/// where
 	///
-	/// * `report_available` - True if the given report is available for the specified media type and locale, false otherwise
+	/// * `report_available` - True if the given report is available for the specified media type and locale, False otherwise
 	fn check_report_spec(&mut self,name:&CapeStringIn,_type:&CapeStringIn,locale:&CapeStringIn) -> Result<CapeBoolean,COBIAError>;
 
 	/// Generates a report and returns its content as a string.
@@ -15901,7 +15901,7 @@ impl CapeReport {
 	///
 	/// where
 	///
-	/// * `report_available` - True if the given report is available for the specified media type and locale, false otherwise
+	/// * `report_available` - True if the given report is available for the specified media type and locale, False otherwise
 	pub fn check_report_spec<TypeOfName:CapeStringProviderIn,TypeOfType:CapeStringProviderIn,TypeOfLocale:CapeStringProviderIn>(&self,name:&TypeOfName,_type:&TypeOfType,locale:&TypeOfLocale) -> Result<CapeBoolean,COBIAError> {
 		let mut report_available:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -15987,7 +15987,7 @@ pub trait ICapeFlowsheetMonitoringComponent {
 	///
 	/// where
 	///
-	/// * `is_valid` - True if the Flowsheet Monitoring Component is valid, false otherwise
+	/// * `is_valid` - True if the Flowsheet Monitoring Component is valid, False otherwise
 	fn validate(&mut self,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Gets the current validation status of the Flowsheet Monitoring Component.
@@ -16147,7 +16147,7 @@ impl CapeFlowsheetMonitoringComponent {
 	///
 	/// where
 	///
-	/// * `is_valid` - True if the Flowsheet Monitoring Component is valid, false otherwise
+	/// * `is_valid` - True if the Flowsheet Monitoring Component is valid, False otherwise
 	pub fn validate<TypeOfMessage:CapeStringProviderOut>(&self,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_valid:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -17889,18 +17889,18 @@ impl CapeCustomDataSource {
 ///
 /// ICapeThermoPetroleumFractions interface
 ///
-/// Interface implemented by CAPE-OPEN Thermodynamic Material Objects that support petroleum fractions.
+/// Interface implemented by CAPE-OPEN Material Objects that support Petroleum Fractions.
 ///
 
 pub trait ICapeThermoPetroleumFractions {
 
-	/// Sets the value of a petroleum compound property.
+	/// Sets the values of a petroleum property for all Petroleum Fractions.
 	///
 	///
 	/// # Arguments
 	/// * `property_id` - The identifier of the property to set
-	/// * `basis` - The basis for the property
-	/// * `values` - The property value
+	/// * `basis` - The basis of the property
+	/// * `values` - The petroleum property value for all Compounds, with UNDEFINED for all real Compounds
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -17911,14 +17911,14 @@ pub trait ICapeThermoPetroleumFractions {
 	///
 	/// # Arguments
 	/// * `property_id` - The identifier of the property to set
-	/// * `basis` - The basis for the property
-	/// * `value` - The property value
+	/// * `basis` - The basis of the property
+	/// * `value` - The bulk property value
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn set_petro_bulk_prop(&mut self,property_id:&CapeStringIn,basis:&CapeStringIn,value:CapeReal) -> Result<(),COBIAError>;
 
-	/// Gets the value of a petroleum compound property.
+	/// Gets the value of a petroleum Compound property.
 	///
 	///
 	/// # Arguments
@@ -18198,7 +18198,7 @@ pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 /// Smart pointer for ICapeThermoPetroleumFractions
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoPetroleumFractions interface
-/// Interface implemented by CAPE-OPEN Thermodynamic Material Objects that support petroleum fractions.
+/// Interface implemented by CAPE-OPEN Material Objects that support Petroleum Fractions.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOPETROLEUMFRACTIONS_UUID)]
@@ -18210,13 +18210,13 @@ pub struct CapeThermoPetroleumFractions {
 impl CapeThermoPetroleumFractions {
 
 
-	/// Sets the value of a petroleum compound property.
+	/// Sets the values of a petroleum property for all Petroleum Fractions.
 	///
 	///
 	/// # Arguments
 	/// * `property_id` - The identifier of the property to set
-	/// * `basis` - The basis for the property
-	/// * `values` - The property value
+	/// * `basis` - The basis of the property
+	/// * `values` - The petroleum property value for all Compounds, with UNDEFINED for all real Compounds
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -18236,8 +18236,8 @@ impl CapeThermoPetroleumFractions {
 	///
 	/// # Arguments
 	/// * `property_id` - The identifier of the property to set
-	/// * `basis` - The basis for the property
-	/// * `value` - The property value
+	/// * `basis` - The basis of the property
+	/// * `value` - The bulk property value
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -18252,7 +18252,7 @@ impl CapeThermoPetroleumFractions {
 	}
 
 
-	/// Gets the value of a petroleum compound property.
+	/// Gets the value of a petroleum Compound property.
 	///
 	///
 	/// # Arguments
@@ -18982,7 +18982,7 @@ pub trait ICapeThermoReactions {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_reaction_attribute(&mut self,reac_id:&CapeStringIn,reac_attribute:&CapeStringIn,attribute_value:&mut CapeValueOut) -> Result<(),COBIAError>;
 
-	/// Gets the number of compounds occurring in the specified Chemical Reaction.
+	/// Gets the number of Compounds occurring in the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
@@ -18993,15 +18993,15 @@ pub trait ICapeThermoReactions {
 	///
 	/// where
 	///
-	/// * `compound_count` - The number of compounds involved in the specified Chemical Reaction
+	/// * `compound_count` - The number of Compounds involved in the specified Chemical Reaction
 	fn get_reaction_compound_count(&mut self,reac_id:&CapeStringIn) -> Result<CapeInteger,COBIAError>;
 
-	/// Gets the identifiers of the compounds participating in the specified Chemical Reaction.
+	/// Gets the identifiers of the Compounds participating in the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `compound_ids` - The identifiers of the compounds participating in the specified Chemical Reaction
+	/// * `compound_ids` - The identifiers of the Compounds participating in the specified Chemical Reaction
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19018,12 +19018,12 @@ pub trait ICapeThermoReactions {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_reaction_stoichiometric_coefficients(&mut self,reac_id:&CapeStringIn,stoichiometric_coefficients:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Gets the Phase identifiers for the Compounds involved in the specified Chemical Reaction.
+	/// Gets the phase labels for the Compounds involved in the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `phase_ids` - The Phase identifiers for the Compounds involved in the specified Chemical Reaction
+	/// * `phase_ids` - The phase labels for the Compounds involved in the specified Chemical Reaction
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19041,14 +19041,14 @@ pub trait ICapeThermoReactions {
 	///
 	/// where
 	///
-	/// * `is_valid` - True if the list of Chemical Reaction identifiers is valid, false otherwise
+	/// * `is_valid` - True if the list of Chemical Reaction identifiers is valid, False otherwise
 	fn is_reaction_list_valid(&mut self,reac_ids:&CapeArrayStringIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Gets a reduced Reaction Set.
 	///
 	///
 	/// # Arguments
-	/// * `present_compound_ids` - List of Compound identifiers of the Compounds that are present (non-zero concentration); UNDEFINED means all Compounds defined on the active Material Object
+	/// * `present_compound_ids` - List of compound identifiers of the Compounds that are present (non-zero concentration); UNDEFINED means all Compounds defined on the active Material Object
 	/// * `reac_ids` - List of active Chemical Reactions identifiers that must be considered
 	/// * `is_equilibrium` - For each of the active Chemical Reactions, a Boolean value stating whether the Chemical Reaction is considered as an Equilibrium Reaction (or Full Conversion Reaction) or not
 	/// * `consider_all_reactions` - True means that Compounds formed by non-equilibrium Reactions should be considered during reduction
@@ -19359,7 +19359,7 @@ impl CapeThermoReactions {
 	}
 
 
-	/// Gets the number of compounds occurring in the specified Chemical Reaction.
+	/// Gets the number of Compounds occurring in the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
@@ -19370,7 +19370,7 @@ impl CapeThermoReactions {
 	///
 	/// where
 	///
-	/// * `compound_count` - The number of compounds involved in the specified Chemical Reaction
+	/// * `compound_count` - The number of Compounds involved in the specified Chemical Reaction
 	pub fn get_reaction_compound_count<TypeOfReacId:CapeStringProviderIn>(&self,reac_id:&TypeOfReacId) -> Result<CapeInteger,COBIAError> {
 		let mut compound_count:CapeInteger=0;
 		let result_code = unsafe {
@@ -19383,12 +19383,12 @@ impl CapeThermoReactions {
 	}
 
 
-	/// Gets the identifiers of the compounds participating in the specified Chemical Reaction.
+	/// Gets the identifiers of the Compounds participating in the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `compound_ids` - The identifiers of the compounds participating in the specified Chemical Reaction
+	/// * `compound_ids` - The identifiers of the Compounds participating in the specified Chemical Reaction
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19423,12 +19423,12 @@ impl CapeThermoReactions {
 	}
 
 
-	/// Gets the Phase identifiers for the Compounds involved in the specified Chemical Reaction.
+	/// Gets the phase labels for the Compounds involved in the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `phase_ids` - The Phase identifiers for the Compounds involved in the specified Chemical Reaction
+	/// * `phase_ids` - The phase labels for the Compounds involved in the specified Chemical Reaction
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19455,7 +19455,7 @@ impl CapeThermoReactions {
 	///
 	/// where
 	///
-	/// * `is_valid` - True if the list of Chemical Reaction identifiers is valid, false otherwise
+	/// * `is_valid` - True if the list of Chemical Reaction identifiers is valid, False otherwise
 	pub fn is_reaction_list_valid<TypeOfReacIds:CapeArrayStringProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,reac_ids:&TypeOfReacIds,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_valid:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -19472,7 +19472,7 @@ impl CapeThermoReactions {
 	///
 	///
 	/// # Arguments
-	/// * `present_compound_ids` - List of Compound identifiers of the Compounds that are present (non-zero concentration); UNDEFINED means all Compounds defined on the active Material Object
+	/// * `present_compound_ids` - List of compound identifiers of the Compounds that are present (non-zero concentration); UNDEFINED means all Compounds defined on the active Material Object
 	/// * `reac_ids` - List of active Chemical Reactions identifiers that must be considered
 	/// * `is_equilibrium` - For each of the active Chemical Reactions, a Boolean value stating whether the Chemical Reaction is considered as an Equilibrium Reaction (or Full Conversion Reaction) or not
 	/// * `consider_all_reactions` - True means that Compounds formed by non-equilibrium Reactions should be considered during reduction
@@ -19531,7 +19531,7 @@ pub trait ICapeThermoReactionRoutine {
 	///
 	/// where
 	///
-	/// * `is_available` - True if the specified Reaction Property can be calculated for the specified Chemical Reaction, false otherwise
+	/// * `is_available` - True if the specified Reaction Property can be calculated for the specified Chemical Reaction, False otherwise
 	fn check_reaction_property_availability(&mut self,reac_id:&CapeStringIn,property:&CapeStringIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Calculates specified Reaction Properties for the specified Chemical Reactions.
@@ -19742,7 +19742,7 @@ impl CapeThermoReactionRoutine {
 	///
 	/// where
 	///
-	/// * `is_available` - True if the specified Reaction Property can be calculated for the specified Chemical Reaction, false otherwise
+	/// * `is_available` - True if the specified Reaction Property can be calculated for the specified Chemical Reaction, False otherwise
 	pub fn check_reaction_property_availability<TypeOfReacId:CapeStringProviderIn,TypeOfProperty:CapeStringProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,reac_id:&TypeOfReacId,property:&TypeOfProperty,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_available:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -20008,7 +20008,7 @@ pub trait ICapeThermoEquilibriumRoutineEx {
 	///
 	/// where
 	///
-	/// * `is_reactive` - True if the Equilibrium Server is a Reactive Equilibrium Server, false otherwise
+	/// * `is_reactive` - True if the Equilibrium Server is a Reactive Equilibrium Server, False otherwise
 	fn is_reactive(&mut self) -> Result<CapeBoolean,COBIAError>;
 
 	/// Checks whether a particular type of Equilibrium Calculation is supported.
@@ -20024,7 +20024,7 @@ pub trait ICapeThermoEquilibriumRoutineEx {
 	///
 	/// where
 	///
-	/// * `is_supported` - True if the combination of specifications and solutionType is supported for phases marked present on the active Material Object
+	/// * `is_supported` - True if the combination of specifications and solutionType is supported for Phases marked present on the active Material Object
 	fn check_equilibrium_spec(&mut self,specification1:&CapeArrayStringIn,specification2:&CapeArrayStringIn,solution_type:CapeSolutionType) -> Result<CapeBoolean,COBIAError>;
 }
 
@@ -20193,7 +20193,7 @@ impl CapeThermoEquilibriumRoutineEx {
 	///
 	/// where
 	///
-	/// * `is_reactive` - True if the Equilibrium Server is a Reactive Equilibrium Server, false otherwise
+	/// * `is_reactive` - True if the Equilibrium Server is a Reactive Equilibrium Server, False otherwise
 	pub fn is_reactive(&self) -> Result<CapeBoolean,COBIAError> {
 		let mut is_reactive:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -20219,7 +20219,7 @@ impl CapeThermoEquilibriumRoutineEx {
 	///
 	/// where
 	///
-	/// * `is_supported` - True if the combination of specifications and solutionType is supported for phases marked present on the active Material Object
+	/// * `is_supported` - True if the combination of specifications and solutionType is supported for Phases marked present on the active Material Object
 	pub fn check_equilibrium_spec<TypeOfSpecification1:CapeArrayStringProviderIn,TypeOfSpecification2:CapeArrayStringProviderIn>(&self,specification1:&TypeOfSpecification1,specification2:&TypeOfSpecification2,solution_type:CapeSolutionType) -> Result<CapeBoolean,COBIAError> {
 		let mut is_supported:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -20238,12 +20238,12 @@ impl CapeThermoEquilibriumRoutineEx {
 ///
 /// ICapeThermoCompoundSlates interface
 ///
-/// Interface implemented by Compounds Servers that provide multiple compound slates, such as a Property Package or Material Object.
+/// Interface implemented by Compounds Servers that provide multiple Compound slates, such as a Property Package or Material Object.
 ///
 
 pub trait ICapeThermoCompoundSlates {
 
-	/// Gets the Compound Slate on which the Compound Server operates.
+	/// Gets the Compound Slate on which to operate.
 	///
 	///
 	/// # Arguments
@@ -20253,7 +20253,7 @@ pub trait ICapeThermoCompoundSlates {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_active_compound_slate(&mut self,active_compound_slate:&mut CapeStringOut) -> Result<(),COBIAError>;
 
-	/// Sets the Compound Slate on which the Compound Server operates.
+	/// Sets the Compound Slate on which to operate.
 	///
 	///
 	/// # Arguments
@@ -20417,7 +20417,7 @@ pub trait ICapeThermoCompoundSlatesImpl : ICapeThermoCompoundSlates {
 /// Smart pointer for ICapeThermoCompoundSlates
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoCompoundSlates interface
-/// Interface implemented by Compounds Servers that provide multiple compound slates, such as a Property Package or Material Object.
+/// Interface implemented by Compounds Servers that provide multiple Compound slates, such as a Property Package or Material Object.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOCOMPOUNDSLATES_UUID)]
@@ -20429,7 +20429,7 @@ pub struct CapeThermoCompoundSlates {
 impl CapeThermoCompoundSlates {
 
 
-	/// Gets the Compound Slate on which the Compound Server operates.
+	/// Gets the Compound Slate on which to operate.
 	///
 	///
 	/// # Arguments
@@ -20448,7 +20448,7 @@ impl CapeThermoCompoundSlates {
 	}
 
 
-	/// Sets the Compound Slate on which the Compound Server operates.
+	/// Sets the Compound Slate on which to operate.
 	///
 	///
 	/// # Arguments
@@ -20513,7 +20513,7 @@ impl CapeThermoCompoundSlates {
 ///
 /// ICapeThermoCompoundSlateUtilities interface
 ///
-/// Interface that provides services to the PME and is implemented by external Compound Servers that support multiple Compound Slates.
+/// Interface that provides services to the PME and is implemented by components that support multiple Compound Slates.
 ///
 
 pub trait ICapeThermoCompoundSlateUtilities {
@@ -20544,14 +20544,14 @@ pub trait ICapeThermoCompoundSlateUtilities {
 	///
 	/// where
 	///
-	/// * `is_valid` - True if the given subset of Compounds is valid for the specified Compound Slate, false otherwise
+	/// * `is_valid` - True if the given subset of Compounds is valid for the specified Compound Slate, False otherwise
 	fn validate_compound_list(&mut self,compound_slate:&CapeStringIn,compound_list:&CapeArrayStringIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Converts composition of the given Phase from one Compound Slate to another Compound Slate.
 	///
 	///
 	/// # Arguments
-	/// * `phase_id` - Identifier of the phase for which the composition conversion is requested
+	/// * `phase_id` - phase labels for which the composition conversion is requested
 	/// * `source_compound_slate` - The name of the target Compound Slate, from which conversion takes place
 	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
 	/// * `target_basis` - The basis in which targetComposition is returned
@@ -20561,17 +20561,17 @@ pub trait ICapeThermoCompoundSlateUtilities {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn convert_fraction_single_phase(&mut self,phase_id:&CapeStringIn,source_compound_slate:&CapeStringIn,target_compound_slate:&CapeStringIn,target_basis:&mut CapeStringOut,target_composition:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Converts overall composition from one Compound Slate to another Compound Slate, at phase equilibrium, and also converts composition and phase fraction for specified phases.
+	/// Converts overall composition from one Compound Slate to another Compound Slate, at phase equilibrium, and also converts composition and phase fraction for specified Phases.
 	///
 	///
 	/// # Arguments
 	/// * `source_compound_slate` - The name of the target Compound Slate, from which conversion takes place
 	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
-	/// * `phase_ids` - An optional array of phase IDs for which targetPhaseFraction and targetPhaseComposition are to be provided, or empty
+	/// * `phase_ids` - An optional array of phase labels for which targetPhaseFraction and targetPhaseComposition are to be provided, or UNDEFINED (empty)
 	/// * `target_basis` - The basis in which targetComposition, targetPhaseFraction, targetPhaseComposition values are returned
 	/// * `target_composition` - The converted overall composition
-	/// * `target_phase_fraction` - Converted phase fraction for each phase specified in phaseIDs
-	/// * `target_phase_composition` - Converted composition for each phase specified in phaseIDs (composition of the first phase is followed by the composition of the second phase, and so on)
+	/// * `target_phase_fraction` - Converted phase fraction for each Phase specified in phase labels
+	/// * `target_phase_composition` - Converted composition for each Phase specified in phaseIDs (composition of the first Phase is followed by the composition of the second Phase, and so on)
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -20736,7 +20736,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 /// Smart pointer for ICapeThermoCompoundSlateUtilities
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoCompoundSlateUtilities interface
-/// Interface that provides services to the PME and is implemented by external Compound Servers that support multiple Compound Slates.
+/// Interface that provides services to the PME and is implemented by components that support multiple Compound Slates.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOCOMPOUNDSLATEUTILITIES_UUID)]
@@ -20783,7 +20783,7 @@ impl CapeThermoCompoundSlateUtilities {
 	///
 	/// where
 	///
-	/// * `is_valid` - True if the given subset of Compounds is valid for the specified Compound Slate, false otherwise
+	/// * `is_valid` - True if the given subset of Compounds is valid for the specified Compound Slate, False otherwise
 	pub fn validate_compound_list<TypeOfCompoundSlate:CapeStringProviderIn,TypeOfCompoundList:CapeArrayStringProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,compound_slate:&TypeOfCompoundSlate,compound_list:&TypeOfCompoundList,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_valid:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
@@ -20800,7 +20800,7 @@ impl CapeThermoCompoundSlateUtilities {
 	///
 	///
 	/// # Arguments
-	/// * `phase_id` - Identifier of the phase for which the composition conversion is requested
+	/// * `phase_id` - phase labels for which the composition conversion is requested
 	/// * `source_compound_slate` - The name of the target Compound Slate, from which conversion takes place
 	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
 	/// * `target_basis` - The basis in which targetComposition is returned
@@ -20819,17 +20819,17 @@ impl CapeThermoCompoundSlateUtilities {
 	}
 
 
-	/// Converts overall composition from one Compound Slate to another Compound Slate, at phase equilibrium, and also converts composition and phase fraction for specified phases.
+	/// Converts overall composition from one Compound Slate to another Compound Slate, at phase equilibrium, and also converts composition and phase fraction for specified Phases.
 	///
 	///
 	/// # Arguments
 	/// * `source_compound_slate` - The name of the target Compound Slate, from which conversion takes place
 	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
-	/// * `phase_ids` - An optional array of phase IDs for which targetPhaseFraction and targetPhaseComposition are to be provided, or empty
+	/// * `phase_ids` - An optional array of phase labels for which targetPhaseFraction and targetPhaseComposition are to be provided, or UNDEFINED (empty)
 	/// * `target_basis` - The basis in which targetComposition, targetPhaseFraction, targetPhaseComposition values are returned
 	/// * `target_composition` - The converted overall composition
-	/// * `target_phase_fraction` - Converted phase fraction for each phase specified in phaseIDs
-	/// * `target_phase_composition` - Converted composition for each phase specified in phaseIDs (composition of the first phase is followed by the composition of the second phase, and so on)
+	/// * `target_phase_fraction` - Converted phase fraction for each Phase specified in phase labels
+	/// * `target_phase_composition` - Converted composition for each Phase specified in phaseIDs (composition of the first Phase is followed by the composition of the second Phase, and so on)
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error

@@ -474,13 +474,13 @@ impl cape_open_1_2::ICapeThermoCompounds for SaltWaterPropertyPackage {
 		//check 
 		if self.constant_property_map.is_empty() {
 			//fill constant property map
-			self.constant_property_map.insert("normalboilingpoint".into(),[CapeValueContent::Real(Self::COMP_BOIL_TEMPS[0]),CapeValueContent::Real(Self::COMP_BOIL_TEMPS[1])]);
-			self.constant_property_map.insert("molecularweight".into(),[CapeValueContent::Real(Self::COMP_MOLWTS[0]),CapeValueContent::Real(Self::COMP_MOLWTS[1])]);
-			self.constant_property_map.insert("casregistrynumber".into(),[CapeValueContent::String(Self::COMP_CASNOS[0].to_string()),CapeValueContent::String(Self::COMP_CASNOS[1].to_string())]);
-			self.constant_property_map.insert("chemicalformula".into(),[CapeValueContent::String(Self::COMP_FORMULAS[0].to_string()),CapeValueContent::String(Self::COMP_FORMULAS[1].to_string())]);
-			self.constant_property_map.insert("iupacname".into(),[CapeValueContent::String(Self::COMP_IUPAC_NAMES[0].to_string()),CapeValueContent::String(Self::COMP_IUPAC_NAMES[1].to_string())]);
-			self.constant_property_map.insert("normalfreezingpoint".into(),[CapeValueContent::Real(Self::COMP_MELT_TEMPS[0]),CapeValueContent::Real(Self::COMP_MELT_TEMPS[1])]);
-			self.constant_property_map.insert("smilesformula".into(),[CapeValueContent::String(Self::COMP_SMILES[0].to_string()),CapeValueContent::String(Self::COMP_SMILES[1].to_string())]);
+			self.constant_property_map.insert("normalboilingpoint",[CapeValueContent::Real(Self::COMP_BOIL_TEMPS[0]),CapeValueContent::Real(Self::COMP_BOIL_TEMPS[1])]);
+			self.constant_property_map.insert("molecularweight",[CapeValueContent::Real(Self::COMP_MOLWTS[0]),CapeValueContent::Real(Self::COMP_MOLWTS[1])]);
+			self.constant_property_map.insert("casregistrynumber",[CapeValueContent::String(Self::COMP_CASNOS[0].to_string()),CapeValueContent::String(Self::COMP_CASNOS[1].to_string())]);
+			self.constant_property_map.insert("chemicalformula",[CapeValueContent::String(Self::COMP_FORMULAS[0].to_string()),CapeValueContent::String(Self::COMP_FORMULAS[1].to_string())]);
+			self.constant_property_map.insert("iupacname",[CapeValueContent::String(Self::COMP_IUPAC_NAMES[0].to_string()),CapeValueContent::String(Self::COMP_IUPAC_NAMES[1].to_string())]);
+			self.constant_property_map.insert("normalfreezingpoint",[CapeValueContent::Real(Self::COMP_MELT_TEMPS[0]),CapeValueContent::Real(Self::COMP_MELT_TEMPS[1])]);
+			self.constant_property_map.insert("smilesformula",[CapeValueContent::String(Self::COMP_SMILES[0].to_string()),CapeValueContent::String(Self::COMP_SMILES[1].to_string())]);
 		}
 		//check comp_ids
 		let mut comp_indices: Vec<u32>=Vec::new();

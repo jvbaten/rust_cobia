@@ -128,7 +128,7 @@ impl PropertyTables {
 
 		let mut single_phase_property_map = CapeOpenMap::new();
 		for prop in SinglePhaseProperty::iter() {
-			single_phase_property_map.insert(prop.name().into(),prop);
+			single_phase_property_map.insert(&prop.name().to_string(),prop);
 		}
 		PropertyTables {
 			single_phase_property_map,

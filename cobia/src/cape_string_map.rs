@@ -1,4 +1,4 @@
-use crate::{CapeStringHashKey,C,CapeStringImpl,CapeStringConstProvider};
+use crate::{cape_string_const::CapeStringHashKey,C,CapeStringImpl,CapeStringConstProvider};
 
 /// Class to store a platform dependent string encoding for use in case
 /// insensitive hash maps or for use of case insensitive comparisons.
@@ -10,21 +10,6 @@ use crate::{CapeStringHashKey,C,CapeStringImpl,CapeStringConstProvider};
 /// owned string data, or allows reference to data provided by any 
 /// class that implements CapeStringConstProvider, so that a copy of 
 /// the data is not needed for hash lookups.
-///
-/// This construct however requires that the hash keys are given a
-/// lifetime; the hash keys that are stored in the map are owned by the map
-/// and are given a dummy life time of 'static. Hash keys that are borrowed
-/// from a CapeStringConstProvider are given the lifetime of the provider.
-/// This implies that the life time checker for any mutable references
-/// to the hash map assumes that keys past to such references are of 
-/// life time 'static. Hence, mutable members of the hash map cannot
-/// take a borrowed key, but must use an owned key; in particular we cannot
-/// remove a key from the map using a borrowed key, nor can we return
-/// mutable references to the values in the map based on borrowed keys.
-/// Some traits, like Index, do not allow for such life time constraints
-/// and are not implemented. Use fn get() instead. Other than that, 
-/// the CapeOpenMap generally provides the same interface as the
-/// standard HashMap, on which it is based.
 ///
 /// A common use case in CAPE-OPEN is to make hash maps of
 /// strings for case-insentive lookups: CapeOpenMap` uses the 
@@ -40,8 +25,8 @@ use crate::{CapeStringHashKey,C,CapeStringImpl,CapeStringConstProvider};
 /// use cobia::*;
 /// use cobia::prelude::*;
 /// let mut map=cobia::CapeOpenMap::new();
-/// map.insert(cobia::CapeStringHashKey::from_string("idealGasEnthalpy"),1);
-/// map.insert("idealGasEntropy".into(),2);
+/// map.insert("idealGasEnthalpy",1);
+/// map.insert("idealGasEntropy",2);
 ///
 /// assert_eq!(map.get(&cobia::CapeStringConstNoCase::from_string("IDEALGASENTHALPY")),Some(&1));
 ///
@@ -56,7 +41,7 @@ use crate::{CapeStringHashKey,C,CapeStringImpl,CapeStringConstProvider};
 /// assert_eq!(map.get(&cobia::CapeStringImpl::from_string("CriticalTemperature")),None);
 /// ```
 
-pub struct CapeOpenMap<V> (std::collections::HashMap<CapeStringHashKey<'static>,V,fxhash::FxBuildHasher>);
+pub struct CapeOpenMap<V> (std::collections::HashMap<CapeStringHashKey,V,fxhash::FxBuildHasher>);
 
 impl<V> CapeOpenMap<V> {
 
@@ -72,49 +57,12 @@ impl<V> CapeOpenMap<V> {
 		self.0.capacity()
 	}
 
-	pub fn keys(&self) -> std::collections::hash_map::Keys<'_, CapeStringHashKey<'static>, V> {
-		self.0.keys()
-	}
-
-	pub fn into_keys(self) -> std::collections::hash_map::IntoKeys<CapeStringHashKey<'static>, V> {
-		self.0.into_keys()
-	}
-
-	pub fn values(&self) -> std::collections::hash_map::Values<'_, CapeStringHashKey<'static>, V> {
-		self.0.values()
-	}
-
-	pub fn values_mut(&mut self) -> std::collections::hash_map::ValuesMut<'_, CapeStringHashKey<'static>, V> {
-		self.0.values_mut()
-	}
-
-	pub fn into_values(self) -> std::collections::hash_map::IntoValues<CapeStringHashKey<'static>, V> {
-		self.0.into_values()
-	}
-
-	pub fn iter(&self) -> std::collections::hash_map::Iter<'_, CapeStringHashKey<'static>, V> {
-		self.0.iter()
-	}
-
-	pub fn iter_mut(&mut self) -> std::collections::hash_map::IterMut<'_, CapeStringHashKey<'static>, V> {
-		self.0.iter_mut()
-	}
-
 	pub fn len(&self) -> usize {
 		self.0.len()
 	}
 
 	pub fn is_empty(&self) -> bool {
 		self.0.is_empty()
-	}
-
-	pub fn drain(&mut self) -> std::collections::hash_map::Drain<'_, CapeStringHashKey<'static>, V> {
-		self.0.drain()
-	}
-
-	pub fn retain<F>(&mut self, f: F) 
-		where F: FnMut(&CapeStringHashKey<'static>, &mut V) -> bool {
-		self.0.retain(f)
 	}
 
 	pub fn clear(&mut self) {
@@ -137,39 +85,33 @@ impl<V> CapeOpenMap<V> {
 		self.0.shrink_to(min_capacity)
 	}
 
-	pub fn entry(&mut self, key: CapeStringHashKey<'static>) -> std::collections::hash_map::Entry<'_, CapeStringHashKey<'static>, V> {
-		self.0.entry(key)
-	}
-
-	pub fn get<'a,'b,Q:CapeStringConstProvider>(&'a self, k: &'b Q) -> Option<&'a V> where 'b:'a {
-		let k = CapeStringHashKey::from_string_constant(k);
+	pub fn get<'a,'b,Q:CapeStringConstProvider>(&'a self, k: &'b Q) -> Option<&'a V> {
+		let k = CapeStringHashKey::borrowed_from_string_constant(k);
 		self.0.get(&k)
 	}
 
-	pub fn get_mut<'a>(&'a mut self, k: CapeStringHashKey<'static>) -> Option<&'a mut V> {
+	pub fn get_mut<'a,'b,Q:CapeStringConstProvider>(&'a mut self, k: &'b Q) -> Option<&'a mut V> {
+		let k = CapeStringHashKey::borrowed_from_string_constant(k);
 		self.0.get_mut(&k)
 	}
 
 	pub fn contains_key<Q:CapeStringConstProvider>(&self, k: &Q) -> bool {
-		let k = CapeStringHashKey::from_string_constant(k);
+		let k = CapeStringHashKey::borrowed_from_string_constant(k);
 		self.0.contains_key(&k)
 	}
 
-	pub fn insert_from_cape_string_constant<T:CapeStringConstProvider>(&mut self, k: T, v: V) -> Option<V> {
+	pub fn insert_from_cape_string<T:CapeStringConstProvider>(&mut self, k: &T, v: V) -> Option<V> {
 		let (ptr,size)=k.as_capechar_const_with_length();
 		self.0.insert(CapeStringHashKey::from_cape_char_const(ptr,size),v)
 	}
 
-	pub fn insert(&mut self, k: CapeStringHashKey<'static>, v: V) -> Option<V> {
-		self.0.insert(k,v)
+	pub fn insert(&mut self, k: &str, v: V) -> Option<V> {
+		self.0.insert(CapeStringHashKey::from_string(k),v)
 	}
 
-	pub fn remove<'a>(&'a mut self, k: CapeStringHashKey<'static>) -> Option<V> {
+	pub fn remove<Q:CapeStringConstProvider>(&mut self, k: &Q) -> Option<V> {
+		let k = CapeStringHashKey::borrowed_from_string_constant(k);
 		self.0.remove(&k)
-	}
-
-	pub fn remove_entry<'a>(&mut self, k: CapeStringHashKey<'static>) -> Option<(CapeStringHashKey<'static>, V)> {
-		self.0.remove_entry(&k)
 	}
 
 }

@@ -3,17 +3,22 @@
 mod cape_string_impl_;
 pub use cape_string_impl_::*;
 
-impl<'a,T:AsRef<str>> From<T> for CapeStringHashKey<'a> {
+impl<T:AsRef<str>> From<T> for CapeStringHashKey {
 	fn from(s: T) -> Self {
 		CapeStringHashKey::from_string(s)
 	}
 }
 
-impl<'a> Clone for CapeStringHashKey<'a> {
+impl Clone for CapeStringHashKey {
 	fn clone(&self) -> Self {
 		match self {
-			CapeStringHashKey::Owned(data) => CapeStringHashKey::Owned(data.clone()),
-			CapeStringHashKey::Borrowed(ptr,len,_) => CapeStringHashKey::Borrowed(*ptr,*len,std::default::Default::default())
+			CapeStringHashKey::Owned(data) => {
+				CapeStringHashKey::Owned(data.clone())
+			},
+			CapeStringHashKey::Borrowed(ptr,len) => {
+				//alwats return an owned key
+				CapeStringHashKey::from_cape_char_const(*ptr,*len)
+			}
 		}
 	}
 }

@@ -71,6 +71,23 @@ impl<Element:Copy+Clone,InterfaceType> CapeArrayVec<Element,InterfaceType> {
 		&self.vec
 	}
 
+	/// Consume as vector
+	///
+	/// Returns a the vector of type T, consuming the value.
+	///
+	/// # Example
+	///
+	/// ```
+	/// use cobia;
+	/// use cobia::prelude::*;
+	/// let arr = cobia::CapeArrayRealVec::from_slice(&[2.5,4.5]);
+	/// assert_eq!(arr.into_vec(), vec![2.5,4.5]);
+	/// ```
+
+	pub fn into_vec(self) -> Vec<Element> {
+		self.vec
+	}
+
 	/// Return a mutable vector
 	///
 	/// Returns a mutable reference to the vector of type T.

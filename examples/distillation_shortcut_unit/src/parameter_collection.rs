@@ -65,7 +65,7 @@ impl ParameterCollection {
 		let iden=cape_open_1_2::CapeIdentification::from_object(&parameter).unwrap();
 		let mut name=cobia::CapeStringImpl::new();
 		iden.get_component_name(&mut name).unwrap();
-		self.parameter_name_map.insert_from_cape_string_constant(name,index);
+		self.parameter_name_map.insert_from_cape_string(&name,index);
 	}
 
 	/// Obtain an iterator to iterate over the parameters in the collection.
