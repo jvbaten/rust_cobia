@@ -1,6 +1,6 @@
 # Rust binding for COBIA
 
-(C) Jasper, AmsterCHEM 2025
+(C) Jasper, AmsterCHEM 2026
 
 This workspace implements rust bindings for COBIA.
 

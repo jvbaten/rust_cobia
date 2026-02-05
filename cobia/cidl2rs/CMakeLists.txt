@@ -1,4 +1,4 @@
-#(C) AmsterCHEM 2025
+#(C) AmsterCHEM 2026
 # note that this file is not typically used - it is used only for building the cidl2rs tool as stand-alone. Normally, the tool is built as part of the rust_cobia module build.
 #TODO remove from repo
 

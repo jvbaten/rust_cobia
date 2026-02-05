@@ -27,7 +27,7 @@ OriginalFilename = "distillation_shortcut_unit.dll"
 FileDescription = "Distillation Shortcut CAPE-OPEN Unit Operation"
 ProductVersion = "0.1.2.0"
 ProductName = "Salt Water"
-LegalCopyright = "Copyright © AmsterCHEM 2025"
+LegalCopyright = "Copyright © AmsterCHEM 2026"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 html_dialog = { path = "../utils/html_dialog/html_dialog"}

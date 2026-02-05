@@ -1,6 +1,6 @@
 # Support macros for create `cobia`
 
-(C) Jasper, AmsterCHEM 2025
+(C) Jasper, AmsterCHEM 2026
 
 This create implements support macros for the cobia crate.
 

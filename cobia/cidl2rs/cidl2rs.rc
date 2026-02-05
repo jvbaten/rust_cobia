@@ -26,12 +26,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "AmsterCHEM"
             VALUE "FileDescription", "Convert COBIA IDL to rust module"
-            VALUE "FileVersion", "0.0.0.1"
+            VALUE "FileVersion", "0.0.0.2"
             VALUE "InternalName", "cidl2rs.exe"
-            VALUE "LegalCopyright", "Copyright (C) 2025 AmsterCHEM"
+            VALUE "LegalCopyright", "Copyright (C) 2026 AmsterCHEM"
             VALUE "OriginalFilename", "cidl2rs.exe"
             VALUE "ProductName", "rust_cobia"
-            VALUE "ProductVersion", "0.0.0.1"
+            VALUE "ProductVersion", "0.0.0.2"
 		END
     END
     BLOCK "VarFileInfo"

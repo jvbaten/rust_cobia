@@ -216,6 +216,7 @@ dependencies = [
  "registry",
  "uuid",
  "webview2-com",
+ "win_dbg_logger",
  "windows 0.61.3",
 ]
 

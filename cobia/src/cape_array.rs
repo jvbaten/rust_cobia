@@ -516,6 +516,31 @@ impl<'a,Element:Copy+Clone,Interface:ArrayInterface<Element>> CapeArrayOut<'a,El
 		}
 	}
 
+	/// Set the content of the array from a scalar
+	///
+	/// # Arguments
+	///
+	/// * `value` - A scalar value
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use cobia::*;
+	///
+	/// fn set_content(arr: &mut CapeArrayRealOut) {
+	///		arr.put_scalar(3.1).unwrap();
+	/// }
+	/// 
+	/// let mut arr = cobia::CapeArrayRealVec::new();
+	/// set_content(&mut CapeArrayRealOutFromProvider::from(&mut arr).as_cape_array_real_out());
+	/// assert_eq!(arr.as_vec(), &vec![3.1]); //the values have been stored on the object that implements ICapeArrayReal
+	/// ```
+
+	pub fn put_scalar(&mut self, value: Element) -> Result<(), COBIAError> {
+		let vec=[value];
+		self.put_array(&vec)
+	}
+
 	/// Resize the array
 	///
 	/// # Arguments
