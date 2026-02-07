@@ -2234,6 +2234,56 @@ impl<CollectionItem:CapeSmartPointer> CapeCollection<CollectionItem> {
 
 }
 
+impl<Element:CapeSmartPointer> cobia_collection::CollectionInterface<Element> for CapeCollection<Element> {
+
+	/// Get the number of elements in the collection
+
+	fn size(&self) -> usize {
+		match self.get_count() {
+			Ok(count) => count as usize,
+			Err(_) => 0, //cannot get count
+		}
+	}
+
+	/// Get a collection item by index in the collection
+	///
+	/// The index is zero-based, and must be 0 <= index < size().
+	///
+	/// Note that the collection implements iterators, but not the Index
+	/// or IndexMut trait, as both these traits require returning the 
+	/// item by reference, which is not possible in this context, as 
+	/// the returned object owns the interface pointer.
+
+	fn at(&self,index : usize) -> Result<Element, COBIAError> {
+		self.item_by_index(index as CapeInteger)
+	}
+
+	/// Get a collection item by name
+	///
+	/// The name is case insentive, but must correspond to one of the items
+	/// in the collection.
+
+	fn get(&self,id : &str) -> Result<Element, COBIAError> {
+		self.item_by_name(&CapeStringImpl::from_string(id))
+	}
+
+}
+
+impl<Element:CapeSmartPointer+ 'static> IntoIterator for CapeCollection<Element> {
+	type Item=Element;
+	type IntoIter=cobia_collection::CobiaCollectionIterator<Element>;
+	fn into_iter(self) -> Self::IntoIter {
+		cobia_collection::CobiaCollectionIterator::new(Box::new(self))
+	}
+}
+
+impl<'a,Element:CapeSmartPointer> IntoIterator for &'a CapeCollection<Element> {
+	type Item=Element;
+	type IntoIter=cobia_collection::CobiaCollectionRefIterator<'a,Element>;
+	fn into_iter(self) -> Self::IntoIter {
+		cobia_collection::CobiaCollectionRefIterator::new(self)
+	}
+}
 
 /// ICapeParameter
 ///

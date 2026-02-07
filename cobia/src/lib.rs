@@ -206,7 +206,7 @@ mod cobia_pmc_helpers;
 pub use cobia_pmc_helpers::*;
 mod cape_object_impl;
 pub use cape_object_impl::*;
-mod cape_smart_pointer;
+pub mod cape_smart_pointer;
 #[cfg_attr(not(target_os="windows"), path = "cape_window_id_posix.rs")]
 #[cfg_attr(target_os="windows", path = "cape_window_id_win32.rs")]
 mod cape_window_id;
@@ -625,4 +625,112 @@ mod tests {
 		let folder = get_cobia_folder();
 		assert!(folder.exists());
 	}
+}
+
+#[cfg(test)]
+mod check_borrow_tests {
+	use crate as cobia;
+	use crate::*;
+
+	//Check that the compiler generates unique raw_add_reference functions,
+	// on which check_borrow and check_borrow_mut depend, and that it does not 
+	// do some sort of optimization in which binary equal functions are 
+	// eliminated.
+
+	#[cobia::cape_object_implementation(
+			interfaces = {
+				cape_open_1_2::ICapeIdentification,
+			},
+	  )] 
+	struct CheckObject1 {
+	}
+	impl std::fmt::Display for CheckObject1 {
+		fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+			write!(f, "CheckObject1")
+		}
+	}
+	impl Default for CheckObject1 {
+		fn default() -> Self {
+			Self {
+				cobia_object_data:Default::default()
+			}
+		}
+	}
+	impl cape_open_1_2::ICapeIdentification for CheckObject1 {
+		fn get_component_name(&mut self,_name:&mut cobia::CapeStringOut) -> Result<(), cobia::COBIAError> {
+			Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
+		}
+		fn get_component_description(&mut self,_description:&mut cobia::CapeStringOut) -> Result<(), cobia::COBIAError> {
+			Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
+		}
+		fn set_component_name(&mut self, _name: &cobia::CapeStringIn) -> Result<(), cobia::COBIAError> {
+			Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
+		}
+		fn set_component_description(&mut self, _desc: &cobia::CapeStringIn) -> Result<(), cobia::COBIAError> {
+			Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
+		}
+	}
+
+	#[cobia::cape_object_implementation(
+			interfaces = {
+				cape_open_1_2::ICapeIdentification,
+			},
+	  )] 
+	struct CheckObject2 {
+	}
+	impl std::fmt::Display for CheckObject2 {
+		fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+			write!(f, "CheckObject2")
+		}
+	}
+	impl Default for CheckObject2 {
+		fn default() -> Self {
+			Self {
+				cobia_object_data:Default::default()
+			}
+		}
+	}
+	impl cape_open_1_2::ICapeIdentification for CheckObject2 {
+		fn get_component_name(&mut self,_name:&mut cobia::CapeStringOut) -> Result<(), cobia::COBIAError> {
+			Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
+		}
+		fn get_component_description(&mut self,_description:&mut cobia::CapeStringOut) -> Result<(), cobia::COBIAError> {
+			Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
+		}
+		fn set_component_name(&mut self, _name: &cobia::CapeStringIn) -> Result<(), cobia::COBIAError> {
+			Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
+		}
+		fn set_component_description(&mut self, _desc: &cobia::CapeStringIn) -> Result<(), cobia::COBIAError> {
+			Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
+		}
+	}
+
+	#[test]
+	fn validate_check_borrow() {
+		cobia::cape_open_initialize().unwrap();
+		let obj : CapeObject = CheckObject1::create();
+		assert!(unsafe{CheckObject1::check_borrow(&obj)}.is_some());
+	}
+
+	#[test]
+	fn validate_check_borrow_fail() {
+		cobia::cape_open_initialize().unwrap();
+		let obj : CapeObject = CheckObject2::create();
+		assert!(unsafe{CheckObject1::check_borrow(&obj)}.is_none());
+	}
+
+	#[test]
+	fn validate_check_borrow_mut() {
+		cobia::cape_open_initialize().unwrap();
+		let mut obj : CapeObject = CheckObject1::create();
+		assert!(unsafe{CheckObject1::check_borrow_mut(&mut obj)}.is_some());
+	}
+
+	#[test]
+	fn validate_check_borrow_mut_fail() {
+		cobia::cape_open_initialize().unwrap();
+		let mut obj : CapeObject = CheckObject2::create();
+		assert!(unsafe{CheckObject1::check_borrow_mut(&mut obj)}.is_none());
+	}
+
 }

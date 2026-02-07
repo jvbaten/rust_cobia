@@ -354,7 +354,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 
 		#cape_create_instance
 
-		use cobia::prelude::CapeSmartPointer;
+		use cobia::cape_smart_pointer::*;
 
 		impl #impl_generics #structname #ty_generics #where_clause {
 			#fn_create_instance
@@ -363,7 +363,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 			/// This function panics if the created object does not implement the
 			/// interface corresponding to the smart pointer to be returned. For a 
 			/// non-panic version, use the try_create() function.
-			pub(crate) fn create<T:cobia::prelude::CapeSmartPointer>(#create_arguments_def) -> T {
+			pub(crate) fn create<T:cobia::cape_smart_pointer::CapeSmartPointer>(#create_arguments_def) -> T {
 				let mut #ptr_name: *mut C::ICapeInterface=std::ptr::null_mut();
 				Self::create_instance(&mut #ptr_name as *mut *mut C::ICapeInterface,#create_arguments);
 				match T::from_cape_interface_pointer(#ptr_name) {
@@ -379,7 +379,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 			///
 			/// This function returns an error if the created object does not implement the
 			/// interface corresponding to the smart pointer to be returned. 
-			pub(crate) fn try_create<T:cobia::prelude::CapeSmartPointer>(#create_arguments_def) -> Result<T,COBIAError> {
+			pub(crate) fn try_create<T:cobia::cape_smart_pointer::CapeSmartPointer>(#create_arguments_def) -> Result<T,COBIAError> {
 				let mut #ptr_name: *mut C::ICapeInterface=std::ptr::null_mut();
 				Self::create_instance(&mut #ptr_name as *mut *mut C::ICapeInterface,#create_arguments);
 				let p=CapeObject::from_interface_pointer(#ptr_name);
@@ -389,15 +389,14 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 			/// 
 			/// Note that as the reference is created from a smart pointer, the reference
 			/// is valid only as long as the smart pointer is valid. The reference
-			/// is not checked for multiple borrows
+			/// is not checked for multiple borrows.
 			///
 			/// # Safety
 			///
 			/// The user must ensure that the smart pointer contains a valid 
-			/// object, and that the object is of the type that is being borrowed. It is 
-			/// not possible for the compiler to check this, as the borrow is done
-			/// through the native object pointer in the interface.
-			pub(crate) unsafe fn borrow<T:cobia::prelude::CapeSmartPointer>(smart_pointer:&T) -> &Self {
+			/// object, and that the object is of the type that is being borrowed.
+			/// To check the object type, use `check_borrow`.
+			pub(crate) unsafe fn borrow<T:cobia::cape_smart_pointer::CapeSmartPointer>(smart_pointer:&T) -> &Self {
 				let p=smart_pointer.as_cape_interface_pointer();
 				let me=unsafe {(*p).me};
 				let p = me as *const Self;
@@ -407,21 +406,92 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 			/// 
 			/// Note that as the reference is created from a smart pointer, the reference
 			/// is valid only as long as the smart pointer is valid. The reference
-			/// is not checked for multiple borrows
+			/// is not checked for multiple borrows.
 			///
 			/// # Safety
 			///
 			/// This function is unsafe because it allows mutable access to the object. 
 			/// Also the user must ensure that the smart pointer contains a valid 
-			/// object, and that the object is of the type that is being borrowed. It is 
-			/// not possible for the compiler to check this, as the borrow is done
-			/// through the native object pointer in the interface.
-			pub(crate) unsafe fn borrow_mut<T:cobia::prelude::CapeSmartPointer>(smart_pointer:&mut T) -> &mut Self {
+			/// object, and that the object is of the type that is being borrowed. 
+			/// To check the object type, use `check_borrow_mut`.
+			pub(crate) unsafe fn borrow_mut<T:cobia::cape_smart_pointer::CapeSmartPointer>(smart_pointer:&mut T) -> &mut Self {
 				let p=smart_pointer.as_cape_interface_pointer();
 				let me=unsafe {(*p).me};
 				let p = me as *mut Self;
 				unsafe {&mut *p}				
 			}
+			/// Get a reference to the object
+			/// 
+			/// Note that as the reference is created from a smart pointer, the reference
+			/// is valid only as long as the smart pointer is valid. The reference
+			/// is not checked for multiple borrows.
+			///
+			/// In addition to `borrow`, this function checks that the smart pointer points to 
+			/// the object. If not, the borrow fails.
+			///
+			/// # Safety
+			///
+			/// The user must ensure that the smart pointer contains a valid 
+			/// object. 
+			pub(crate) unsafe fn check_borrow<T:cobia::cape_smart_pointer::CapeSmartPointer>(smart_pointer:&T) -> Option<&Self> {
+				let p=smart_pointer.as_cape_interface_pointer();
+				let src_add_ref=unsafe {(*((*p).vTbl)).addReference};
+				match src_add_ref {
+					Some(fn_ptr) => {
+						//check against my own function pointer
+						let self_object_data=#cobiainfostruct::new();
+						let my_add_ref=unsafe {(*self_object_data.cape_object_data.get_raw_interface().vTbl).addReference};
+						#[allow(unpredictable_function_pointer_comparisons)]
+						if my_add_ref.unwrap()==fn_ptr {
+							//same object, can borrow
+							let me=unsafe {(*p).me};
+							let p = me as *const Self;
+							unsafe {Some(&*p)}
+						} else {
+							//different object, cannot borrow
+							None
+						}
+					},
+					_ => None,
+				}
+			}
+			/// Get a mutable reference to the object
+			/// 
+			/// Note that as the reference is created from a smart pointer, the reference
+			/// is valid only as long as the smart pointer is valid. The reference
+			/// is not checked for multiple borrows.
+			///
+			/// In addition to `borrow_mut`, this function checks that the smart pointer points to 
+			/// the object. If not, the borrow fails.
+			///
+			/// # Safety
+			///
+			/// The user must ensure that the smart pointer contains a valid 
+			/// object. 
+			pub(crate) unsafe fn check_borrow_mut<T:cobia::cape_smart_pointer::CapeSmartPointer>(smart_pointer:&T) -> Option<&Self> {
+				let p=smart_pointer.as_cape_interface_pointer();
+				let src_add_ref=unsafe {(*((*p).vTbl)).addReference};
+				match src_add_ref {
+					Some(fn_ptr) => {
+						//check against my own function pointer
+						let self_object_data=#cobiainfostruct::new();
+						let my_add_ref=unsafe {(*self_object_data.cape_object_data.get_raw_interface().vTbl).addReference};
+						#[allow(unpredictable_function_pointer_comparisons)]
+						if my_add_ref.unwrap()==fn_ptr {
+							//same object, can borrow
+							let me=unsafe {(*p).me};
+							let p = me as *mut Self;
+							unsafe {Some(&mut *p)}
+						} else {
+							//different object, cannot borrow
+							None
+						}
+					},
+					_ => None,
+				}
+			}
+
+			
 		}
 
 		impl Default for #cobiainfostruct {

@@ -23,6 +23,12 @@ pub struct CapeObjectData {
 	interface_map: std::collections::HashMap<CapeUUID, *mut C::ICapeInterface>,
 }
 
+impl CapeObjectData {
+	pub fn get_raw_interface(&self) -> C::ICapeInterface {
+		self.interface
+	}
+}
+
 unsafe impl Send for CapeObjectData {}
 unsafe impl Sync for CapeObjectData {}
 

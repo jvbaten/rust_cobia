@@ -3,17 +3,124 @@ use crate::*;
 use std::marker::PhantomData;
 use cape_smart_pointer::CapeSmartPointer;
 
+pub trait CollectionInterface<Element:CapeSmartPointer> {
+	/// Get the number of elements in the collection
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use cobia;
+	/// use cobia::prelude::*;
+	/// cobia::cape_open_initialize().unwrap();
+	/// let library_enumerator = cobia::CapeTypeLibraries::new().unwrap();
+	/// let libraries = library_enumerator.libraries().unwrap(); //this is a CobiaCollection smart pointer
+	/// assert!(libraries.size() > 0); //normally the CAPE-OPEN type libraries are registered
+	/// cobia::cape_open_cleanup();
+	/// ```
+	fn size(&self) -> usize;
+	/// Get a collection item by name
+	///
+	/// The name is case insentive, but must correspond to one of the items
+	/// in the collection.
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use cobia;
+	/// use cobia::prelude::*;
+	/// cobia::cape_open_initialize().unwrap();
+	/// let library_enumerator = cobia::CapeTypeLibraries::new().unwrap();
+	/// let libraries = library_enumerator.libraries().unwrap(); //this is a CobiaCollection smart pointer
+	/// assert!(libraries.size() > 0); //normally the CAPE-OPEN type libraries are registered
+	/// let library = libraries.at(0).unwrap();
+	/// let lib_name = library.get_name().unwrap();
+	/// let library1 = libraries.get(&lib_name).unwrap();
+	/// assert_eq!(library.get_uuid().unwrap(),library1.get_uuid().unwrap());
+	/// cobia::cape_open_cleanup();
+	/// ```
+	fn get(&self,id : &str) -> Result<Element, COBIAError>;
+	/// Create a new CobiaCollection from an interface pointer without adding a reference
+	///
+	/// This member is not typically called. Instead, the CobiaCollection is created by the API functions that return it.
+	///
+	/// # Safety
+	///
+	/// The interface pointer must be valid and must point to an object that implements the ICobiaCollection interface.
+	///
+	/// # Panics
+	///
+	/// This function panics if the interface pointer is null.
+	fn at(&self,index : usize) -> Result<Element, COBIAError>;
+}
+
+pub trait CollectionInterfaceGetIterator<Element:CapeSmartPointer> {
+	///Get an iterator for the collection by reference
+	///
+	///This iterator does not consume the collection.
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use cobia;
+	/// use cobia::prelude::*;
+	/// cobia::cape_open_initialize().unwrap();
+	/// let library_enumerator = cobia::CapeTypeLibraries::new().unwrap();
+	/// let libraries = library_enumerator.libraries().unwrap(); //this is a CobiaCollection smart pointer
+	/// let mut found=false;
+	/// for library in libraries.iter() {
+	///     let lib_name = library.get_name().unwrap();
+	///     if lib_name=="CAPEOPEN_1_2" { //performance note: this is not efficient, but it is an example
+	///         found=true;
+	///			break;
+	///     }
+	/// }
+	/// assert!(found);
+	/// cobia::cape_open_cleanup();
+	/// ```
+	fn iter(&self) -> CobiaCollectionRefIterator<'_,Element>;
+}
+
+impl<T,Element:CapeSmartPointer> CollectionInterfaceGetIterator<Element> for T where T: CollectionInterface<Element> {
+
+	///Get an iterator for the collection by reference
+	///
+	///This iterator does not consume the collection.
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use cobia;
+	/// use cobia::prelude::*;
+	/// cobia::cape_open_initialize().unwrap();
+	/// let library_enumerator = cobia::CapeTypeLibraries::new().unwrap();
+	/// let libraries = library_enumerator.libraries().unwrap(); //this is a CobiaCollection smart pointer
+	/// let mut found=false;
+	/// for library in libraries.iter() {
+	///     let lib_name = library.get_name().unwrap();
+	///     if lib_name=="CAPEOPEN_1_2" { //performance note: this is not efficient, but it is an example
+	///         found=true;
+	///			break;
+	///     }
+	/// }
+	/// assert!(found);
+	/// cobia::cape_open_cleanup();
+	/// ```
+
+	fn iter(&self) -> CobiaCollectionRefIterator<'_,Element> {
+		CobiaCollectionRefIterator {
+			collection:self,
+			index:0
+		}
+	}
+
+}
+
+
 const ICOBIACOLLECTION_UUID:CapeUUID=CapeUUID::from_slice(&[0xdeu8,0xafu8,0xeau8,0x79u8,0xd3u8,0x49u8,0x4du8,0x03u8,0xbbu8,0x05u8,0x37u8,0x7cu8,0x0du8,0x3eu8,0x47u8,0x8bu8]);
 
-/// CobiaCollectionBase wraps an collection interface
-/// 
-/// The collection interface is returned in case muliple objects
-/// are returned by a method. 
-/// 
-/// Collection items each must have a unique name, and the name
-/// is exposed from the approproate identification interface.
-/// 
-/// Collection items are accessed by index or by name.
+/// CobiaCollection wraps an ICobiaCollection interface
+///
+/// This interface is returned by API functions that return multiple objects.
 ///
 /// #Example
 ///
@@ -28,16 +135,16 @@ const ICOBIACOLLECTION_UUID:CapeUUID=CapeUUID::from_slice(&[0xdeu8,0xafu8,0xeau8
 /// ```
 
 #[cape_smart_pointer(ICOBIACOLLECTION_UUID)]
-pub struct CobiaCollectionBase<Element:CapeSmartPointer> {
+pub struct CobiaCollection<Element:CapeSmartPointer> {
 	interface: *mut C::ICobiaCollection, //the interface is cast to ICapeCollection - function signatures are identical
 	element_type : PhantomData<Element>
 }
 
-impl<Element:CapeSmartPointer> CobiaCollectionBase<Element> {
+impl<Element:CapeSmartPointer> CobiaCollection<Element> {
 
-	/// Create a new CobiaCollectionBase from an interface pointer
+	/// Create a new CobiaCollection from an interface pointer
 	///
-	/// This member is not typically called. Instead, the CobiaCollectionBase is created by the API functions that return it.
+	/// This member is not typically called. Instead, the CobiaCollection is created by the API functions that return it.
 	///
 	/// # Safety
 	///
@@ -49,7 +156,7 @@ impl<Element:CapeSmartPointer> CobiaCollectionBase<Element> {
 
 	pub(crate) fn from_interface_pointer(interface: *mut C::ICobiaCollection) ->  Self {
 		if interface.is_null() {
-			panic!("Null pointer in creation of CobiaCollectionBase<Element>");
+			panic!("Null pointer in creation of CobiaCollection<Element>");
 		}
 		unsafe {((*(*interface).vTbl).base.addReference.unwrap())((*interface).me)};
 		Self {
@@ -58,9 +165,9 @@ impl<Element:CapeSmartPointer> CobiaCollectionBase<Element> {
 		}
 	}
 
-	/// Create a new CobiaCollectionBase from an interface pointer without adding a reference
+	/// Create a new CobiaCollection from an interface pointer without adding a reference
 	///
-	/// This member is not typically called. Instead, the CobiaCollectionBase is created by the API functions that return it.
+	/// This member is not typically called. Instead, the CobiaCollection is created by the API functions that return it.
 	///
 	/// # Safety
 	///
@@ -72,13 +179,16 @@ impl<Element:CapeSmartPointer> CobiaCollectionBase<Element> {
 
 	pub(crate) fn attach(interface: *mut C::ICobiaCollection) ->  Self {
 		if interface.is_null() {
-			panic!("Null pointer in creation of CobiaCollectionBase<Element>");
+			panic!("Null pointer in creation of CobiaCollection<Element>");
 		}
 		Self {
 			interface,
 			element_type: PhantomData,
 		}
 	}
+}
+
+impl<Element:CapeSmartPointer> CollectionInterface<Element> for CobiaCollection<Element> {
 
 	/// Get the number of elements in the collection
 	///
@@ -94,7 +204,7 @@ impl<Element:CapeSmartPointer> CobiaCollectionBase<Element> {
 	/// cobia::cape_open_cleanup();
 	/// ```
 
-	pub fn size(&self) -> usize {
+	fn size(&self) -> usize {
 		let mut size: C::CapeInteger = 0;
 		let res=unsafe { (*(*self.interface).vTbl).getCount.unwrap()((*self.interface).me, &mut size as *mut C::CapeInteger) };
 		if res == COBIAERR_NOERROR { 
@@ -128,7 +238,7 @@ impl<Element:CapeSmartPointer> CobiaCollectionBase<Element> {
 	/// cobia::cape_open_cleanup();
 	/// ```
 
-	pub fn at(&self,index : usize) -> Result<Element, COBIAError> {
+	fn at(&self,index : usize) -> Result<Element, COBIAError> {
 		let mut el : *mut C::ICapeInterface=std::ptr::null_mut();
 		let index = index as C::CapeInteger;
 		let res=unsafe { (*(*self.interface).vTbl).ItemByIndex.unwrap()((*self.interface).me,index,&mut el as *mut *mut C::ICapeInterface) };
@@ -165,7 +275,7 @@ impl<Element:CapeSmartPointer> CobiaCollectionBase<Element> {
 	/// cobia::cape_open_cleanup();
 	/// ```
 
-	pub fn get(&self,id : &str) -> Result<Element, COBIAError> {
+	fn get(&self,id : &str) -> Result<Element, COBIAError> {
 		let mut el : *mut C::ICapeInterface=std::ptr::null_mut();
 		let id=CapeStringImpl::from_string(id);
 		let res=unsafe { (*(*self.interface).vTbl).ItemByName.unwrap()((*self.interface).me,(&id.as_cape_string_in() as *const C::ICapeString).cast_mut(),&mut el as *mut *mut C::ICapeInterface) };
@@ -181,40 +291,9 @@ impl<Element:CapeSmartPointer> CobiaCollectionBase<Element> {
 		}
 	}
 
-	///Get an iterator for the collection by reference
-	///
-	///This iterator does not consume the collection.
-	///
-	/// # Examples
-	///
-	/// ```
-	/// use cobia;
-	/// use cobia::prelude::*;
-	/// cobia::cape_open_initialize().unwrap();
-	/// let library_enumerator = cobia::CapeTypeLibraries::new().unwrap();
-	/// let libraries = library_enumerator.libraries().unwrap(); //this is a CobiaCollection smart pointer
-	/// let mut found=false;
-	/// for library in libraries.iter() {
-	///     let lib_name = library.get_name().unwrap();
-	///     if lib_name=="CAPEOPEN_1_2" { //performance note: this is not efficient, but it is an example
-	///         found=true;
-	///			break;
-	///     }
-	/// }
-	/// assert!(found);
-	/// cobia::cape_open_cleanup();
-	/// ```
-
-	pub fn iter(&self) -> CobiaCollectionBaseRefIterator<'_,Element> {
-		CobiaCollectionBaseRefIterator {
-			collection:self,
-			index:0
-		}
-	}
-
 }
 
-/// Iterator that consumes a CobiaCollectionBase
+/// Iterator that consumes a CollectionInterface
 ///
 /// This iterator consumes the collection and returns the elements.
 ///
@@ -238,12 +317,21 @@ impl<Element:CapeSmartPointer> CobiaCollectionBase<Element> {
 /// cobia::cape_open_cleanup();
 /// ```
 
-pub struct CobiaCollectionBaseIterator<Element:CapeSmartPointer> {
-	collection:CobiaCollectionBase<Element>,
+pub struct CobiaCollectionIterator<Element:CapeSmartPointer> {
+	collection:Box<dyn CollectionInterface<Element>>,
 	index:usize
 }
 
-impl<Element:CapeSmartPointer> Iterator for CobiaCollectionBaseIterator<Element> {
+impl<Element:CapeSmartPointer> CobiaCollectionIterator<Element> {
+	pub fn new(collection:Box<dyn CollectionInterface<Element>>) -> Self {
+		Self {
+			collection,
+			index:0
+		}
+	}
+}
+
+impl<Element:CapeSmartPointer> Iterator for CobiaCollectionIterator<Element> {
 	type Item=Element;
 	fn next(&mut self) -> Option<Self::Item> {
 		if self.index < self.collection.size() {
@@ -259,18 +347,15 @@ impl<Element:CapeSmartPointer> Iterator for CobiaCollectionBaseIterator<Element>
 	}
 }
 
-impl<Element:CapeSmartPointer> IntoIterator for CobiaCollectionBase<Element> {
+impl<Element:CapeSmartPointer+ 'static> IntoIterator for CobiaCollection<Element> {
 	type Item=Element;
-	type IntoIter=CobiaCollectionBaseIterator<Element>;
+	type IntoIter=CobiaCollectionIterator<Element>;
 	fn into_iter(self) -> Self::IntoIter {
-		CobiaCollectionBaseIterator {
-			collection:self,
-			index:0
-		}
+		CobiaCollectionIterator::new(Box::new(self))
 	}
 }
 
-/// Iterator that using a reference to CobiaCollectionBase
+/// Iterator that using a reference to CobiaCollection
 ///
 /// This iterator returns the elements and does not consume the collection.
 ///
@@ -294,12 +379,21 @@ impl<Element:CapeSmartPointer> IntoIterator for CobiaCollectionBase<Element> {
 /// cobia::cape_open_cleanup();
 /// ```
 
-pub struct CobiaCollectionBaseRefIterator<'a,Element:CapeSmartPointer> {
-	collection:&'a CobiaCollectionBase<Element>,
+pub struct CobiaCollectionRefIterator<'a,Element:CapeSmartPointer> {
+	collection:&'a dyn CollectionInterface<Element>,
 	index:usize
 }
 
-impl<'a,Element:CapeSmartPointer> Iterator for CobiaCollectionBaseRefIterator<'a,Element> {
+impl<'a,Element:CapeSmartPointer> CobiaCollectionRefIterator<'a,Element> {
+	pub fn new(collection:&'a dyn CollectionInterface<Element>) -> Self {
+		Self {
+			collection,
+			index:0
+		}
+	}
+}
+
+impl<'a,Element:CapeSmartPointer> Iterator for CobiaCollectionRefIterator<'a,Element> {
 	type Item=Element;
 	fn next(&mut self) -> Option<Self::Item> {
 		if self.index < self.collection.size() {
@@ -315,32 +409,11 @@ impl<'a,Element:CapeSmartPointer> Iterator for CobiaCollectionBaseRefIterator<'a
 	}
 }
 
-impl<'a,Element:CapeSmartPointer> IntoIterator for &'a CobiaCollectionBase<Element> {
+impl<'a,Element:CapeSmartPointer> IntoIterator for &'a CobiaCollection<Element> {
 	type Item=Element;
-	type IntoIter=CobiaCollectionBaseRefIterator<'a,Element>;
+	type IntoIter=CobiaCollectionRefIterator<'a,Element>;
 	fn into_iter(self) -> Self::IntoIter {
-		CobiaCollectionBaseRefIterator {
-			collection:&self,
-			index:0
-		}
+		CobiaCollectionRefIterator::new(self)
 	}
 }
-
-/// CobiaCollection wraps an ICobiaCollection interface
-///
-/// This interface is returned by API functions that return multiple objects.
-///
-/// #Example
-///
-/// ```
-/// use cobia;
-/// use cobia::prelude::*;
-/// cobia::cape_open_initialize().unwrap();
-/// let library_enumerator = cobia::CapeTypeLibraries::new().unwrap();
-/// let libraries = library_enumerator.libraries().unwrap(); //this is a CobiaCollection smart pointer
-/// assert!(libraries.size() > 0); //normally the CAPE-OPEN type libraries are registered
-/// cobia::cape_open_cleanup();
-/// ```
-
-pub type CobiaCollection<Element> = CobiaCollectionBase<Element>;
 

@@ -15,3 +15,4 @@ pub use crate::ICapeInterfaceImpl;
 pub use crate::CapeRegistryKeyReader;
 pub use crate::PMCRegisterationInfo;
 pub use crate::cape_smart_pointer::CapeSmartPointer;
+pub use crate::cobia_collection::*;

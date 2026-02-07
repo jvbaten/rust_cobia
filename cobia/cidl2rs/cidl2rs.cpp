@@ -1562,6 +1562,55 @@ int main(int argc,char* argv[]) {
 				code<<"\t\t};\n"
 					  "}\n"
 					  "\n";
+				//identify collection interface
+				bool is_collection_interface=false;
+				if (iface.TemplateArgCount()==1) {
+					bool has_count{};
+					bool has_item_by_name{};
+					bool has_item_by_index{};
+					ConstCapeString property_get{COBIATEXT("property_get")};
+					ConstCapeString long_name{COBIATEXT("long_name")};
+					ConstCapeString arg_in{COBIATEXT("in")};
+					ConstCapeString arg_out{COBIATEXT("out")};
+					for (int method_index=0;method_index<iface.MethodCount();method_index++) {
+						auto method=iface.Method(method_index);
+						CapeStringImpl method_name;
+						method.Name(method_name);
+						if (method_name.compare(COBIATEXT("Count"))==0) {
+							if ((method.HasAttribute(property_get))&&
+								(!method.HasAttribute(long_name))&&
+								(method.ArgumentCount()==1)) {
+								auto arg1=method.Argument(0);
+								if ((arg1.HasAttribute(arg_out))&&(arg1.DataType().Type()==IDL::IDLDataType_CapeInteger)) {
+									has_count=true;
+								}
+							}
+						} else if (method_name.compare(COBIATEXT("Item"))==0) {
+							if ((!method.HasAttribute(ConstCapeString{COBIATEXT("property_get")}))&&
+								(method.HasAttribute(long_name))&&
+								(method.ArgumentCount()==2)) {
+								CapeStringImpl name;
+								method.AttributeValue(long_name,name);
+								if (name==COBIATEXT("ItemByName")) {
+									auto arg1=method.Argument(0);
+									auto arg2=method.Argument(1);
+									if ((arg1.HasAttribute(arg_in))&&(arg1.DataType().Type()==IDL::IDLDataType_CapeString)&&
+										(arg2.HasAttribute(arg_out))&&(arg2.DataType().Type()==IDL::IDLDataType_CapeTemplateArgument)) {
+										has_item_by_name=true;
+									}
+								} else if (name==COBIATEXT("ItemByIndex")) {
+									auto arg1=method.Argument(0);
+									auto arg2=method.Argument(1);
+									if ((arg1.HasAttribute(arg_in))&&(arg1.DataType().Type()==IDL::IDLDataType_CapeInteger)&&
+										(arg2.HasAttribute(arg_out))&&(arg2.DataType().Type()==IDL::IDLDataType_CapeTemplateArgument)) {
+										has_item_by_index=true;
+									}
+								}
+							}
+						}
+					}
+					is_collection_interface=has_count&&has_item_by_name&&has_item_by_index;
+				}
 				//smart pointer definition
 				std::string smart_pointer_name;
 				if (iface_name.front()=='I') {
@@ -1876,6 +1925,58 @@ int main(int argc,char* argv[]) {
 				}
 				code<<"}\n"
 					"\n";
+				if (is_collection_interface) {
+					code<<"impl<Element:CapeSmartPointer> cobia_collection::CollectionInterface<Element> for "<<smart_pointer_name<<"<Element> {\n"
+						"\n"
+						"	/// Get the number of elements in the collection\n"
+						"\n"
+						"	fn size(&self) -> usize {\n"
+						"		match self.get_count() {\n"
+						"			Ok(count) => count as usize,\n"
+						"			Err(_) => 0, //cannot get count\n"
+						"		}\n"
+						"	}\n"
+						"\n"
+						"	/// Get a collection item by index in the collection\n"
+						"	///\n"
+						"	/// The index is zero-based, and must be 0 <= index < size().\n"
+						"	///\n"
+						"	/// Note that the collection implements iterators, but not the Index\n"
+						"	/// or IndexMut trait, as both these traits require returning the \n"
+						"	/// item by reference, which is not possible in this context, as \n"
+						"	/// the returned object owns the interface pointer.\n"
+						"\n"
+						"	fn at(&self,index : usize) -> Result<Element, COBIAError> {\n"
+						"		self.item_by_index(index as CapeInteger)\n"
+						"	}\n"
+						"\n"
+						"	/// Get a collection item by name\n"
+						"	///\n"
+						"	/// The name is case insentive, but must correspond to one of the items\n"
+						"	/// in the collection.\n"
+						"\n"
+						"	fn get(&self,id : &str) -> Result<Element, COBIAError> {\n"
+						"		self.item_by_name(&CapeStringImpl::from_string(id))\n"
+						"	}\n"
+						"\n"
+						"}\n"
+						"\n"
+						"impl<Element:CapeSmartPointer+ 'static> IntoIterator for "<<smart_pointer_name<<"<Element> {\n"
+						"	type Item=Element;\n"
+						"	type IntoIter=cobia_collection::CobiaCollectionIterator<Element>;\n"
+						"	fn into_iter(self) -> Self::IntoIter {\n"
+						"		cobia_collection::CobiaCollectionIterator::new(Box::new(self))\n"
+						"	}\n"
+						"}\n"
+						"\n"
+						"impl<'a,Element:CapeSmartPointer> IntoIterator for &'a "<<smart_pointer_name<<"<Element> {\n"
+						"	type Item=Element;\n"
+						"	type IntoIter=cobia_collection::CobiaCollectionRefIterator<'a,Element>;\n"
+						"	fn into_iter(self) -> Self::IntoIter {\n"
+						"		cobia_collection::CobiaCollectionRefIterator::new(self)\n"
+						"	}\n"
+						"}\n";
+				}
 			}
 
 		}
