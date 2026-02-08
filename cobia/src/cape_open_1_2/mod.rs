@@ -2167,17 +2167,22 @@ impl<CollectionItem:CapeSmartPointer> CapeCollection<CollectionItem> {
 	///
 	/// * `item` - The item in the collection at the specified index
 	pub fn item_by_index(&self,index:CapeInteger) -> Result<CollectionItem,COBIAError> {
-		let mut item: *mut crate::C::ICapeInterface=std::ptr::null_mut();
+		let mut item_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).ItemByIndex.unwrap())((*self.interface).me,index,&mut item as *mut *mut crate::C::ICapeInterface)
+			((*(*self.interface).vTbl).ItemByIndex.unwrap())((*self.interface).me,index,&mut item_ptr as *mut *mut crate::C::ICapeInterface)
 		};
-		let item=crate::CapeObject::attach(item);
+		let item=crate::CapeObject::attach(item_ptr);
 		let item=match CollectionItem::from_object(&item) {
 			Ok(_item) => _item,
 			Err(e) => {return Err(e);}
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(item)},
+			COBIAERR_NOERROR => {
+				if item_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(item)
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -2196,17 +2201,22 @@ impl<CollectionItem:CapeSmartPointer> CapeCollection<CollectionItem> {
 	///
 	/// * `item` - The item in the collection with the specified name
 	pub fn item_by_name<TypeOfName:CapeStringProviderIn>(&self,name:&TypeOfName) -> Result<CollectionItem,COBIAError> {
-		let mut item: *mut crate::C::ICapeInterface=std::ptr::null_mut();
+		let mut item_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).ItemByName.unwrap())((*self.interface).me,(&name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut item as *mut *mut crate::C::ICapeInterface)
+			((*(*self.interface).vTbl).ItemByName.unwrap())((*self.interface).me,(&name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut item_ptr as *mut *mut crate::C::ICapeInterface)
 		};
-		let item=crate::CapeObject::attach(item);
+		let item=crate::CapeObject::attach(item_ptr);
 		let item=match CollectionItem::from_object(&item) {
 			Ok(_item) => _item,
 			Err(e) => {return Err(e);}
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(item)},
+			COBIAERR_NOERROR => {
+				if item_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(item)
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -9548,12 +9558,17 @@ impl CapeUtilities {
 	///
 	/// * `parameters` - The collection of parameters of the object
 	pub fn get_parameters(&self) -> Result<CapeCollection<CapeParameter>,COBIAError> {
-		let mut parameters: *mut C::CAPEOPEN_1_2_ICapeCollection=std::ptr::null_mut();
+		let mut parameters_ptr: *mut C::CAPEOPEN_1_2_ICapeCollection=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).getParameters.unwrap())((*self.interface).me,&mut parameters as *mut *mut C::CAPEOPEN_1_2_ICapeCollection)
+			((*(*self.interface).vTbl).getParameters.unwrap())((*self.interface).me,&mut parameters_ptr as *mut *mut C::CAPEOPEN_1_2_ICapeCollection)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(CapeCollection::<CapeParameter>::attach(parameters))},
+			COBIAERR_NOERROR => {
+				if parameters_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(CapeCollection::<CapeParameter>::attach(parameters_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -10037,12 +10052,17 @@ impl CapeMaterialManager {
 	///
 	/// * `material` - A Material Object instance of the requested configuration
 	pub fn create_material<TypeOfMaterialName:CapeStringProviderIn>(&self,material_name:&TypeOfMaterialName) -> Result<crate::CapeObject,COBIAError> {
-		let mut material: *mut crate::C::ICapeInterface=std::ptr::null_mut();
+		let mut material_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).CreateMaterial.unwrap())((*self.interface).me,(&material_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut material as *mut *mut crate::C::ICapeInterface)
+			((*(*self.interface).vTbl).CreateMaterial.unwrap())((*self.interface).me,(&material_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut material_ptr as *mut *mut crate::C::ICapeInterface)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(crate::CapeObject::attach(material))},
+			COBIAERR_NOERROR => {
+				if material_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(crate::CapeObject::attach(material_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -10324,7 +10344,7 @@ pub trait ICapeThermoMaterial {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_tpfraction(&mut self,phase_label:&CapeStringIn,temperature:&mut CapeReal,pressure:&mut CapeReal,composition:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Gets Physical Property values for the specified pair of Phases
+	/// Gets Physical Property values for the specified pair of Phases.
 	///
 	///
 	/// # Arguments
@@ -10373,7 +10393,7 @@ pub trait ICapeThermoMaterial {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn set_single_phase_prop(&mut self,property:&CapeStringIn,phase_label:&CapeStringIn,basis:&CapeStringIn,values:&CapeArrayRealIn) -> Result<(),COBIAError>;
 
-	/// Sets Physical Property values for the specified pair of Phases
+	/// Sets Physical Property values for the specified pair of Phases.
 	///
 	///
 	/// # Arguments
@@ -10784,12 +10804,17 @@ impl CapeThermoMaterial {
 	///
 	/// * `material_object` - A new Material Object instance
 	pub fn create_material(&self) -> Result<CapeThermoMaterial,COBIAError> {
-		let mut material_object: *mut C::CAPEOPEN_1_2_ICapeThermoMaterial=std::ptr::null_mut();
+		let mut material_object_ptr: *mut C::CAPEOPEN_1_2_ICapeThermoMaterial=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).CreateMaterial.unwrap())((*self.interface).me,&mut material_object as *mut *mut C::CAPEOPEN_1_2_ICapeThermoMaterial)
+			((*(*self.interface).vTbl).CreateMaterial.unwrap())((*self.interface).me,&mut material_object_ptr as *mut *mut C::CAPEOPEN_1_2_ICapeThermoMaterial)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(CapeThermoMaterial::attach(material_object))},
+			COBIAERR_NOERROR => {
+				if material_object_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(CapeThermoMaterial::attach(material_object_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -10901,7 +10926,7 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Gets Physical Property values for the specified pair of Phases
+	/// Gets Physical Property values for the specified pair of Phases.
 	///
 	///
 	/// # Arguments
@@ -10986,7 +11011,7 @@ impl CapeThermoMaterial {
 	}
 
 
-	/// Sets Physical Property values for the specified pair of Phases
+	/// Sets Physical Property values for the specified pair of Phases.
 	///
 	///
 	/// # Arguments
@@ -12953,12 +12978,17 @@ impl CapeThermoPropertyPackageManager {
 	///
 	/// * `package` - A Property Package instance of the requested configuration
 	pub fn get_property_package<TypeOfPackageName:CapeStringProviderIn>(&self,package_name:&TypeOfPackageName) -> Result<crate::CapeObject,COBIAError> {
-		let mut package: *mut crate::C::ICapeInterface=std::ptr::null_mut();
+		let mut package_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).GetPropertyPackage.unwrap())((*self.interface).me,(&package_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut package as *mut *mut crate::C::ICapeInterface)
+			((*(*self.interface).vTbl).GetPropertyPackage.unwrap())((*self.interface).me,(&package_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut package_ptr as *mut *mut crate::C::ICapeInterface)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(crate::CapeObject::attach(package))},
+			COBIAERR_NOERROR => {
+				if package_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(crate::CapeObject::attach(package_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -13171,12 +13201,17 @@ impl CapeUnit {
 	///
 	/// * `ports` - The collection of ports of the Unit Operation
 	pub fn ports(&self) -> Result<CapeCollection<CapeUnitPort>,COBIAError> {
-		let mut ports: *mut C::CAPEOPEN_1_2_ICapeCollection=std::ptr::null_mut();
+		let mut ports_ptr: *mut C::CAPEOPEN_1_2_ICapeCollection=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).ports.unwrap())((*self.interface).me,&mut ports as *mut *mut C::CAPEOPEN_1_2_ICapeCollection)
+			((*(*self.interface).vTbl).ports.unwrap())((*self.interface).me,&mut ports_ptr as *mut *mut C::CAPEOPEN_1_2_ICapeCollection)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(CapeCollection::<CapeUnitPort>::attach(ports))},
+			COBIAERR_NOERROR => {
+				if ports_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(CapeCollection::<CapeUnitPort>::attach(ports_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -13529,12 +13564,17 @@ impl CapeUnitPort {
 	///
 	/// * `connected_object` - The object currently connected to the port, can be UNDEFINED
 	pub fn get_connected_object(&self) -> Result<crate::CapeObject,COBIAError> {
-		let mut connected_object: *mut crate::C::ICapeInterface=std::ptr::null_mut();
+		let mut connected_object_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).getConnectedObject.unwrap())((*self.interface).me,&mut connected_object as *mut *mut crate::C::ICapeInterface)
+			((*(*self.interface).vTbl).getConnectedObject.unwrap())((*self.interface).me,&mut connected_object_ptr as *mut *mut crate::C::ICapeInterface)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(crate::CapeObject::attach(connected_object))},
+			COBIAERR_NOERROR => {
+				if connected_object_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(crate::CapeObject::attach(connected_object_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -14316,12 +14356,17 @@ impl CapePersistWriter {
 	///
 	/// * `value` - The writer for the node
 	pub fn add_node<TypeOfNodeName:CapeStringProviderIn>(&self,node_name:&TypeOfNodeName) -> Result<CapePersistWriter,COBIAError> {
-		let mut value: *mut C::CAPEOPEN_1_2_ICapePersistWriter=std::ptr::null_mut();
+		let mut value_ptr: *mut C::CAPEOPEN_1_2_ICapePersistWriter=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).AddNode.unwrap())((*self.interface).me,(&node_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut value as *mut *mut C::CAPEOPEN_1_2_ICapePersistWriter)
+			((*(*self.interface).vTbl).AddNode.unwrap())((*self.interface).me,(&node_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut value_ptr as *mut *mut C::CAPEOPEN_1_2_ICapePersistWriter)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(CapePersistWriter::attach(value))},
+			COBIAERR_NOERROR => {
+				if value_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(CapePersistWriter::attach(value_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -15350,12 +15395,17 @@ impl CapePersistReader {
 	///
 	/// * `value` - The reader for the child node
 	pub fn get_node<TypeOfNodeName:CapeStringProviderIn>(&self,node_name:&TypeOfNodeName) -> Result<CapePersistReader,COBIAError> {
-		let mut value: *mut C::CAPEOPEN_1_2_ICapePersistReader=std::ptr::null_mut();
+		let mut value_ptr: *mut C::CAPEOPEN_1_2_ICapePersistReader=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).GetNode.unwrap())((*self.interface).me,(&node_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut value as *mut *mut C::CAPEOPEN_1_2_ICapePersistReader)
+			((*(*self.interface).vTbl).GetNode.unwrap())((*self.interface).me,(&node_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut value_ptr as *mut *mut C::CAPEOPEN_1_2_ICapePersistReader)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(CapePersistReader::attach(value))},
+			COBIAERR_NOERROR => {
+				if value_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(CapePersistReader::attach(value_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -16477,12 +16527,17 @@ impl CapeStream {
 	///
 	/// * `stream_object` - The object representing the Stream
 	pub fn get_stream_object(&self) -> Result<crate::CapeObject,COBIAError> {
-		let mut stream_object: *mut crate::C::ICapeInterface=std::ptr::null_mut();
+		let mut stream_object_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).getStreamObject.unwrap())((*self.interface).me,&mut stream_object as *mut *mut crate::C::ICapeInterface)
+			((*(*self.interface).vTbl).getStreamObject.unwrap())((*self.interface).me,&mut stream_object_ptr as *mut *mut crate::C::ICapeInterface)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(crate::CapeObject::attach(stream_object))},
+			COBIAERR_NOERROR => {
+				if stream_object_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(crate::CapeObject::attach(stream_object_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -17449,12 +17504,17 @@ impl CapeFlowsheetMonitoring {
 	///
 	/// * `stream_collection` - The collection of streams of the requested type
 	pub fn get_stream_collection(&self,_type:CapeStreamType) -> Result<CapeCollection<CapeStream>,COBIAError> {
-		let mut stream_collection: *mut C::CAPEOPEN_1_2_ICapeCollection=std::ptr::null_mut();
+		let mut stream_collection_ptr: *mut C::CAPEOPEN_1_2_ICapeCollection=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).GetStreamCollection.unwrap())((*self.interface).me,_type as C::CAPEOPEN_1_2_CapeStreamType,&mut stream_collection as *mut *mut C::CAPEOPEN_1_2_ICapeCollection)
+			((*(*self.interface).vTbl).GetStreamCollection.unwrap())((*self.interface).me,_type as C::CAPEOPEN_1_2_CapeStreamType,&mut stream_collection_ptr as *mut *mut C::CAPEOPEN_1_2_ICapeCollection)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(CapeCollection::<CapeStream>::attach(stream_collection))},
+			COBIAERR_NOERROR => {
+				if stream_collection_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(CapeCollection::<CapeStream>::attach(stream_collection_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -17470,12 +17530,17 @@ impl CapeFlowsheetMonitoring {
 	///
 	/// * `unit_operation_collection` - The collection of Unit Operations
 	pub fn get_unit_operation_collection(&self) -> Result<CapeCollection<CapeUnit>,COBIAError> {
-		let mut unit_operation_collection: *mut C::CAPEOPEN_1_2_ICapeCollection=std::ptr::null_mut();
+		let mut unit_operation_collection_ptr: *mut C::CAPEOPEN_1_2_ICapeCollection=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).GetUnitOperationCollection.unwrap())((*self.interface).me,&mut unit_operation_collection as *mut *mut C::CAPEOPEN_1_2_ICapeCollection)
+			((*(*self.interface).vTbl).GetUnitOperationCollection.unwrap())((*self.interface).me,&mut unit_operation_collection_ptr as *mut *mut C::CAPEOPEN_1_2_ICapeCollection)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(CapeCollection::<CapeUnit>::attach(unit_operation_collection))},
+			COBIAERR_NOERROR => {
+				if unit_operation_collection_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(CapeCollection::<CapeUnit>::attach(unit_operation_collection_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -17689,12 +17754,17 @@ impl CapeThermoMaterialCustomData {
 	/// * `source` - The source Material Object
 	/// * `custom_data_container` - The custom data container associated with the source Material Object, created using ICapeCustomDataSource::CreateCustomDataContainer()
 	pub fn get_custom_data_container(&self,source:&crate::CapeObject) -> Result<crate::CapeObject,COBIAError> {
-		let mut custom_data_container: *mut crate::C::ICapeInterface=std::ptr::null_mut();
+		let mut custom_data_container_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).GetCustomDataContainer.unwrap())((*self.interface).me,source.as_interface_pointer() as *mut crate::C::ICapeInterface,&mut custom_data_container as *mut *mut crate::C::ICapeInterface)
+			((*(*self.interface).vTbl).GetCustomDataContainer.unwrap())((*self.interface).me,source.as_interface_pointer() as *mut crate::C::ICapeInterface,&mut custom_data_container_ptr as *mut *mut crate::C::ICapeInterface)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(crate::CapeObject::attach(custom_data_container))},
+			COBIAERR_NOERROR => {
+				if custom_data_container_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(crate::CapeObject::attach(custom_data_container_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -17881,12 +17951,17 @@ impl CapeCustomDataSource {
 	///
 	/// * `custom_data_container` - A new custom data container object
 	pub fn create_custom_data_container(&self) -> Result<crate::CapeObject,COBIAError> {
-		let mut custom_data_container: *mut crate::C::ICapeInterface=std::ptr::null_mut();
+		let mut custom_data_container_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).CreateCustomDataContainer.unwrap())((*self.interface).me,&mut custom_data_container as *mut *mut crate::C::ICapeInterface)
+			((*(*self.interface).vTbl).CreateCustomDataContainer.unwrap())((*self.interface).me,&mut custom_data_container_ptr as *mut *mut crate::C::ICapeInterface)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(crate::CapeObject::attach(custom_data_container))},
+			COBIAERR_NOERROR => {
+				if custom_data_container_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(crate::CapeObject::attach(custom_data_container_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -18750,12 +18825,17 @@ impl CapeManager {
 	///
 	/// * `object` - An instance of the Primary PMC Object that the PME will de-persist
 	pub fn create_for_load(&self) -> Result<crate::CapeObject,COBIAError> {
-		let mut object: *mut crate::C::ICapeInterface=std::ptr::null_mut();
+		let mut object_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).CreateForLoad.unwrap())((*self.interface).me,&mut object as *mut *mut crate::C::ICapeInterface)
+			((*(*self.interface).vTbl).CreateForLoad.unwrap())((*self.interface).me,&mut object_ptr as *mut *mut crate::C::ICapeInterface)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(crate::CapeObject::attach(object))},
+			COBIAERR_NOERROR => {
+				if object_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(crate::CapeObject::attach(object_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -18771,12 +18851,17 @@ impl CapeManager {
 	///
 	/// * `object` - A Primary PMC Object that is not based on a Template and is not de-persisted
 	pub fn create_new(&self) -> Result<crate::CapeObject,COBIAError> {
-		let mut object: *mut crate::C::ICapeInterface=std::ptr::null_mut();
+		let mut object_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).CreateNew.unwrap())((*self.interface).me,&mut object as *mut *mut crate::C::ICapeInterface)
+			((*(*self.interface).vTbl).CreateNew.unwrap())((*self.interface).me,&mut object_ptr as *mut *mut crate::C::ICapeInterface)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(crate::CapeObject::attach(object))},
+			COBIAERR_NOERROR => {
+				if object_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(crate::CapeObject::attach(object_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -18814,12 +18899,17 @@ impl CapeManager {
 	///
 	/// * `object` - A Primary PMC Object based on the specified Template
 	pub fn create_from_template<TypeOfTemplateName:CapeStringProviderIn>(&self,template_name:&TypeOfTemplateName) -> Result<crate::CapeObject,COBIAError> {
-		let mut object: *mut crate::C::ICapeInterface=std::ptr::null_mut();
+		let mut object_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).CreateFromTemplate.unwrap())((*self.interface).me,(&template_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut object as *mut *mut crate::C::ICapeInterface)
+			((*(*self.interface).vTbl).CreateFromTemplate.unwrap())((*self.interface).me,(&template_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut object_ptr as *mut *mut crate::C::ICapeInterface)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(crate::CapeObject::attach(object))},
+			COBIAERR_NOERROR => {
+				if object_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(crate::CapeObject::attach(object_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -19535,12 +19625,17 @@ impl CapeThermoReactions {
 	///
 	/// * `reduced_reaction_set` - The reduced Reaction Set
 	pub fn get_reduced_reaction_set<TypeOfPresentCompoundIds:CapeArrayStringProviderIn,TypeOfReacIds:CapeArrayStringProviderIn,TypeOfIsEquilibrium:CapeArrayBooleanProviderIn>(&self,present_compound_ids:&TypeOfPresentCompoundIds,reac_ids:&TypeOfReacIds,is_equilibrium:&TypeOfIsEquilibrium,consider_all_reactions:CapeBoolean,over_reduced:&mut CapeBoolean) -> Result<CapeThermoReactionSet,COBIAError> {
-		let mut reduced_reaction_set: *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet=std::ptr::null_mut();
+		let mut reduced_reaction_set_ptr: *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).GetReducedReactionSet.unwrap())((*self.interface).me,(&present_compound_ids.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&reac_ids.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&is_equilibrium.as_cape_array_boolean_in() as *const crate::C::ICapeArrayBoolean).cast_mut(),consider_all_reactions,over_reduced as *mut CapeBoolean,&mut reduced_reaction_set as *mut *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet)
+			((*(*self.interface).vTbl).GetReducedReactionSet.unwrap())((*self.interface).me,(&present_compound_ids.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&reac_ids.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&is_equilibrium.as_cape_array_boolean_in() as *const crate::C::ICapeArrayBoolean).cast_mut(),consider_all_reactions,over_reduced as *mut CapeBoolean,&mut reduced_reaction_set_ptr as *mut *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(CapeThermoReactionSet::attach(reduced_reaction_set))},
+			COBIAERR_NOERROR => {
+				if reduced_reaction_set_ptr.is_null() {
+					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
+				}
+				Ok(CapeThermoReactionSet::attach(reduced_reaction_set_ptr))
+			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -20601,7 +20696,7 @@ pub trait ICapeThermoCompoundSlateUtilities {
 	///
 	///
 	/// # Arguments
-	/// * `phase_id` - phase labels for which the composition conversion is requested
+	/// * `phase_id` - Phase labels for which the composition conversion is requested
 	/// * `source_compound_slate` - The name of the target Compound Slate, from which conversion takes place
 	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
 	/// * `target_basis` - The basis in which targetComposition is returned
@@ -20850,7 +20945,7 @@ impl CapeThermoCompoundSlateUtilities {
 	///
 	///
 	/// # Arguments
-	/// * `phase_id` - phase labels for which the composition conversion is requested
+	/// * `phase_id` - Phase labels for which the composition conversion is requested
 	/// * `source_compound_slate` - The name of the target Compound Slate, from which conversion takes place
 	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
 	/// * `target_basis` - The basis in which targetComposition is returned

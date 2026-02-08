@@ -201,6 +201,7 @@ public:
 
 struct MethodArgumentInfo {
 	bool is_basic_data_type{};
+	bool is_cape_interface{};
 	bool is_data_interface{};
 	bool is_interface{};
 	bool is_in={};
@@ -474,6 +475,7 @@ struct MethodArgumentInfo {
 				to_raw_conversion=".as_cape_interface_pointer()";
 				from_raw_conversion=(is_out)?"attach":"from_interface_pointer";
 				raw_returned_value=".detach()";
+				is_cape_interface=true;
 			} else {
 				//split in namespace and type name
 				std::string name_space,type_name;
@@ -515,6 +517,7 @@ struct MethodArgumentInfo {
 			break;
 		case IDL::CapeIDLDataType::IDLDataType_CapeTemplateArgument:
 			is_interface=true;
+			is_cape_interface=true;
 			raw_type_name=cobia_module_name+"::C::ICapeInterface";
 			smart_pointer_type_name=rust_type_name;
 			to_raw_conversion=".as_cape_interface_pointer()";
@@ -1839,7 +1842,11 @@ int main(int argc,char* argv[]) {
 						if (retval->is_basic_data_type) {
 							code<<"\t\tlet mut "<<retval->name<<':'<<retval->raw_type_name<<'='<<retval->init_value<<";\n";
 						} else {
-							code<<"\t\tlet mut "<<retval->name<<": *mut "<<retval->raw_type_name<<"=std::ptr::null_mut();\n";
+							code<<"\t\tlet mut "<<retval->name;
+							if (retval->is_interface) {
+								code<<"_ptr";
+							}
+							code<<": *mut "<<retval->raw_type_name<<"=std::ptr::null_mut();\n";
 						}
 					}
 					code<<"\t\tlet result_code = unsafe {\n"
@@ -1850,7 +1857,7 @@ int main(int argc,char* argv[]) {
 							code<<arg_info.data_interface_to_raw();
 						} else if (arg_info.is_interface) {
 							if (arg_info.is_out) {
-								code<<"&mut "<<arg_info.name<<" as *mut *mut "<<arg_info.raw_type_name;
+								code<<"&mut "<<arg_info.name<<"_ptr as *mut *mut "<<arg_info.raw_type_name;
 							} else {
 								code<<arg_info.name<<".as_interface_pointer() as *mut "<<arg_info.raw_type_name;
 							}
@@ -1877,9 +1884,14 @@ int main(int argc,char* argv[]) {
 						if ((retvals[retval_index]->is_interface)&&(retvals[retval_index]->from_raw_conversion=="from_object")) {
 							//QI will follow - this argument is an ICapeInterface that carries a reference count
 							// bind to a CapeObject smart pointer without increasing reference count first
-							code<<"\t\tlet "<<retvals[retval_index]->name<<"="<<cobia_module_name<<"::CapeObject::attach("<<retvals[retval_index]->name<<");\n";
+							code<<"\t\tlet "<<retvals[retval_index]->name<<"="<<cobia_module_name<<"::CapeObject::attach("<<retvals[retval_index]->name;
+							if (retvals[retval_index]->is_interface) {
+								code<<"_ptr";
+							}
+							code<<");\n";
 						}
 					}
+					int return_interface_count{};
 					for (size_t retval_index=0;retval_index<retvals.size();retval_index++) {
 						if (retvals[retval_index]->need_unpack_rust_conversion) {
 							if (retvals[retval_index]->is_basic_data_type) {
@@ -1898,9 +1910,45 @@ int main(int argc,char* argv[]) {
 									"\t\t};\n";
 							}
 						}
+						if (retvals[retval_index]->is_interface) {
+							return_interface_count++;
+						}
 					}
 					code<<"\t\tmatch result_code {\n"
-						"\t\t\tCOBIAERR_NOERROR => {Ok(";
+						"\t\t\tCOBIAERR_NOERROR => {";
+					if (return_interface_count>0) {
+						code<<"\n\t\t\t\tif ";
+						bool first=true;
+						for (size_t retval_index=0;retval_index<retvals.size();retval_index++) {
+							if (retvals[retval_index]->is_interface) {
+								if (first) {
+									first=false;
+								} else {
+									code<<"||";
+								}
+								code<<retvals[retval_index]->name<<"_ptr.is_null()";
+							}
+						}
+						code<<" {\n";
+						if (return_interface_count>1) {
+							//release others
+							for (size_t retval_index=0;retval_index<retvals.size();retval_index++) {
+								if (retvals[retval_index]->is_interface) {
+									code<<"\t\t\t\t\tif !"<<retvals[retval_index]->name<<"_ptr.is_null() {\n"
+										"\t\t\t\t\t\tunsafe{(*(*"<<retvals[retval_index]->name<<"_ptr).vTbl)";
+									if (!retvals[retval_index]->is_cape_interface) {
+										code<<".base";
+									}
+									code<<".release.unwrap()((*"<<retvals[retval_index]->name<<"_ptr).me)};\n"
+										"\t\t\t\t\t}\n";
+								}
+							}
+						}
+						code<<"\t\t\t\t\treturn Err(COBIAError::Code(COBIAERR_NULLPOINTER));\n"
+							"\t\t\t\t}\n"
+							"\t\t\t\t";
+					}
+					code<<"Ok(";
 					if (retvals.size()!=1) {
 						code<<'(';
 					}
@@ -1911,13 +1959,21 @@ int main(int argc,char* argv[]) {
 						if (retvals[retval_index]->is_basic_data_type||retvals[retval_index]->need_unpack_rust_conversion) {
 							code<<retvals[retval_index]->name;
 						} else {
-							code<<retvals[retval_index]->smart_pointer_type_name_from_pointer()<<'('<<retvals[retval_index]->name<<')';
+							code<<retvals[retval_index]->smart_pointer_type_name_from_pointer()<<'('<<retvals[retval_index]->name;
+							if (retvals[retval_index]->is_interface) {
+								code<<"_ptr";
+							}
+							code<<')';
 						}
 					}
 					if (retvals.size()!=1) {
 						code<<')';
 					}
-					code<<")},\n"
+					code<<")";
+					if (return_interface_count) {
+						code<<"\n\t\t\t";
+					}
+					code<<"},\n"
 						"\t\t\t_ => Err(COBIAError::from_object(result_code,self))\n"
 						"\t\t}\n"
 						"\t}\n"
