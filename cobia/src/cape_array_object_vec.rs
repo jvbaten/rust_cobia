@@ -34,6 +34,26 @@ impl<ElementImpl,ElementInterface> CapeArrayObjectVec<ElementImpl,ElementInterfa
 		}
 	}
 
+	/// Create a new CapeArrayObjectVec with given capacity
+	///
+	/// Creates a new CapeArrayObjectVec with an empty array and given capacity.
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use cobia;
+	/// use cobia::prelude::*;
+	/// let arr = cobia::CapeArrayStringVec::with_capacity(1);
+	/// assert_eq!(arr.as_string_vec().len(), 0);
+	/// ```
+	pub fn with_capacity(initial_capacity:usize) -> Self {
+		Self {
+			vec: Vec::with_capacity(initial_capacity),
+			interface_vec: Vec::with_capacity(initial_capacity),
+			interface_ptr_vec: Vec::with_capacity(initial_capacity),
+		}
+	}
+
 	/// Return a vector
 	///
 	/// Returns a reference to the vector of ElementImpl.
@@ -49,6 +69,24 @@ impl<ElementImpl,ElementInterface> CapeArrayObjectVec<ElementImpl,ElementInterfa
 
 	pub fn as_vec(&self) -> &Vec<ElementImpl> {
 		&self.vec
+	}
+
+	/// Return an element
+	///
+	/// Returns a mutable reference to element at the given index.
+	///
+	/// # Example
+	///
+	/// ```
+	/// use cobia;
+	/// use cobia::prelude::*;
+	/// let mut arr = cobia::CapeArrayStringVec::from_slice(&["idealGasEnthalpy", "idealGasEntropy"]);
+	/// arr.get_mut(1).unwrap().set_string("idealGasHeatCapacity");
+	/// assert_eq!(arr.as_vec()[1].as_string(), "idealGasHeatCapacity".to_string());
+	/// ```
+
+	pub fn get_mut(&mut self,index: usize) -> Option<&mut ElementImpl> {
+		self.vec.get_mut(index)
 	}
 
 	///Return size 
@@ -248,6 +286,46 @@ impl CapeArrayStringVec {
 		interface_ptr_vec.reserve(array.len());
 		for s in array.iter() {
 			vec.push(CapeStringImpl::from_string(s.as_ref()));
+			interface_vec.push(vec.last_mut().unwrap().as_cape_string_out());
+			interface_ptr_vec.push((interface_vec.last().unwrap() as *const C::ICapeString).cast_mut());
+		}
+		Self {
+			vec: vec,
+			interface_vec,
+			interface_ptr_vec,
+		}
+	}
+
+	/// Initialize from CAPE-OPEN string vector
+	///
+	/// Creates a new CapeArrayStringVec from a vector of array of CAPE-OPEN strings.
+	///
+	/// # Arguments
+	///
+	/// * `array` - A vector or array or slice of CAPE-OPEN strings or string slices to be converted to a CapeArrayStringVec
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use cobia;
+	/// 
+    /// let enthalpy = cobia::CapeStringConstNoCase::from_string("enthalpy");
+    /// let entropy = cobia::CapeStringConstNoCase::from_string("entropy");
+    /// let volume = cobia::CapeStringConstNoCase::from_string("volume");
+    /// let density = cobia::CapeStringConstNoCase::from_string("density");
+	/// let arr = cobia::CapeArrayStringVec::from_cape_open_string_slice(&[&enthalpy,&entropy,&volume,&density]);
+	/// assert_eq!(arr.as_string_vec(), vec!["enthalpy".to_string(), "entropy".to_string(), "volume".to_string(), "density".to_string()]);
+	/// ```
+	pub fn from_cape_open_string_slice<T: CapeStringConstProvider>(array: &[&T]) -> CapeArrayStringVec {
+		let mut vec = Vec::new();
+		let mut interface_vec = Vec::new();
+		let mut interface_ptr_vec = Vec::new();
+		vec .reserve(array.len());
+		interface_vec.reserve(array.len());
+		interface_ptr_vec.reserve(array.len());
+		for s in array.iter() {
+			let (ptr,len)=(*s).as_capechar_const_with_length();
+			vec.push(unsafe{CapeStringImpl::from_raw_data(ptr,len)});
 			interface_vec.push(vec.last_mut().unwrap().as_cape_string_out());
 			interface_ptr_vec.push((interface_vec.last().unwrap() as *const C::ICapeString).cast_mut());
 		}

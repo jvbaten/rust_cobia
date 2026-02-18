@@ -54,6 +54,25 @@ impl<Element:Copy+Clone,InterfaceType> CapeArrayVec<Element,InterfaceType> {
 		}
 	}
 
+	/// Create a new CapeArrayVec with capacity
+	///
+	/// Creates a new empty CapeArrayVec with initial capacity
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use cobia;
+	/// use cobia::prelude::*;
+	/// let arr = cobia::CapeArrayRealVec::with_capacity(1);
+	/// assert_eq!(arr.as_vec().len(), 0);
+	/// ```
+	pub fn with_capacity(initial_capacity:usize) -> Self {
+		Self {
+			vec: Vec::with_capacity(initial_capacity),
+			interface_type: std::default::Default::default(),
+		}
+	}
+
 	/// Return a vector
 	///
 	/// Returns a reference to the vector of type T.

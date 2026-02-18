@@ -42,6 +42,9 @@ use crate::cape_result_value::*;
 ///
 /// fn test_eq(s:CapeStringConstNoCase, s3:&CapeStringIn) {
 ///		assert_eq!(&s,s3);
+///		assert!(&s==s3);
+///     //but not
+///     assert_ne!(&s,s3);
 /// }
 ///
 ///	test_eq(s,&CapeStringInFromProvider::from(&s2).as_cape_string_in()); 
