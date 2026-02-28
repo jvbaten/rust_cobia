@@ -447,8 +447,7 @@ impl cape_open_1_2::ICapeIdentification for DistillationShortcutUnit {
 	/// * A `Result` indicating success or failure. If successful, the name is set in `name`.
 
 	fn get_component_name(&mut self,name:&mut CapeStringOut) -> Result<(), COBIAError> {
-		name.set(&self.shared_unit_data.borrow().name)?;
-		Ok(())
+		name.set(&self.shared_unit_data.borrow().name)
 	}
 
 	/// Get the description of the component.

@@ -298,8 +298,7 @@ impl cape_open_1_2::ICapeIdentification for SaltWaterPropertyPackage {
 	/// * `Result` - A result object that indicates whether the operation was successful or not
 
 	fn get_component_name(&mut self,name:&mut CapeStringOut) -> Result<(), COBIAError> {
-		name.set_string(&self.name)?;
-		Ok(())
+		name.set_string(&self.name)
 	}
 
 	/// Obtain the description of the object
@@ -311,8 +310,7 @@ impl cape_open_1_2::ICapeIdentification for SaltWaterPropertyPackage {
 	/// * `Result` - A result object that indicates whether the operation was successful or not
 
 	fn get_component_description(&mut self,description:&mut CapeStringOut) -> Result<(), COBIAError> {
-		description.set_string(&self.description)?;
-		Ok(())
+		description.set_string(&self.description)
 	}
 
 	/// Set the name of the object

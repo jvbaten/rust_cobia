@@ -83,8 +83,7 @@ impl cape_open_1_2::ICapeIdentification for PortCollection {
 	/// * A `Result` indicating success or failure. If successful, the name is set in `name`.
 
 	fn get_component_name(&mut self,name:&mut CapeStringOut) -> Result<(), COBIAError> {
-		name.set(&self.name)?;
-		Ok(())
+		name.set(&self.name)
 	}
 
 	/// Get the description of the component.
@@ -96,8 +95,7 @@ impl cape_open_1_2::ICapeIdentification for PortCollection {
 	/// * A `Result` indicating success or failure. If successful, the description is set in `description`.
 
 	fn get_component_description(&mut self,description:&mut CapeStringOut) -> Result<(), COBIAError> {
-		description.set(&self.description)?;
-		Ok(())
+		description.set(&self.description)
 	}
 
 	/// Set the name of the component.

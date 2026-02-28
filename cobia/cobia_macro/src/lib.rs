@@ -491,7 +491,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 			/// Also the user must ensure that the smart pointer contains a valid 
 			/// object, and that the object is of the type that is being borrowed. 
 			/// To check the object type, use `check_borrow_mut`.
-			pub(crate) unsafe fn borrow_mut<T:cobia::cape_smart_pointer::CapeSmartPointer>(smart_pointer:&mut T) -> &mut Self {
+			pub(crate) unsafe fn borrow_mut<T:cobia::cape_smart_pointer::CapeSmartPointer>(smart_pointer:&T) -> &mut Self {
 				let p=smart_pointer.as_cape_interface_pointer();
 				let me=unsafe {(*p).me};
 				let p = me as *mut Self;
@@ -545,7 +545,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 			///
 			/// The user must ensure that the smart pointer contains a valid 
 			/// object. 
-			pub(crate) unsafe fn check_borrow_mut<T:cobia::cape_smart_pointer::CapeSmartPointer>(smart_pointer:&T) -> Option<&Self> {
+			pub(crate) unsafe fn check_borrow_mut<T:cobia::cape_smart_pointer::CapeSmartPointer>(smart_pointer:&T) -> Option<&mut Self> {
 				let p=smart_pointer.as_cape_interface_pointer();
 				let src_add_ref=unsafe {(*((*p).vTbl)).addReference};
 				match src_add_ref {
