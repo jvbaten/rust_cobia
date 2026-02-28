@@ -642,18 +642,12 @@ mod check_borrow_tests {
 				cape_open_1_2::ICapeIdentification,
 			},
 	  )] 
+	#[derive(std::default::Default)]
 	struct CheckObject1 {
 	}
 	impl std::fmt::Display for CheckObject1 {
 		fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 			write!(f, "CheckObject1")
-		}
-	}
-	impl Default for CheckObject1 {
-		fn default() -> Self {
-			Self {
-				cobia_object_data:Default::default()
-			}
 		}
 	}
 	impl cape_open_1_2::ICapeIdentification for CheckObject1 {
@@ -676,18 +670,12 @@ mod check_borrow_tests {
 				cape_open_1_2::ICapeIdentification,
 			},
 	  )] 
+	#[derive(std::default::Default)]
 	struct CheckObject2 {
 	}
 	impl std::fmt::Display for CheckObject2 {
 		fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 			write!(f, "CheckObject2")
-		}
-	}
-	impl Default for CheckObject2 {
-		fn default() -> Self {
-			Self {
-				cobia_object_data:Default::default()
-			}
 		}
 	}
 	impl cape_open_1_2::ICapeIdentification for CheckObject2 {

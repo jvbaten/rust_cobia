@@ -6,6 +6,7 @@ enum CapeOpenObjectMacroArg {
 	Interfaces(Vec<syn::Path>),
 	CreateArguments(Vec<syn::Ident>),
 	NewArguments(Vec<syn::Ident>),
+	DefaultValues(Vec<syn::ExprAssign>),
 }
 
 impl syn::parse::Parse for CapeOpenObjectMacroArg {
@@ -42,12 +43,21 @@ impl syn::parse::Parse for CapeOpenObjectMacroArg {
 				items.push(p);
 			}
 			Ok(CapeOpenObjectMacroArg::NewArguments(items))
+		} else if name=="default_values" {
+			let content;
+			syn::braced!(content in input);
+			let assigns : syn::punctuated::Punctuated::<syn::ExprAssign, syn::Token![,]> = content.parse_terminated(syn::ExprAssign::parse)?;
+			//convert expressions to vector
+			let mut items : Vec<syn::ExprAssign> = Vec::with_capacity(assigns.len());
+			for p in assigns {
+				items.push(p);
+			}
+			Ok(CapeOpenObjectMacroArg::DefaultValues(items))
 		} else {
 			Err(syn::parse::Error::new(name.span(),format!("Unknown argument: {}",name)))
 		}
     }
 }
-
 
 /// The cape_object_implementation macro generates the necessary code to implement a COBIA object.
 ///
@@ -67,10 +77,17 @@ impl syn::parse::Parse for CapeOpenObjectMacroArg {
 ///                  of the struct. The arguments must match the name of the fields in the
 ///                  struct, and will have the same type in the struct. Any arguments present
 ///                  in the struct but not in the arguments will be initialized through
-///                  std::default::Default::default().
+///                  `std::default::Default::default()`, unless the specified default_values 
+///                  contains an expression for the field.
 /// * `new_arguments` - if specified, a set of arguments used to pass to a function `new` 
 ///                  that is implemented by the `impl` block of the struct, with the same
 ///                  arguments. These arguments must then be passed to the `create` or `try_create`.
+/// * `default_values` - if specified, a set of assignment expressions that are used instead of 
+///					 `std::default::Default::default()` to initialize fields that are not included
+///                  in the `create_arguments`. The left hand side of the assignment must be a field 
+///	                 name, and the right hand side must be an expression that can be used to  
+///                  initialize the field. Cannot be used with `new_arguments` (directly assign
+///                  default values in `new` instead).
 ///
 /// Arguments are separated from their names by an equal sign, e.g.
 ///
@@ -82,7 +99,7 @@ impl syn::parse::Parse for CapeOpenObjectMacroArg {
 /// ```
 ///
 /// In addition to using this macro, a COBIA object class must also initialize its generated memeber
-/// cobia_object_data in its constructor. This member can be set to Default::default()
+/// cobia_object_data in its constructor. This member can be set to `Default::default()`
 ///
 /// The following traits must be implemented for the object:
 /// - std::fmt::Display, which is used to get a description of the object for error handing; it is advised to include the object's type and name
@@ -103,6 +120,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 	//see which fields are specified
 	let mut interfaces : Vec<syn::Path> = Vec::new();
 	let mut creation_arguments : Option<CapeOpenObjectMacroArg> = None;
+	let mut default_values : Option<CapeOpenObjectMacroArg> =None;
 	for arg in arguments {
 		match arg {
 			CapeOpenObjectMacroArg::Interfaces(ifaces) => {
@@ -120,12 +138,25 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 				}
 				creation_arguments= Some(CapeOpenObjectMacroArg::NewArguments(_args));
 			},
-		}
+			CapeOpenObjectMacroArg::DefaultValues(_args) => {
+				if default_values.is_some() {
+					panic!("Multiple default_values specified");
+				}
+				default_values= Some(CapeOpenObjectMacroArg::DefaultValues(_args));
+			},
+		};
 	}
+	match creation_arguments {
+		Some(CapeOpenObjectMacroArg::NewArguments(_)) => {
+			if default_values.is_some() {
+				panic!("Cannot specify default_values when new_arguments are specified");
+			}
+		},
+		_ => {}
+	};
 	if interfaces.len()==0 {
 		panic!("No interfaces specified");
 	}
-
 	let mut struct_desc = syn::parse_macro_input!(item as syn::ItemStruct);
 	let structname = &struct_desc.ident;
 	let (impl_generics, ty_generics, where_clause) = struct_desc.generics.split_for_impl();
@@ -149,22 +180,53 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 	
 	match struct_desc.fields {
 		syn::Fields::Named(ref mut fields) => {
-			match creation_arguments {
-				None => {
-					object_creation= quote! {
-						std::default::Default::default()
-					};
-				}
+			let args=match creation_arguments {
 				Some(CapeOpenObjectMacroArg::CreateArguments(ref args)) | Some(CapeOpenObjectMacroArg::NewArguments(ref args))  => {
-					//make a dictionary of struct items and their types
-					let struct_items : std::collections::HashMap<String, syn::Type> = fields
-						.named
-						.iter()
-						.map(|f| {
-							(f.ident.as_ref().unwrap().to_string(), f.ty.clone())
-						})
-						.collect();
-					for id in args {
+					Some(args.clone())
+				},
+				None => None,
+				_ => {
+					unreachable!();
+				}
+			};
+			let defaults=match default_values {
+				Some(CapeOpenObjectMacroArg::DefaultValues(ref args)) => {
+					let mut map=std::collections::HashMap::<String, Box<syn::Expr>>::new();
+					for assign in args {
+						match &*assign.left {
+							syn::Expr::Path(path) => {
+								if path.path.segments.len()!=1 {
+									panic!("Invalid left hand side in default_values: expected a field name");
+								}
+								let field_name=path.path.segments[0].ident.to_string();
+								map.insert(field_name, assign.right.clone());
+							},
+							_ => {
+								panic!("Invalid left hand side in default_values: expected a field name");
+							}
+						}
+					}
+					Some(map)
+				},
+				None => None,
+				_ => {
+					unreachable!();
+				}
+			};
+			if args.is_none() && defaults.is_none() {
+				object_creation= quote! {
+					std::default::Default::default()
+				};
+			} else {
+				let struct_items : std::collections::HashMap<String, syn::Type> = fields
+					.named
+					.iter()
+					.map(|f| {
+						(f.ident.as_ref().unwrap().to_string(), f.ty.clone())
+					})
+					.collect();
+				if args.is_some() {
+					for id in args.as_ref().unwrap() {
 						let typ = struct_items.get(&id.to_string());
 						if typ.is_none() {
 							panic!("Field '{}' not found in struct", &id);
@@ -178,45 +240,60 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 							#arg,
 						});
 					}
-					match creation_arguments {
-						Some(CapeOpenObjectMacroArg::CreateArguments(_)) => {
-							let create_arg_set=std::collections::HashSet::<String>::from_iter(args.iter().map(|x| x.to_string()));
-							let mut create_arguments = proc_macro2::TokenStream::new();
-							for f in fields.named.iter() {
-								let id=&f.ident;
-								if create_arg_set.contains(&f.ident.as_ref().unwrap().to_string()) {
-									create_arguments.extend(quote! {
-										#id,
-									});
-								} else {
-									create_arguments.extend(quote! {
-										#id : std::default::Default::default(),
-									});
+				}
+				match creation_arguments {
+					Some(CapeOpenObjectMacroArg::CreateArguments(_)) => {
+						let create_arg_set=std::collections::HashSet::<String>::from_iter(args.unwrap().iter().map(|x| x.to_string()));
+						let mut create_arguments = proc_macro2::TokenStream::new();
+						for f in fields.named.iter() {
+							let id=&f.ident;
+							if create_arg_set.contains(&f.ident.as_ref().unwrap().to_string()) {
+								create_arguments.extend(quote! {
+									#id,
+								});
+								//see if not also in default values
+								if default_values.is_some() {
+									if defaults.as_ref().unwrap().contains_key(&id.as_ref().unwrap().to_string()) {
+										panic!("Field '{}' cannot be in both create_arguments and default_values", &id.as_ref().unwrap());
+									}
 								}
-							};
-							create_arguments.extend(quote! {
-								cobia_object_data : std::default::Default::default(),
-							});
-							object_creation.extend(quote! {
-								Self {
-									#create_arguments
-								}
-							});
-						}
-						Some(CapeOpenObjectMacroArg::NewArguments(_)) => {
-							object_creation.extend(quote! {
-								Self::new(#create_arguments)
-							});
-						}
-						_ => {
-							panic!("Internal error");
-						}
-					}
 
-				}
-				_ => {
-					panic!("Internal error");
-				}
+							} else {
+								//see if in default values
+								let mut rhs = quote! {
+									std::default::Default::default()
+								};
+								if defaults.is_some() {
+									if defaults.as_ref().unwrap().contains_key(&id.as_ref().unwrap().to_string()) {
+										let expr=defaults.as_ref().unwrap().get(&id.as_ref().unwrap().to_string()).unwrap();
+										rhs=quote! {
+											#expr
+										};
+									}
+								};
+								create_arguments.extend(quote! {
+									#id : #rhs,
+								});
+							}
+						};
+						create_arguments.extend(quote! {
+							cobia_object_data : std::default::Default::default(),
+						});
+						object_creation.extend(quote! {
+							Self {
+								#create_arguments
+							}
+						});
+					}
+					Some(CapeOpenObjectMacroArg::NewArguments(_)) => {
+						object_creation.extend(quote! {
+							Self::new(#create_arguments)
+						});
+					}
+					_ => {
+						unreachable!();
+					}
+				};
 			};
 			fields.named.push(
 				syn::Field::parse_named
@@ -324,7 +401,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 		Some(CapeOpenObjectMacroArg::CreateArguments(args)) => args.len()==0,
 		Some(CapeOpenObjectMacroArg::NewArguments(args)) => args.len()==0,
 		_ => {
-			panic!("Internal error");
+			unreachable!();
 		}
 	};
 	if provide_cape_create_instance {

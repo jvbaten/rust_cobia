@@ -17,7 +17,7 @@ use cobia::*;
 			cape_open_1_2::ICapeParameter,
 			cape_open_1_2::ICapeStringParameter,
 		},
-		new_arguments = {
+		create_arguments = {
 			name,
 			description,
 			is_input,
@@ -25,6 +25,10 @@ use cobia::*;
 			default_value,
 			possible_values,
 			exclusive,
+		},
+		default_values = {
+			value=default_value.clone(),
+			validation_status=cape_open_1_2::CapeValidationStatus::CapeNotValidated,
 		}
   )] 
 pub struct StringParameter {
@@ -49,21 +53,6 @@ pub struct StringParameter {
 }
 
 impl StringParameter {
-
-	pub fn new(name: CapeStringImpl, description: CapeStringImpl, is_input: bool, shared_unit_data: SharedUnitDataRef, default_value: CapeStringImpl, possible_values: Option<CapeArrayStringVec>, exclusive: bool) -> Self {
-		Self {
-			cobia_object_data:std::default::Default::default(), //initialization of this generated field is needed; can always be set to Default::default()
-			name,
-			description,
-			is_input,
-			shared_unit_data,
-			value:default_value.clone(),
-			default_value,
-			possible_values,
-			exclusive,
-			validation_status:cape_open_1_2::CapeValidationStatus::CapeNotValidated,
-		}
-	}
 
 	/// Replace the list of possible values with a new list.
 	///

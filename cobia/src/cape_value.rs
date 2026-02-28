@@ -80,7 +80,7 @@ impl<'a> CapeValueIn<'a> {
 		let tp= unsafe {(*(**self.interface).vTbl).getValueType.unwrap()((**self.interface).me)};
 		match CapeValueType::from(tp as i32) {
 			Some(v) => Ok(v),
-			None => Err(COBIAError::Code(COBIAERR_NOSUCHITEM))
+			None => Err(COBIAError::Code(COBIAERR_INVALIDARGUMENT))
 		}
 	}
 
