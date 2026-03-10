@@ -792,7 +792,7 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 			}
 			fn from_interface_pointer(interface: *mut Self::Interface) ->  Self {
 				if interface.is_null() {
-					panic!("Null pointer in creation of ICapeIdentificationSmartPtr");
+					panic!("Null pointer in creation of CapeSmartPtr");
 				}
 				unsafe {((*(*(interface as *mut C::ICapeInterface)).vTbl).addReference.unwrap())((*interface).me)};
 				Self {
@@ -802,7 +802,7 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 			}
 			fn attach(interface: *mut Self::Interface) ->  Self {
 				if interface.is_null() {
-					panic!("Null pointer in creation of ICapeIdentificationSmartPtr");
+					panic!("Null pointer in creation of CapeSmartPtr");
 				}
 				Self {
 					interface,

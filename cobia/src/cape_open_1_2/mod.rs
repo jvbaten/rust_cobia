@@ -2171,16 +2171,16 @@ impl<CollectionItem:CapeSmartPointer> CapeCollection<CollectionItem> {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).ItemByIndex.unwrap())((*self.interface).me,index,&mut item_ptr as *mut *mut crate::C::ICapeInterface)
 		};
-		let item=crate::CapeObject::attach(item_ptr);
-		let item=match CollectionItem::from_object(&item) {
-			Ok(_item) => _item,
-			Err(e) => {return Err(e);}
-		};
 		match result_code {
 			COBIAERR_NOERROR => {
 				if item_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
+				let item=crate::CapeObject::attach(item_ptr);
+				let item=match CollectionItem::from_object(&item) {
+					Ok(_item) => _item,
+					Err(e) => {return Err(e);}
+				};
 				Ok(item)
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
@@ -2205,16 +2205,16 @@ impl<CollectionItem:CapeSmartPointer> CapeCollection<CollectionItem> {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).ItemByName.unwrap())((*self.interface).me,(&name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut item_ptr as *mut *mut crate::C::ICapeInterface)
 		};
-		let item=crate::CapeObject::attach(item_ptr);
-		let item=match CollectionItem::from_object(&item) {
-			Ok(_item) => _item,
-			Err(e) => {return Err(e);}
-		};
 		match result_code {
 			COBIAERR_NOERROR => {
 				if item_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
+				let item=crate::CapeObject::attach(item_ptr);
+				let item=match CollectionItem::from_object(&item) {
+					Ok(_item) => _item,
+					Err(e) => {return Err(e);}
+				};
 				Ok(item)
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
@@ -2237,7 +2237,8 @@ impl<CollectionItem:CapeSmartPointer> CapeCollection<CollectionItem> {
 			((*(*self.interface).vTbl).getCount.unwrap())((*self.interface).me,&mut item_count as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(item_count)},
+			COBIAERR_NOERROR => {
+				Ok(item_count)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -2533,12 +2534,13 @@ impl CapeParameter {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).getValStatus.unwrap())((*self.interface).me,&mut val_status as *mut C::CAPEOPEN_1_2_CapeValidationStatus)
 		};
-		let val_status=match CapeValidationStatus::from(val_status) {
-			Some(_val_status) => _val_status,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(val_status)},
+			COBIAERR_NOERROR => {
+				let val_status=match CapeValidationStatus::from(val_status) {
+					Some(_val_status) => _val_status,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(val_status)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -2558,12 +2560,13 @@ impl CapeParameter {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).getMode.unwrap())((*self.interface).me,&mut mode as *mut C::CAPEOPEN_1_2_CapeParamMode)
 		};
-		let mode=match CapeParamMode::from(mode) {
-			Some(_mode) => _mode,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(mode)},
+			COBIAERR_NOERROR => {
+				let mode=match CapeParamMode::from(mode) {
+					Some(_mode) => _mode,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(mode)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -2583,12 +2586,13 @@ impl CapeParameter {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).getType.unwrap())((*self.interface).me,&mut parameter_type as *mut C::CAPEOPEN_1_2_CapeParamType)
 		};
-		let parameter_type=match CapeParamType::from(parameter_type) {
-			Some(_parameter_type) => _parameter_type,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(parameter_type)},
+			COBIAERR_NOERROR => {
+				let parameter_type=match CapeParamType::from(parameter_type) {
+					Some(_parameter_type) => _parameter_type,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(parameter_type)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -2612,7 +2616,8 @@ impl CapeParameter {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -2944,7 +2949,8 @@ impl CapeRealParameter {
 			((*(*self.interface).vTbl).getValue.unwrap())((*self.interface).me,&mut value as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value)},
+			COBIAERR_NOERROR => {
+				Ok(value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -2984,7 +2990,8 @@ impl CapeRealParameter {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -3005,7 +3012,8 @@ impl CapeRealParameter {
 			((*(*self.interface).vTbl).getLowerBound.unwrap())((*self.interface).me,&mut l_bound as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(l_bound)},
+			COBIAERR_NOERROR => {
+				Ok(l_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -3026,7 +3034,8 @@ impl CapeRealParameter {
 			((*(*self.interface).vTbl).getUpperBound.unwrap())((*self.interface).me,&mut u_bound as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(u_bound)},
+			COBIAERR_NOERROR => {
+				Ok(u_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -3070,7 +3079,8 @@ impl CapeRealParameter {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -3353,7 +3363,8 @@ impl CapeIntegerParameter {
 			((*(*self.interface).vTbl).getValue.unwrap())((*self.interface).me,&mut value as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value)},
+			COBIAERR_NOERROR => {
+				Ok(value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -3393,7 +3404,8 @@ impl CapeIntegerParameter {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -3414,7 +3426,8 @@ impl CapeIntegerParameter {
 			((*(*self.interface).vTbl).getLowerBound.unwrap())((*self.interface).me,&mut l_bound as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(l_bound)},
+			COBIAERR_NOERROR => {
+				Ok(l_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -3435,7 +3448,8 @@ impl CapeIntegerParameter {
 			((*(*self.interface).vTbl).getUpperBound.unwrap())((*self.interface).me,&mut u_bound as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(u_bound)},
+			COBIAERR_NOERROR => {
+				Ok(u_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -3460,7 +3474,8 @@ impl CapeIntegerParameter {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -3824,7 +3839,8 @@ impl CapeStringParameter {
 			((*(*self.interface).vTbl).getRestrictedToList.unwrap())((*self.interface).me,&mut restricted as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(restricted)},
+			COBIAERR_NOERROR => {
+				Ok(restricted)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -3849,7 +3865,8 @@ impl CapeStringParameter {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&value.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -4068,7 +4085,8 @@ impl CapeBooleanParameter {
 			((*(*self.interface).vTbl).getValue.unwrap())((*self.interface).me,&mut value as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value)},
+			COBIAERR_NOERROR => {
+				Ok(value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -4108,7 +4126,8 @@ impl CapeBooleanParameter {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -4133,7 +4152,8 @@ impl CapeBooleanParameter {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -4287,7 +4307,8 @@ impl CapeArrayParameter {
 			((*(*self.interface).vTbl).getNumDimensions.unwrap())((*self.interface).me,&mut num_dimensions as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(num_dimensions)},
+			COBIAERR_NOERROR => {
+				Ok(num_dimensions)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -4772,7 +4793,8 @@ impl CapeArrayRealParameter {
 			((*(*self.interface).vTbl).GetElementValue.unwrap())((*self.interface).me,(&position.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),&mut value as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value)},
+			COBIAERR_NOERROR => {
+				Ok(value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -4813,7 +4835,8 @@ impl CapeArrayRealParameter {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -4834,7 +4857,8 @@ impl CapeArrayRealParameter {
 			((*(*self.interface).vTbl).getLowerBound.unwrap())((*self.interface).me,&mut l_bound as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(l_bound)},
+			COBIAERR_NOERROR => {
+				Ok(l_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -4855,7 +4879,8 @@ impl CapeArrayRealParameter {
 			((*(*self.interface).vTbl).getUpperBound.unwrap())((*self.interface).me,&mut u_bound as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(u_bound)},
+			COBIAERR_NOERROR => {
+				Ok(u_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -4900,7 +4925,8 @@ impl CapeArrayRealParameter {
 			((*(*self.interface).vTbl).ValidateElement.unwrap())((*self.interface).me,(&position.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -4925,7 +4951,8 @@ impl CapeArrayRealParameter {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&value.as_cape_array_real_in() as *const crate::C::ICapeArrayReal).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -5358,7 +5385,8 @@ impl CapeArrayIntegerParameter {
 			((*(*self.interface).vTbl).GetElementValue.unwrap())((*self.interface).me,(&position.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),&mut value as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value)},
+			COBIAERR_NOERROR => {
+				Ok(value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -5399,7 +5427,8 @@ impl CapeArrayIntegerParameter {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -5420,7 +5449,8 @@ impl CapeArrayIntegerParameter {
 			((*(*self.interface).vTbl).getLowerBound.unwrap())((*self.interface).me,&mut l_bound as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(l_bound)},
+			COBIAERR_NOERROR => {
+				Ok(l_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -5441,7 +5471,8 @@ impl CapeArrayIntegerParameter {
 			((*(*self.interface).vTbl).getUpperBound.unwrap())((*self.interface).me,&mut u_bound as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(u_bound)},
+			COBIAERR_NOERROR => {
+				Ok(u_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -5467,7 +5498,8 @@ impl CapeArrayIntegerParameter {
 			((*(*self.interface).vTbl).ValidateElement.unwrap())((*self.interface).me,(&position.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -5492,7 +5524,8 @@ impl CapeArrayIntegerParameter {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&value.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6003,7 +6036,8 @@ impl CapeArrayStringParameter {
 			((*(*self.interface).vTbl).getRestrictedToList.unwrap())((*self.interface).me,&mut restricted as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(restricted)},
+			COBIAERR_NOERROR => {
+				Ok(restricted)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6029,7 +6063,8 @@ impl CapeArrayStringParameter {
 			((*(*self.interface).vTbl).ValidateElement.unwrap())((*self.interface).me,(&position.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),(&value.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6054,7 +6089,8 @@ impl CapeArrayStringParameter {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&value.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6423,7 +6459,8 @@ impl CapeArrayBooleanParameter {
 			((*(*self.interface).vTbl).GetElementValue.unwrap())((*self.interface).me,(&position.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),&mut value as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value)},
+			COBIAERR_NOERROR => {
+				Ok(value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6464,7 +6501,8 @@ impl CapeArrayBooleanParameter {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6490,7 +6528,8 @@ impl CapeArrayBooleanParameter {
 			((*(*self.interface).vTbl).ValidateElement.unwrap())((*self.interface).me,(&position.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6515,7 +6554,8 @@ impl CapeArrayBooleanParameter {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&value.as_cape_array_boolean_in() as *const crate::C::ICapeArrayBoolean).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6635,12 +6675,13 @@ impl CapeParameterSpecification {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).getType.unwrap())((*self.interface).me,&mut parameter_type as *mut C::CAPEOPEN_1_2_CapeParamType)
 		};
-		let parameter_type=match CapeParamType::from(parameter_type) {
-			Some(_parameter_type) => _parameter_type,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(parameter_type)},
+			COBIAERR_NOERROR => {
+				let parameter_type=match CapeParamType::from(parameter_type) {
+					Some(_parameter_type) => _parameter_type,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(parameter_type)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6899,7 +6940,8 @@ impl CapeRealParameterSpecification {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6920,7 +6962,8 @@ impl CapeRealParameterSpecification {
 			((*(*self.interface).vTbl).getLowerBound.unwrap())((*self.interface).me,&mut l_bound as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(l_bound)},
+			COBIAERR_NOERROR => {
+				Ok(l_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6941,7 +6984,8 @@ impl CapeRealParameterSpecification {
 			((*(*self.interface).vTbl).getUpperBound.unwrap())((*self.interface).me,&mut u_bound as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(u_bound)},
+			COBIAERR_NOERROR => {
+				Ok(u_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -6985,7 +7029,8 @@ impl CapeRealParameterSpecification {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -7211,7 +7256,8 @@ impl CapeIntegerParameterSpecification {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -7232,7 +7278,8 @@ impl CapeIntegerParameterSpecification {
 			((*(*self.interface).vTbl).getLowerBound.unwrap())((*self.interface).me,&mut l_bound as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(l_bound)},
+			COBIAERR_NOERROR => {
+				Ok(l_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -7253,7 +7300,8 @@ impl CapeIntegerParameterSpecification {
 			((*(*self.interface).vTbl).getUpperBound.unwrap())((*self.interface).me,&mut u_bound as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(u_bound)},
+			COBIAERR_NOERROR => {
+				Ok(u_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -7278,7 +7326,8 @@ impl CapeIntegerParameterSpecification {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -7545,7 +7594,8 @@ impl CapeStringParameterSpecification {
 			((*(*self.interface).vTbl).getRestrictedToList.unwrap())((*self.interface).me,&mut restricted as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(restricted)},
+			COBIAERR_NOERROR => {
+				Ok(restricted)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -7570,7 +7620,8 @@ impl CapeStringParameterSpecification {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&value.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -7732,7 +7783,8 @@ impl CapeBooleanParameterSpecification {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -7757,7 +7809,8 @@ impl CapeBooleanParameterSpecification {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -7911,7 +7964,8 @@ impl CapeArrayParameterSpecification {
 			((*(*self.interface).vTbl).getNumDimensions.unwrap())((*self.interface).me,&mut num_dimensions as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(num_dimensions)},
+			COBIAERR_NOERROR => {
+				Ok(num_dimensions)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -8233,7 +8287,8 @@ impl CapeArrayRealParameterSpecification {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -8254,7 +8309,8 @@ impl CapeArrayRealParameterSpecification {
 			((*(*self.interface).vTbl).getLowerBound.unwrap())((*self.interface).me,&mut l_bound as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(l_bound)},
+			COBIAERR_NOERROR => {
+				Ok(l_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -8275,7 +8331,8 @@ impl CapeArrayRealParameterSpecification {
 			((*(*self.interface).vTbl).getUpperBound.unwrap())((*self.interface).me,&mut u_bound as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(u_bound)},
+			COBIAERR_NOERROR => {
+				Ok(u_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -8320,7 +8377,8 @@ impl CapeArrayRealParameterSpecification {
 			((*(*self.interface).vTbl).ValidateElement.unwrap())((*self.interface).me,(&position.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -8345,7 +8403,8 @@ impl CapeArrayRealParameterSpecification {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&value.as_cape_array_real_in() as *const crate::C::ICapeArrayReal).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -8615,7 +8674,8 @@ impl CapeArrayIntegerParameterSpecification {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -8636,7 +8696,8 @@ impl CapeArrayIntegerParameterSpecification {
 			((*(*self.interface).vTbl).getLowerBound.unwrap())((*self.interface).me,&mut l_bound as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(l_bound)},
+			COBIAERR_NOERROR => {
+				Ok(l_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -8657,7 +8718,8 @@ impl CapeArrayIntegerParameterSpecification {
 			((*(*self.interface).vTbl).getUpperBound.unwrap())((*self.interface).me,&mut u_bound as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(u_bound)},
+			COBIAERR_NOERROR => {
+				Ok(u_bound)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -8683,7 +8745,8 @@ impl CapeArrayIntegerParameterSpecification {
 			((*(*self.interface).vTbl).ValidateElement.unwrap())((*self.interface).me,(&position.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -8708,7 +8771,8 @@ impl CapeArrayIntegerParameterSpecification {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&value.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -9019,7 +9083,8 @@ impl CapeArrayStringParameterSpecification {
 			((*(*self.interface).vTbl).getRestrictedToList.unwrap())((*self.interface).me,&mut restricted as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(restricted)},
+			COBIAERR_NOERROR => {
+				Ok(restricted)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -9045,7 +9110,8 @@ impl CapeArrayStringParameterSpecification {
 			((*(*self.interface).vTbl).ValidateElement.unwrap())((*self.interface).me,(&position.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),(&value.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -9070,7 +9136,8 @@ impl CapeArrayStringParameterSpecification {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&value.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -9276,7 +9343,8 @@ impl CapeArrayBooleanParameterSpecification {
 			((*(*self.interface).vTbl).getDefaultValue.unwrap())((*self.interface).me,&mut default_value as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(default_value)},
+			COBIAERR_NOERROR => {
+				Ok(default_value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -9302,7 +9370,8 @@ impl CapeArrayBooleanParameterSpecification {
 			((*(*self.interface).vTbl).ValidateElement.unwrap())((*self.interface).me,(&position.as_cape_array_integer_in() as *const crate::C::ICapeArrayInteger).cast_mut(),value,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -9327,7 +9396,8 @@ impl CapeArrayBooleanParameterSpecification {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&value.as_cape_array_boolean_in() as *const crate::C::ICapeArrayBoolean).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_ok as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_ok)},
+			COBIAERR_NOERROR => {
+				Ok(is_ok)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -9643,12 +9713,13 @@ impl CapeUtilities {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).Edit.unwrap())((*self.interface).me,crate::CapeWindowIdToRaw(parent),&mut result as *mut C::CAPEOPEN_1_2_CapeEditResult)
 		};
-		let result=match CapeEditResult::from(result) {
-			Some(_result) => _result,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(result)},
+			COBIAERR_NOERROR => {
+				let result=match CapeEditResult::from(result) {
+					Some(_result) => _result,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(result)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -11203,7 +11274,7 @@ impl CapeThermoMaterialContext {
 
 pub trait ICapeThermoCompounds {
 
-	/// Gets values of constant Properties for the specified Compounds.
+	/// Gets constant property values for the specified Compounds.
 	///
 	///
 	/// # Arguments
@@ -11220,12 +11291,12 @@ pub trait ICapeThermoCompounds {
 	///
 	///
 	/// # Arguments
-	/// * `comp_ids` - The compound identifiers of the Compounds
-	/// * `formulae` - The chemical formulae of the Compounds, in Hills format
-	/// * `names` - The names of the Compounds
-	/// * `boil_temps` - The normal boiling points of the Compounds, in K
-	/// * `molwts` - The relative molecular weights of the Compounds
-	/// * `casnos` - The CAS registry numbers of the Compounds
+	/// * `comp_ids` - The compound identifiers
+	/// * `formulae` - The chemical formulae, in Hills format
+	/// * `names` - The compound names
+	/// * `boil_temps` - The normal boiling points, in K
+	/// * `molwts` - The relative molar mass, dimensionless
+	/// * `casnos` - The CAS registry numbers
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11235,7 +11306,7 @@ pub trait ICapeThermoCompounds {
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of supported constant properties 
+	/// * `props` - The list of supported constant properties
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11258,15 +11329,15 @@ pub trait ICapeThermoCompounds {
 	/// # Arguments
 	/// * `props` - The identifiers of the properties
 	/// * `pressure` - Pressure, in Pa
-	/// * `comp_ids` - The compound identifiers for which to get the properties, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
 	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
-	/// * `prop_vals` - The property values for the first property, then for the second property, and so on
+	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_pdependent_property(&mut self,props:&CapeArrayStringIn,pressure:CapeReal,comp_ids:&CapeArrayStringIn,contains_missing_values:&mut CapeBoolean,prop_vals:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Gets the list of supported pressure-dependent properties supported.
+	/// Gets the list of supported pressure-dependent properties.
 	///
 	///
 	/// # Arguments
@@ -11282,9 +11353,9 @@ pub trait ICapeThermoCompounds {
 	/// # Arguments
 	/// * `props` - The identifiers of the properties
 	/// * `temperature` - Temperature, in K
-	/// * `comp_ids` - The compound identifiers for which to get the properties, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
 	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
-	/// * `prop_vals` - The property values for the first property, then for the second property, and so on
+	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11567,7 +11638,7 @@ pub struct CapeThermoCompounds {
 impl CapeThermoCompounds {
 
 
-	/// Gets values of constant Properties for the specified Compounds.
+	/// Gets constant property values for the specified Compounds.
 	///
 	///
 	/// # Arguments
@@ -11593,12 +11664,12 @@ impl CapeThermoCompounds {
 	///
 	///
 	/// # Arguments
-	/// * `comp_ids` - The compound identifiers of the Compounds
-	/// * `formulae` - The chemical formulae of the Compounds, in Hills format
-	/// * `names` - The names of the Compounds
-	/// * `boil_temps` - The normal boiling points of the Compounds, in K
-	/// * `molwts` - The relative molecular weights of the Compounds
-	/// * `casnos` - The CAS registry numbers of the Compounds
+	/// * `comp_ids` - The compound identifiers
+	/// * `formulae` - The chemical formulae, in Hills format
+	/// * `names` - The compound names
+	/// * `boil_temps` - The normal boiling points, in K
+	/// * `molwts` - The relative molar mass, dimensionless
+	/// * `casnos` - The CAS registry numbers
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11617,7 +11688,7 @@ impl CapeThermoCompounds {
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of supported constant properties 
+	/// * `props` - The list of supported constant properties
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11647,7 +11718,8 @@ impl CapeThermoCompounds {
 			((*(*self.interface).vTbl).getNumCompounds.unwrap())((*self.interface).me,&mut num as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(num)},
+			COBIAERR_NOERROR => {
+				Ok(num)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -11659,9 +11731,9 @@ impl CapeThermoCompounds {
 	/// # Arguments
 	/// * `props` - The identifiers of the properties
 	/// * `pressure` - Pressure, in Pa
-	/// * `comp_ids` - The compound identifiers for which to get the properties, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
 	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
-	/// * `prop_vals` - The property values for the first property, then for the second property, and so on
+	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11676,7 +11748,7 @@ impl CapeThermoCompounds {
 	}
 
 
-	/// Gets the list of supported pressure-dependent properties supported.
+	/// Gets the list of supported pressure-dependent properties.
 	///
 	///
 	/// # Arguments
@@ -11701,9 +11773,9 @@ impl CapeThermoCompounds {
 	/// # Arguments
 	/// * `props` - The identifiers of the properties
 	/// * `temperature` - Temperature, in K
-	/// * `comp_ids` - The compound identifiers for which to get the properties, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
 	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
-	/// * `prop_vals` - The property values for the first property, then for the second property, and so on
+	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -11928,7 +12000,8 @@ impl CapeThermoPhases {
 			((*(*self.interface).vTbl).getNumPhases.unwrap())((*self.interface).me,&mut num as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(num)},
+			COBIAERR_NOERROR => {
+				Ok(num)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -12057,21 +12130,21 @@ pub trait ICapeThermoPropertyRoutine {
 	/// * `valid` - True if the property is supported for the specified Phase pair, False otherwise
 	fn check_two_phase_prop_spec(&mut self,property:&CapeStringIn,phase_labels:&CapeArrayStringIn) -> Result<CapeBoolean,COBIAError>;
 
-	/// Gets the list of single phase properties supported by the Property Calculator.
+	/// Gets the list of supported single phase properties.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of single phase properties supported by the Property Calculator
+	/// * `props` - The list of supported single phase properties
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_single_phase_prop_list(&mut self,props:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
-	/// Gets the list of two phase properties supported by the Property Calculator.
+	/// Gets the list of supported two phase properties.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of two phase properties supported by the Property Calculator
+	/// * `props` - The list of supported two phase properties
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12377,7 +12450,8 @@ impl CapeThermoPropertyRoutine {
 			((*(*self.interface).vTbl).CheckSinglePhasePropSpec.unwrap())((*self.interface).me,(&property.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&phase_label.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut valid as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(valid)},
+			COBIAERR_NOERROR => {
+				Ok(valid)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -12402,17 +12476,18 @@ impl CapeThermoPropertyRoutine {
 			((*(*self.interface).vTbl).CheckTwoPhasePropSpec.unwrap())((*self.interface).me,(&property.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&phase_labels.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),&mut valid as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(valid)},
+			COBIAERR_NOERROR => {
+				Ok(valid)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
 
 
-	/// Gets the list of single phase properties supported by the Property Calculator.
+	/// Gets the list of supported single phase properties.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of single phase properties supported by the Property Calculator
+	/// * `props` - The list of supported single phase properties
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12427,11 +12502,11 @@ impl CapeThermoPropertyRoutine {
 	}
 
 
-	/// Gets the list of two phase properties supported by the Property Calculator.
+	/// Gets the list of supported two phase properties.
 	///
 	///
 	/// # Arguments
-	/// * `props` - The list of two phase properties supported by the Property Calculator
+	/// * `props` - The list of supported two phase properties
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12452,30 +12527,30 @@ impl CapeThermoPropertyRoutine {
 ///
 /// ICapeThermoEquilibriumRoutine interface
 ///
-/// Interface implemented by CAPE-OPEN Thermodynamic Phase Equilibrium Calculators, such as a Material Object or a Property Package.
+/// Interface implemented by any CAPE-OPEN component that calculates Thermodynamic Phase Equilibrium.
 ///
 
 pub trait ICapeThermoEquilibriumRoutine {
 
-	/// Calculates phase equilibrium for the specified specifications.
+	/// Calculates phase equilibrium.
 	///
 	///
 	/// # Arguments
-	/// * `specification1` - The first specification for the phase equilibrium calculation
-	/// * `specification2` - The second specification for the phase equilibrium calculation
-	/// * `solution_type` - The requested type of solution
+	/// * `specification1` - The first equilibrium specification
+	/// * `specification2` - The second equilibrium specification
+	/// * `solution_type` - The requested type of phase equilibrium
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn calc_equilibrium(&mut self,specification1:&CapeArrayStringIn,specification2:&CapeArrayStringIn,solution_type:&CapeStringIn) -> Result<(),COBIAError>;
 
-	/// Checks if the specified phase equilibrium specifications are supported, using the present Phases on the current Material Object.
+	/// Checks if the specified phase equilibrium calculation is supported, using the present Phases on the current Material Object.
 	///
 	///
 	/// # Arguments
-	/// * `specification1` - The first specification
-	/// * `specification2` - The second specification
-	/// * `solution_type` - The requested type of solution
+	/// * `specification1` - The first equilibrium specification
+	/// * `specification2` - The second equilibrium specification
+	/// * `solution_type` - The requested type of phase equilibrium
 	///
 	/// # Returns
 	/// * Result<'is_supported',COBIAError> - Ok if successful, Err if there was an error
@@ -12572,7 +12647,7 @@ pub trait ICapeThermoEquilibriumRoutineImpl : ICapeThermoEquilibriumRoutine {
 /// Smart pointer for ICapeThermoEquilibriumRoutine
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoEquilibriumRoutine interface
-/// Interface implemented by CAPE-OPEN Thermodynamic Phase Equilibrium Calculators, such as a Material Object or a Property Package.
+/// Interface implemented by any CAPE-OPEN component that calculates Thermodynamic Phase Equilibrium.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOEQUILIBRIUMROUTINE_UUID)]
@@ -12584,13 +12659,13 @@ pub struct CapeThermoEquilibriumRoutine {
 impl CapeThermoEquilibriumRoutine {
 
 
-	/// Calculates phase equilibrium for the specified specifications.
+	/// Calculates phase equilibrium.
 	///
 	///
 	/// # Arguments
-	/// * `specification1` - The first specification for the phase equilibrium calculation
-	/// * `specification2` - The second specification for the phase equilibrium calculation
-	/// * `solution_type` - The requested type of solution
+	/// * `specification1` - The first equilibrium specification
+	/// * `specification2` - The second equilibrium specification
+	/// * `solution_type` - The requested type of phase equilibrium
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12605,13 +12680,13 @@ impl CapeThermoEquilibriumRoutine {
 	}
 
 
-	/// Checks if the specified phase equilibrium specifications are supported, using the present Phases on the current Material Object.
+	/// Checks if the specified phase equilibrium calculation is supported, using the present Phases on the current Material Object.
 	///
 	///
 	/// # Arguments
-	/// * `specification1` - The first specification
-	/// * `specification2` - The second specification
-	/// * `solution_type` - The requested type of solution
+	/// * `specification1` - The first equilibrium specification
+	/// * `specification2` - The second equilibrium specification
+	/// * `solution_type` - The requested type of phase equilibrium
 	///
 	/// # Returns
 	/// * Result<'is_supported',COBIAError> - Ok if successful, Err if there was an error
@@ -12625,7 +12700,8 @@ impl CapeThermoEquilibriumRoutine {
 			((*(*self.interface).vTbl).CheckEquilibriumSpec.unwrap())((*self.interface).me,(&specification1.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&specification2.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&solution_type.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut is_supported as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_supported)},
+			COBIAERR_NOERROR => {
+				Ok(is_supported)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -12637,7 +12713,7 @@ impl CapeThermoEquilibriumRoutine {
 ///
 /// ICapeThermoUniversalConstant interface
 ///
-/// Interface implemented by CAPE-OPEN Components that supply universal constants, such as a Property Package or a Material Object.
+/// Interface implemented by CAPE-OPEN Components that provide universal constants.
 ///
 
 pub trait ICapeThermoUniversalConstant {
@@ -12646,18 +12722,18 @@ pub trait ICapeThermoUniversalConstant {
 	///
 	///
 	/// # Arguments
-	/// * `constant_id` - The identifier of the constant to get
-	/// * `constant_value` - The value of the requested universal constant
+	/// * `constant_id` - The identifier of the constant
+	/// * `constant_value` - The value of the constant
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_universal_constant(&mut self,constant_id:&CapeStringIn,constant_value:&mut CapeValueOut) -> Result<(),COBIAError>;
 
-	/// Gets the list of universal constant identifiers supported by the Component.
+	/// Gets the list of supported universal constant identifiers.
 	///
 	///
 	/// # Arguments
-	/// * `constant_id_list` - The list of universal constant identifiers supported by the Component
+	/// * `constant_id_list` - The list of supported universal constant identifiers
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12755,7 +12831,7 @@ pub trait ICapeThermoUniversalConstantImpl : ICapeThermoUniversalConstant {
 /// Smart pointer for ICapeThermoUniversalConstant
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoUniversalConstant interface
-/// Interface implemented by CAPE-OPEN Components that supply universal constants, such as a Property Package or a Material Object.
+/// Interface implemented by CAPE-OPEN Components that provide universal constants.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOUNIVERSALCONSTANT_UUID)]
@@ -12771,8 +12847,8 @@ impl CapeThermoUniversalConstant {
 	///
 	///
 	/// # Arguments
-	/// * `constant_id` - The identifier of the constant to get
-	/// * `constant_value` - The value of the requested universal constant
+	/// * `constant_id` - The identifier of the constant
+	/// * `constant_value` - The value of the constant
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12787,11 +12863,11 @@ impl CapeThermoUniversalConstant {
 	}
 
 
-	/// Gets the list of universal constant identifiers supported by the Component.
+	/// Gets the list of supported universal constant identifiers.
 	///
 	///
 	/// # Arguments
-	/// * `constant_id_list` - The list of universal constant identifiers supported by the Component
+	/// * `constant_id_list` - The list of supported universal constant identifiers
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12812,33 +12888,33 @@ impl CapeThermoUniversalConstant {
 ///
 /// ICapeThermoPropertyPackageManager interface
 ///
-/// Interface implemented by Thermodynamic Property Package Managers PMCs.
+/// Principal interface implemented by CAPE-OPEN Thermodynamic Property Package Managers PMCs.
 ///
 
 pub trait ICapeThermoPropertyPackageManager {
 
-	/// Gets the list of available Property Package configurations.
+	/// Gets the list of available Property Package templates.
 	///
 	///
 	/// # Arguments
-	/// * `package_names` - The list of available Property Package configurations
+	/// * `package_names` - The list of available Property Package templates
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_property_package_list(&mut self,package_names:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
-	/// Creates an instance of a Property Package given its configuration name.
+	/// Creates an instance of a Property Package given its template name.
 	///
 	///
 	/// # Arguments
-	/// * `package_name` - The name of the Property Package configuration to instantiate
+	/// * `package_name` - The name of the Property Package template
 	///
 	/// # Returns
 	/// * Result<'package',COBIAError> - Ok if successful, Err if there was an error
 	///
 	/// where
 	///
-	/// * `package` - A Property Package instance of the requested configuration
+	/// * `package` - A Property Package instance
 	fn get_property_package(&mut self,package_name:&CapeStringIn) -> Result<crate::CapeObject,COBIAError>;
 }
 
@@ -12934,7 +13010,7 @@ pub trait ICapeThermoPropertyPackageManagerImpl : ICapeThermoPropertyPackageMana
 /// Smart pointer for ICapeThermoPropertyPackageManager
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoPropertyPackageManager interface
-/// Interface implemented by Thermodynamic Property Package Managers PMCs.
+/// Principal interface implemented by CAPE-OPEN Thermodynamic Property Package Managers PMCs.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOPROPERTYPACKAGEMANAGER_UUID)]
@@ -12946,11 +13022,11 @@ pub struct CapeThermoPropertyPackageManager {
 impl CapeThermoPropertyPackageManager {
 
 
-	/// Gets the list of available Property Package configurations.
+	/// Gets the list of available Property Package templates.
 	///
 	///
 	/// # Arguments
-	/// * `package_names` - The list of available Property Package configurations
+	/// * `package_names` - The list of available Property Package templates
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12965,18 +13041,18 @@ impl CapeThermoPropertyPackageManager {
 	}
 
 
-	/// Creates an instance of a Property Package given its configuration name.
+	/// Creates an instance of a Property Package given its template name.
 	///
 	///
 	/// # Arguments
-	/// * `package_name` - The name of the Property Package configuration to instantiate
+	/// * `package_name` - The name of the Property Package template
 	///
 	/// # Returns
 	/// * Result<'package',COBIAError> - Ok if successful, Err if there was an error
 	///
 	/// where
 	///
-	/// * `package` - A Property Package instance of the requested configuration
+	/// * `package` - A Property Package instance
 	pub fn get_property_package<TypeOfPackageName:CapeStringProviderIn>(&self,package_name:&TypeOfPackageName) -> Result<crate::CapeObject,COBIAError> {
 		let mut package_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
@@ -13231,12 +13307,13 @@ impl CapeUnit {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).getValStatus.unwrap())((*self.interface).me,&mut val_status as *mut C::CAPEOPEN_1_2_CapeValidationStatus)
 		};
-		let val_status=match CapeValidationStatus::from(val_status) {
-			Some(_val_status) => _val_status,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(val_status)},
+			COBIAERR_NOERROR => {
+				let val_status=match CapeValidationStatus::from(val_status) {
+					Some(_val_status) => _val_status,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(val_status)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -13276,7 +13353,8 @@ impl CapeUnit {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_valid as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_valid)},
+			COBIAERR_NOERROR => {
+				Ok(is_valid)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -13518,12 +13596,13 @@ impl CapeUnitPort {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).getPortType.unwrap())((*self.interface).me,&mut port_type as *mut C::CAPEOPEN_1_2_CapePortType)
 		};
-		let port_type=match CapePortType::from(port_type) {
-			Some(_port_type) => _port_type,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(port_type)},
+			COBIAERR_NOERROR => {
+				let port_type=match CapePortType::from(port_type) {
+					Some(_port_type) => _port_type,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(port_type)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -13543,12 +13622,13 @@ impl CapeUnitPort {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).getDirection.unwrap())((*self.interface).me,&mut port_direction as *mut C::CAPEOPEN_1_2_CapePortDirection)
 		};
-		let port_direction=match CapePortDirection::from(port_direction) {
-			Some(_port_direction) => _port_direction,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(port_direction)},
+			COBIAERR_NOERROR => {
+				let port_direction=match CapePortDirection::from(port_direction) {
+					Some(_port_direction) => _port_direction,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(port_direction)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -15076,12 +15156,13 @@ impl CapePersistReader {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).GetValueType.unwrap())((*self.interface).me,(&value_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut value_type as *mut C::CAPEOPEN_1_2_CapePersistedDataType)
 		};
-		let value_type=match CapePersistedDataType::from(value_type) {
-			Some(_value_type) => _value_type,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value_type)},
+			COBIAERR_NOERROR => {
+				let value_type=match CapePersistedDataType::from(value_type) {
+					Some(_value_type) => _value_type,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(value_type)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -15105,7 +15186,8 @@ impl CapePersistReader {
 			((*(*self.interface).vTbl).GetReal.unwrap())((*self.interface).me,(&value_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut value as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value)},
+			COBIAERR_NOERROR => {
+				Ok(value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -15129,7 +15211,8 @@ impl CapePersistReader {
 			((*(*self.interface).vTbl).GetInteger.unwrap())((*self.interface).me,(&value_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut value as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value)},
+			COBIAERR_NOERROR => {
+				Ok(value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -15153,7 +15236,8 @@ impl CapePersistReader {
 			((*(*self.interface).vTbl).GetBoolean.unwrap())((*self.interface).me,(&value_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut value as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value)},
+			COBIAERR_NOERROR => {
+				Ok(value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -15197,7 +15281,8 @@ impl CapePersistReader {
 			((*(*self.interface).vTbl).GetEnumeration.unwrap())((*self.interface).me,(&value_name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut value as *mut crate::C::CapeEnumeration)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value)},
+			COBIAERR_NOERROR => {
+				Ok(value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -15638,7 +15723,8 @@ impl CapePersist {
 			((*(*self.interface).vTbl).getIsDirty.unwrap())((*self.interface).me,&mut dirty as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(dirty)},
+			COBIAERR_NOERROR => {
+				Ok(dirty)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -16008,7 +16094,8 @@ impl CapeReport {
 			((*(*self.interface).vTbl).CheckReportSpec.unwrap())((*self.interface).me,(&name.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&_type.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&locale.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut report_available as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(report_available)},
+			COBIAERR_NOERROR => {
+				Ok(report_available)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -16254,7 +16341,8 @@ impl CapeFlowsheetMonitoringComponent {
 			((*(*self.interface).vTbl).Validate.unwrap())((*self.interface).me,(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_valid as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_valid)},
+			COBIAERR_NOERROR => {
+				Ok(is_valid)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -16274,12 +16362,13 @@ impl CapeFlowsheetMonitoringComponent {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).getValStatus.unwrap())((*self.interface).me,&mut validation_status as *mut C::CAPEOPEN_1_2_CapeValidationStatus)
 		};
-		let validation_status=match CapeValidationStatus::from(validation_status) {
-			Some(_validation_status) => _validation_status,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(validation_status)},
+			COBIAERR_NOERROR => {
+				let validation_status=match CapeValidationStatus::from(validation_status) {
+					Some(_validation_status) => _validation_status,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(validation_status)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -16506,12 +16595,13 @@ impl CapeStream {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).StreamType.unwrap())((*self.interface).me,&mut stream_type as *mut C::CAPEOPEN_1_2_CapeStreamType)
 		};
-		let stream_type=match CapeStreamType::from(stream_type) {
-			Some(_stream_type) => _stream_type,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(stream_type)},
+			COBIAERR_NOERROR => {
+				let stream_type=match CapeStreamType::from(stream_type) {
+					Some(_stream_type) => _stream_type,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(stream_type)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -17560,12 +17650,13 @@ impl CapeFlowsheetMonitoring {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).getSolutionStatus.unwrap())((*self.interface).me,&mut solution_status as *mut C::CAPEOPEN_1_2_CapeSolutionStatus)
 		};
-		let solution_status=match CapeSolutionStatus::from(solution_status) {
-			Some(_solution_status) => _solution_status,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(solution_status)},
+			COBIAERR_NOERROR => {
+				let solution_status=match CapeSolutionStatus::from(solution_status) {
+					Some(_solution_status) => _solution_status,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(solution_status)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -17585,12 +17676,13 @@ impl CapeFlowsheetMonitoring {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).getValStatus.unwrap())((*self.interface).me,&mut validation_status as *mut C::CAPEOPEN_1_2_CapeValidationStatus)
 		};
-		let validation_status=match CapeValidationStatus::from(validation_status) {
-			Some(_validation_status) => _validation_status,
-			None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
-		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(validation_status)},
+			COBIAERR_NOERROR => {
+				let validation_status=match CapeValidationStatus::from(validation_status) {
+					Some(_validation_status) => _validation_status,
+					None => {return Err(COBIAError::Message("Invalid enumeration value".to_string()));}
+				};
+				Ok(validation_status)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -17649,7 +17741,7 @@ impl CapeFlowsheetMonitoring {
 
 pub trait ICapeThermoMaterialCustomData {
 
-	/// Gets the custom data container associated with the specified source Material Object.
+	/// Gets the custom data container associated with the a Material Object.
 	///
 	///
 	/// # Returns
@@ -17657,8 +17749,8 @@ pub trait ICapeThermoMaterialCustomData {
 	///
 	/// where
 	///
-	/// * `source` - The source Material Object
-	/// * `custom_data_container` - The custom data container associated with the source Material Object, created using ICapeCustomDataSource::CreateCustomDataContainer()
+	/// * `source` - The Material Object
+	/// * `custom_data_container` - The custom data container associated with the Material Object, created using ICapeCustomDataSource::CreateCustomDataContainer()
 	fn get_custom_data_container(&mut self,source:crate::CapeObject) -> Result<crate::CapeObject,COBIAError>;
 }
 
@@ -17743,7 +17835,7 @@ pub struct CapeThermoMaterialCustomData {
 impl CapeThermoMaterialCustomData {
 
 
-	/// Gets the custom data container associated with the specified source Material Object.
+	/// Gets the custom data container associated with the a Material Object.
 	///
 	///
 	/// # Returns
@@ -17751,8 +17843,8 @@ impl CapeThermoMaterialCustomData {
 	///
 	/// where
 	///
-	/// * `source` - The source Material Object
-	/// * `custom_data_container` - The custom data container associated with the source Material Object, created using ICapeCustomDataSource::CreateCustomDataContainer()
+	/// * `source` - The Material Object
+	/// * `custom_data_container` - The custom data container associated with the Material Object, created using ICapeCustomDataSource::CreateCustomDataContainer()
 	pub fn get_custom_data_container(&self,source:&crate::CapeObject) -> Result<crate::CapeObject,COBIAError> {
 		let mut custom_data_container_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
@@ -17776,12 +17868,12 @@ impl CapeThermoMaterialCustomData {
 ///
 /// ICapeCustomDataSource interface
 ///
-/// Interface implemented by PMC Objects that wish to store custom data on Material Objects.
+/// Interface implemented by Primary PMC Objects that store custom data on Material Objects.
 ///
 
 pub trait ICapeCustomDataSource {
 
-	/// Creates a new custom data container object.
+	/// Creates a new instance of its custom data container.
 	///
 	///
 	/// # Returns
@@ -17789,10 +17881,10 @@ pub trait ICapeCustomDataSource {
 	///
 	/// where
 	///
-	/// * `custom_data_container` - A new custom data container object
+	/// * `custom_data_container` - A new instance of the custom data container
 	fn create_custom_data_container(&mut self) -> Result<crate::CapeObject,COBIAError>;
 
-	/// Copies custom data from the source Material Object to the target Material Object.
+	/// Copies the content of one Custom Data Container to another Custom Data Container.
 	///
 	///
 	/// # Returns
@@ -17800,11 +17892,11 @@ pub trait ICapeCustomDataSource {
 	///
 	/// where
 	///
-	/// * `source` - The source Material Object
-	/// * `target` - The target Material Object
+	/// * `source` - The Custom Data Container from which the content is to be copied
+	/// * `target` - The Custom Data Container to which the content is to be copied
 	fn copy_custom_data(&mut self,source:crate::CapeObject,target:crate::CapeObject) -> Result<(),COBIAError>;
 
-	/// Notifies that the thermodynamic configuration of the specified Material Object has changed to allow for resetting custom data.
+	/// Clears content of Custom Data Container on change of thermodynamic configuration of the Material Object.
 	///
 	///
 	/// # Returns
@@ -17812,7 +17904,7 @@ pub trait ICapeCustomDataSource {
 	///
 	/// where
 	///
-	/// * `container` - The Material Object whose thermodynamic configuration has changed
+	/// * `container` - The Custom Data Container from which the content is to be cleared
 	fn thermodynamic_configuration_changed(&mut self,container:crate::CapeObject) -> Result<(),COBIAError>;
 }
 
@@ -17929,7 +18021,7 @@ pub trait ICapeCustomDataSourceImpl : ICapeCustomDataSource {
 /// Smart pointer for ICapeCustomDataSource
 ///
 /// This provides rust-callable functions for an externally implemented ICapeCustomDataSource interface
-/// Interface implemented by PMC Objects that wish to store custom data on Material Objects.
+/// Interface implemented by Primary PMC Objects that store custom data on Material Objects.
 ///
 
 #[cape_smart_pointer(ICAPECUSTOMDATASOURCE_UUID)]
@@ -17941,7 +18033,7 @@ pub struct CapeCustomDataSource {
 impl CapeCustomDataSource {
 
 
-	/// Creates a new custom data container object.
+	/// Creates a new instance of its custom data container.
 	///
 	///
 	/// # Returns
@@ -17949,7 +18041,7 @@ impl CapeCustomDataSource {
 	///
 	/// where
 	///
-	/// * `custom_data_container` - A new custom data container object
+	/// * `custom_data_container` - A new instance of the custom data container
 	pub fn create_custom_data_container(&self) -> Result<crate::CapeObject,COBIAError> {
 		let mut custom_data_container_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
@@ -17967,7 +18059,7 @@ impl CapeCustomDataSource {
 	}
 
 
-	/// Copies custom data from the source Material Object to the target Material Object.
+	/// Copies the content of one Custom Data Container to another Custom Data Container.
 	///
 	///
 	/// # Returns
@@ -17975,8 +18067,8 @@ impl CapeCustomDataSource {
 	///
 	/// where
 	///
-	/// * `source` - The source Material Object
-	/// * `target` - The target Material Object
+	/// * `source` - The Custom Data Container from which the content is to be copied
+	/// * `target` - The Custom Data Container to which the content is to be copied
 	pub fn copy_custom_data(&self,source:&crate::CapeObject,target:&crate::CapeObject) -> Result<(),COBIAError> {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).CopyCustomData.unwrap())((*self.interface).me,source.as_interface_pointer() as *mut crate::C::ICapeInterface,target.as_interface_pointer() as *mut crate::C::ICapeInterface)
@@ -17988,7 +18080,7 @@ impl CapeCustomDataSource {
 	}
 
 
-	/// Notifies that the thermodynamic configuration of the specified Material Object has changed to allow for resetting custom data.
+	/// Clears content of Custom Data Container on change of thermodynamic configuration of the Material Object.
 	///
 	///
 	/// # Returns
@@ -17996,7 +18088,7 @@ impl CapeCustomDataSource {
 	///
 	/// where
 	///
-	/// * `container` - The Material Object whose thermodynamic configuration has changed
+	/// * `container` - The Custom Data Container from which the content is to be cleared
 	pub fn thermodynamic_configuration_changed(&self,container:&crate::CapeObject) -> Result<(),COBIAError> {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).ThermodynamicConfigurationChanged.unwrap())((*self.interface).me,container.as_interface_pointer() as *mut crate::C::ICapeInterface)
@@ -18023,7 +18115,7 @@ pub trait ICapeThermoPetroleumFractions {
 	///
 	///
 	/// # Arguments
-	/// * `property_id` - The identifier of the property to set
+	/// * `property_id` - The identifier of the property
 	/// * `basis` - The basis of the property
 	/// * `values` - The petroleum property value for all Compounds, with UNDEFINED for all real Compounds
 	///
@@ -18035,7 +18127,7 @@ pub trait ICapeThermoPetroleumFractions {
 	///
 	///
 	/// # Arguments
-	/// * `property_id` - The identifier of the property to set
+	/// * `property_id` - The identifier of the property
 	/// * `basis` - The basis of the property
 	/// * `value` - The bulk property value
 	///
@@ -18047,9 +18139,9 @@ pub trait ICapeThermoPetroleumFractions {
 	///
 	///
 	/// # Arguments
-	/// * `property_id` - The identifier of the property to get
+	/// * `property_id` - The identifier of the property
 	/// * `basis` - The basis for the property
-	/// * `values` - The property value
+	/// * `values` - The property value for all Compounds, including available values for real Compounds
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -18059,7 +18151,7 @@ pub trait ICapeThermoPetroleumFractions {
 	///
 	///
 	/// # Arguments
-	/// * `property_id` - The identifier of the property to get
+	/// * `property_id` - The identifier of the property
 	/// * `basis` - The basis for the property
 	///
 	/// # Returns
@@ -18085,8 +18177,8 @@ pub trait ICapeThermoPetroleumFractions {
 	///
 	/// # Arguments
 	/// * `property_id` - The identifier of the property
-	/// * `attribute_name` - The name of the attribute to get
-	/// * `attribute_value` - The value of the requested attribute
+	/// * `attribute_name` - The name of the attribute
+	/// * `attribute_value` - The value of the attribute
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -18100,7 +18192,7 @@ pub trait ICapeThermoPetroleumFractions {
 	///
 	/// where
 	///
-	/// * `source` - The source Material Object
+	/// * `source` - The source Material Object that supports petroleum fractions
 	fn copy_petro_properties(&mut self,source:CapeThermoMaterial) -> Result<(),COBIAError>;
 
 	/// Performs task of completion of petroleum properties at Material Object after all specifications are complete, such as characterization.
@@ -18339,7 +18431,7 @@ impl CapeThermoPetroleumFractions {
 	///
 	///
 	/// # Arguments
-	/// * `property_id` - The identifier of the property to set
+	/// * `property_id` - The identifier of the property
 	/// * `basis` - The basis of the property
 	/// * `values` - The petroleum property value for all Compounds, with UNDEFINED for all real Compounds
 	///
@@ -18360,7 +18452,7 @@ impl CapeThermoPetroleumFractions {
 	///
 	///
 	/// # Arguments
-	/// * `property_id` - The identifier of the property to set
+	/// * `property_id` - The identifier of the property
 	/// * `basis` - The basis of the property
 	/// * `value` - The bulk property value
 	///
@@ -18381,9 +18473,9 @@ impl CapeThermoPetroleumFractions {
 	///
 	///
 	/// # Arguments
-	/// * `property_id` - The identifier of the property to get
+	/// * `property_id` - The identifier of the property
 	/// * `basis` - The basis for the property
-	/// * `values` - The property value
+	/// * `values` - The property value for all Compounds, including available values for real Compounds
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -18402,7 +18494,7 @@ impl CapeThermoPetroleumFractions {
 	///
 	///
 	/// # Arguments
-	/// * `property_id` - The identifier of the property to get
+	/// * `property_id` - The identifier of the property
 	/// * `basis` - The basis for the property
 	///
 	/// # Returns
@@ -18417,7 +18509,8 @@ impl CapeThermoPetroleumFractions {
 			((*(*self.interface).vTbl).GetPetroBulkProp.unwrap())((*self.interface).me,(&property_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&basis.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut value as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(value)},
+			COBIAERR_NOERROR => {
+				Ok(value)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -18447,8 +18540,8 @@ impl CapeThermoPetroleumFractions {
 	///
 	/// # Arguments
 	/// * `property_id` - The identifier of the property
-	/// * `attribute_name` - The name of the attribute to get
-	/// * `attribute_value` - The value of the requested attribute
+	/// * `attribute_name` - The name of the attribute
+	/// * `attribute_value` - The value of the attribute
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -18471,7 +18564,7 @@ impl CapeThermoPetroleumFractions {
 	///
 	/// where
 	///
-	/// * `source` - The source Material Object
+	/// * `source` - The source Material Object that supports petroleum fractions
 	pub fn copy_petro_properties(&self,source:&CapeThermoMaterial) -> Result<(),COBIAError> {
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).CopyPetroProperties.unwrap())((*self.interface).me,source.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoMaterial)
@@ -18788,7 +18881,8 @@ impl CapeManager {
 			((*(*self.interface).vTbl).getSupportsCreateNew.unwrap())((*self.interface).me,&mut supports_create_new as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(supports_create_new)},
+			COBIAERR_NOERROR => {
+				Ok(supports_create_new)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -18809,7 +18903,8 @@ impl CapeManager {
 			((*(*self.interface).vTbl).getLastCreateNewWasCanceledByUser.unwrap())((*self.interface).me,&mut user_cancel as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(user_cancel)},
+			COBIAERR_NOERROR => {
+				Ok(user_cancel)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -18921,12 +19016,12 @@ impl CapeManager {
 ///
 /// ICapeThermoReactionSet interface
 ///
-/// Interface that gives a Client of a Chemical Reaction Server access to the list of Chemical Reactions that can be exercised in each context defined by the Client, implemented by a Reaction Set object and any Chemical Reaction Server.
+/// Interface that gives a Client of a Chemical Reaction Server access to the list of Chemical Reactions, implemented by a Reaction Set object and any Chemical Reaction Server.
 ///
 
 pub trait ICapeThermoReactionSet {
 
-	/// Gets the number of Chemical Reactions contained in the Reaction Set.
+	/// Gets the number of Chemical Reactions.
 	///
 	///
 	/// # Returns
@@ -18934,14 +19029,14 @@ pub trait ICapeThermoReactionSet {
 	///
 	/// where
 	///
-	/// * `number_of_reactions` - The number of Chemical Reactions (zero or more) contained in the Reaction Set
+	/// * `number_of_reactions` - The number of Chemical Reactions (zero or more)
 	fn get_number_of_reactions(&mut self) -> Result<CapeInteger,COBIAError>;
 
-	/// Identifiers of all Chemical Reactions exposed by the Reaction Set.
+	/// Identifiers of Chemical Reactions in the set.
 	///
 	///
 	/// # Arguments
-	/// * `reaction_ids` - The identifiers of all Chemical Reactions exposed by the Reaction Set
+	/// * `reaction_ids` - The identifiers of the Chemical Reactions
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19036,7 +19131,7 @@ pub trait ICapeThermoReactionSetImpl : ICapeThermoReactionSet {
 /// Smart pointer for ICapeThermoReactionSet
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoReactionSet interface
-/// Interface that gives a Client of a Chemical Reaction Server access to the list of Chemical Reactions that can be exercised in each context defined by the Client, implemented by a Reaction Set object and any Chemical Reaction Server.
+/// Interface that gives a Client of a Chemical Reaction Server access to the list of Chemical Reactions, implemented by a Reaction Set object and any Chemical Reaction Server.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOREACTIONSET_UUID)]
@@ -19048,7 +19143,7 @@ pub struct CapeThermoReactionSet {
 impl CapeThermoReactionSet {
 
 
-	/// Gets the number of Chemical Reactions contained in the Reaction Set.
+	/// Gets the number of Chemical Reactions.
 	///
 	///
 	/// # Returns
@@ -19056,24 +19151,25 @@ impl CapeThermoReactionSet {
 	///
 	/// where
 	///
-	/// * `number_of_reactions` - The number of Chemical Reactions (zero or more) contained in the Reaction Set
+	/// * `number_of_reactions` - The number of Chemical Reactions (zero or more)
 	pub fn get_number_of_reactions(&self) -> Result<CapeInteger,COBIAError> {
 		let mut number_of_reactions:CapeInteger=0;
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).getNumberOfReactions.unwrap())((*self.interface).me,&mut number_of_reactions as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(number_of_reactions)},
+			COBIAERR_NOERROR => {
+				Ok(number_of_reactions)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
 
 
-	/// Identifiers of all Chemical Reactions exposed by the Reaction Set.
+	/// Identifiers of Chemical Reactions in the set.
 	///
 	///
 	/// # Arguments
-	/// * `reaction_ids` - The identifiers of all Chemical Reactions exposed by the Reaction Set
+	/// * `reaction_ids` - The identifiers of the Chemical Reactions
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19094,35 +19190,35 @@ impl CapeThermoReactionSet {
 ///
 /// ICapeThermoReactions interface
 ///
-/// Interface ICapeThermoReactions gives access to the static description of a Chemical Reaction, implemented by any Chemical Reaction Server.
+/// Interface that gives access to the description of a Chemical Reaction, implemented by any Chemical Reaction Server.
 ///
 
 pub trait ICapeThermoReactions {
 
-	/// Gets the attributes of the specified Chemical Reaction.
+	/// Gets the attribute identifiers for the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `attribute_list` - The list of attributes of the specified Chemical Reaction
+	/// * `attribute_list` - The list of attribute identifiers
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_reaction_attribute_list(&mut self,reac_id:&CapeStringIn,attribute_list:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
-	/// Gets the the value(s) of the specified attribute of the specified Chemical Reaction.
+	/// Gets the the value of the specified attribute of the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
 	/// * `reac_attribute` - The identifier of the attribute
-	/// * `attribute_value` - The value(s) of the specified attribute of the specified Chemical Reaction
+	/// * `attribute_value` - The value of the attribute
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_reaction_attribute(&mut self,reac_id:&CapeStringIn,reac_attribute:&CapeStringIn,attribute_value:&mut CapeValueOut) -> Result<(),COBIAError>;
 
-	/// Gets the number of Compounds occurring in the specified Chemical Reaction.
+	/// Gets the number of Compounds participating in the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
@@ -19133,7 +19229,7 @@ pub trait ICapeThermoReactions {
 	///
 	/// where
 	///
-	/// * `compound_count` - The number of Compounds involved in the specified Chemical Reaction
+	/// * `compound_count` - The number of Compounds
 	fn get_reaction_compound_count(&mut self,reac_id:&CapeStringIn) -> Result<CapeInteger,COBIAError>;
 
 	/// Gets the identifiers of the Compounds participating in the specified Chemical Reaction.
@@ -19141,18 +19237,18 @@ pub trait ICapeThermoReactions {
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `compound_ids` - The identifiers of the Compounds participating in the specified Chemical Reaction
+	/// * `comp_ids` - The identifiers of the Compounds
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	fn get_reaction_compound_ids(&mut self,reac_id:&CapeStringIn,compound_ids:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
+	fn get_reaction_compound_ids(&mut self,reac_id:&CapeStringIn,comp_ids:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
-	/// Gets the stoichiometric coefficients of the specified Chemical Reaction.
+	/// Gets the stoichiometric coefficients for the compounds participating in the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `stoichiometric_coefficients` - The stoichiometric coefficients of the specified Chemical Reaction
+	/// * `stoichiometric_coefficients` - The stoichiometric coefficients
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19163,11 +19259,11 @@ pub trait ICapeThermoReactions {
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `phase_ids` - The phase labels for the Compounds involved in the specified Chemical Reaction
+	/// * `phase_labels` - The phase labels, one for each Compound participating in the Reaction
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	fn get_reaction_compound_phases(&mut self,reac_id:&CapeStringIn,phase_ids:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
+	fn get_reaction_compound_phases(&mut self,reac_id:&CapeStringIn,phase_labels:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
 	/// Checks if the list of Chemical Reaction identifiers is valid as a set of Chemical Reactions.
 	///
@@ -19184,11 +19280,11 @@ pub trait ICapeThermoReactions {
 	/// * `is_valid` - True if the list of Chemical Reaction identifiers is valid, False otherwise
 	fn is_reaction_list_valid(&mut self,reac_ids:&CapeArrayStringIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
-	/// Gets a reduced Reaction Set.
+	/// Gets a Reduced Reaction Set.
 	///
 	///
 	/// # Arguments
-	/// * `present_compound_ids` - List of compound identifiers of the Compounds that are present (non-zero concentration); UNDEFINED means all Compounds defined on the active Material Object
+	/// * `present_comp_ids` - List of compound identifiers of the Compounds that have non-zero fraction (are available) prior to reacting; UNDEFINED (empty) means all Compounds defined on the active Material Object
 	/// * `reac_ids` - List of active Chemical Reactions identifiers that must be considered
 	/// * `is_equilibrium` - For each of the active Chemical Reactions, a Boolean value stating whether the Chemical Reaction is considered as an Equilibrium Reaction (or Full Conversion Reaction) or not
 	/// * `consider_all_reactions` - True means that Compounds formed by non-equilibrium Reactions should be considered during reduction
@@ -19200,7 +19296,7 @@ pub trait ICapeThermoReactions {
 	/// where
 	///
 	/// * `reduced_reaction_set` - The reduced Reaction Set
-	fn get_reduced_reaction_set(&mut self,present_compound_ids:&CapeArrayStringIn,reac_ids:&CapeArrayStringIn,is_equilibrium:&CapeArrayBooleanIn,consider_all_reactions:CapeBoolean,over_reduced:&mut CapeBoolean) -> Result<CapeThermoReactionSet,COBIAError>;
+	fn get_reduced_reaction_set(&mut self,present_comp_ids:&CapeArrayStringIn,reac_ids:&CapeArrayStringIn,is_equilibrium:&CapeArrayBooleanIn,consider_all_reactions:CapeBoolean,over_reduced:&mut CapeBoolean) -> Result<CapeThermoReactionSet,COBIAError>;
 }
 
 /// COBIA interface implementation for ICapeThermoReactions
@@ -19305,19 +19401,19 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_compound_ids(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,compound_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
-		if compound_ids.is_null() {
+	extern "C" fn raw_get_reaction_compound_ids(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,comp_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+		if comp_ids.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
-		if compound_ids.is_null() {
+		if comp_ids.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
 		let reac_id=CapeStringIn::new(&reac_id);
-		let mut compound_ids=unsafe{*((&compound_ids as *const *mut crate::C::ICapeArrayString) as *mut *mut crate::C::ICapeArrayString)};
-		let mut compound_ids=CapeArrayStringOut::new(&mut compound_ids);
-		match myself.get_reaction_compound_ids(&reac_id,&mut compound_ids) {
+		let mut comp_ids=unsafe{*((&comp_ids as *const *mut crate::C::ICapeArrayString) as *mut *mut crate::C::ICapeArrayString)};
+		let mut comp_ids=CapeArrayStringOut::new(&mut comp_ids);
+		match myself.get_reaction_compound_ids(&reac_id,&mut comp_ids) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeThermoReactions::GetReactionCompoundIds")
 		}
@@ -19351,19 +19447,19 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_compound_phases(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,phase_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
-		if phase_ids.is_null() {
+	extern "C" fn raw_get_reaction_compound_phases(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+		if phase_labels.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
-		if phase_ids.is_null() {
+		if phase_labels.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
 		let reac_id=CapeStringIn::new(&reac_id);
-		let mut phase_ids=unsafe{*((&phase_ids as *const *mut crate::C::ICapeArrayString) as *mut *mut crate::C::ICapeArrayString)};
-		let mut phase_ids=CapeArrayStringOut::new(&mut phase_ids);
-		match myself.get_reaction_compound_phases(&reac_id,&mut phase_ids) {
+		let mut phase_labels=unsafe{*((&phase_labels as *const *mut crate::C::ICapeArrayString) as *mut *mut crate::C::ICapeArrayString)};
+		let mut phase_labels=CapeArrayStringOut::new(&mut phase_labels);
+		match myself.get_reaction_compound_phases(&reac_id,&mut phase_labels) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeThermoReactions::GetReactionCompoundPhases")
 		}
@@ -19400,7 +19496,7 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reduced_reaction_set(me: *mut std::ffi::c_void,present_compound_ids:*mut crate::C::ICapeArrayString,reac_ids:*mut crate::C::ICapeArrayString,is_equilibrium:*mut crate::C::ICapeArrayBoolean,consider_all_reactions:CapeBoolean,over_reduced:*mut CapeBoolean,reduced_reaction_set:*mut *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet) -> crate::C::CapeResult {
+	extern "C" fn raw_get_reduced_reaction_set(me: *mut std::ffi::c_void,present_comp_ids:*mut crate::C::ICapeArrayString,reac_ids:*mut crate::C::ICapeArrayString,is_equilibrium:*mut crate::C::ICapeArrayBoolean,consider_all_reactions:CapeBoolean,over_reduced:*mut CapeBoolean,reduced_reaction_set:*mut *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet) -> crate::C::CapeResult {
 		if over_reduced.is_null()||reduced_reaction_set.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19409,11 +19505,11 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 		if reduced_reaction_set.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let present_compound_ids=CapeArrayStringIn::new(&present_compound_ids);
+		let present_comp_ids=CapeArrayStringIn::new(&present_comp_ids);
 		let reac_ids=CapeArrayStringIn::new(&reac_ids);
 		let is_equilibrium=CapeArrayBooleanIn::new(&is_equilibrium);
 		let mut _over_reduced:CapeBoolean=false as CapeBoolean;
-		match myself.get_reduced_reaction_set(&present_compound_ids,&reac_ids,&is_equilibrium,consider_all_reactions,&mut _over_reduced) {
+		match myself.get_reduced_reaction_set(&present_comp_ids,&reac_ids,&is_equilibrium,consider_all_reactions,&mut _over_reduced) {
 			Ok(_reduced_reaction_set) => {
 				unsafe{*over_reduced=_over_reduced;}
 				unsafe{*reduced_reaction_set=_reduced_reaction_set.detach();}
@@ -19446,7 +19542,7 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 /// Smart pointer for ICapeThermoReactions
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoReactions interface
-/// Interface ICapeThermoReactions gives access to the static description of a Chemical Reaction, implemented by any Chemical Reaction Server.
+/// Interface that gives access to the description of a Chemical Reaction, implemented by any Chemical Reaction Server.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOREACTIONS_UUID)]
@@ -19458,12 +19554,12 @@ pub struct CapeThermoReactions {
 impl CapeThermoReactions {
 
 
-	/// Gets the attributes of the specified Chemical Reaction.
+	/// Gets the attribute identifiers for the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `attribute_list` - The list of attributes of the specified Chemical Reaction
+	/// * `attribute_list` - The list of attribute identifiers
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19478,13 +19574,13 @@ impl CapeThermoReactions {
 	}
 
 
-	/// Gets the the value(s) of the specified attribute of the specified Chemical Reaction.
+	/// Gets the the value of the specified attribute of the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
 	/// * `reac_attribute` - The identifier of the attribute
-	/// * `attribute_value` - The value(s) of the specified attribute of the specified Chemical Reaction
+	/// * `attribute_value` - The value of the attribute
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19499,7 +19595,7 @@ impl CapeThermoReactions {
 	}
 
 
-	/// Gets the number of Compounds occurring in the specified Chemical Reaction.
+	/// Gets the number of Compounds participating in the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
@@ -19510,14 +19606,15 @@ impl CapeThermoReactions {
 	///
 	/// where
 	///
-	/// * `compound_count` - The number of Compounds involved in the specified Chemical Reaction
+	/// * `compound_count` - The number of Compounds
 	pub fn get_reaction_compound_count<TypeOfReacId:CapeStringProviderIn>(&self,reac_id:&TypeOfReacId) -> Result<CapeInteger,COBIAError> {
 		let mut compound_count:CapeInteger=0;
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).GetReactionCompoundCount.unwrap())((*self.interface).me,(&reac_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),&mut compound_count as *mut CapeInteger)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(compound_count)},
+			COBIAERR_NOERROR => {
+				Ok(compound_count)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -19528,13 +19625,13 @@ impl CapeThermoReactions {
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `compound_ids` - The identifiers of the Compounds participating in the specified Chemical Reaction
+	/// * `comp_ids` - The identifiers of the Compounds
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	pub fn get_reaction_compound_ids<TypeOfReacId:CapeStringProviderIn,TypeOfCompoundIds:CapeArrayStringProviderOut>(&self,reac_id:&TypeOfReacId,compound_ids:&mut TypeOfCompoundIds) -> Result<(),COBIAError> {
+	pub fn get_reaction_compound_ids<TypeOfReacId:CapeStringProviderIn,TypeOfCompIds:CapeArrayStringProviderOut>(&self,reac_id:&TypeOfReacId,comp_ids:&mut TypeOfCompIds) -> Result<(),COBIAError> {
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).GetReactionCompoundIds.unwrap())((*self.interface).me,(&reac_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&compound_ids.as_cape_array_string_out() as *const crate::C::ICapeArrayString).cast_mut())
+			((*(*self.interface).vTbl).GetReactionCompoundIds.unwrap())((*self.interface).me,(&reac_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&comp_ids.as_cape_array_string_out() as *const crate::C::ICapeArrayString).cast_mut())
 		};
 		match result_code {
 			COBIAERR_NOERROR => {Ok(())},
@@ -19543,12 +19640,12 @@ impl CapeThermoReactions {
 	}
 
 
-	/// Gets the stoichiometric coefficients of the specified Chemical Reaction.
+	/// Gets the stoichiometric coefficients for the compounds participating in the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `stoichiometric_coefficients` - The stoichiometric coefficients of the specified Chemical Reaction
+	/// * `stoichiometric_coefficients` - The stoichiometric coefficients
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19568,13 +19665,13 @@ impl CapeThermoReactions {
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `phase_ids` - The phase labels for the Compounds involved in the specified Chemical Reaction
+	/// * `phase_labels` - The phase labels, one for each Compound participating in the Reaction
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	pub fn get_reaction_compound_phases<TypeOfReacId:CapeStringProviderIn,TypeOfPhaseIds:CapeArrayStringProviderOut>(&self,reac_id:&TypeOfReacId,phase_ids:&mut TypeOfPhaseIds) -> Result<(),COBIAError> {
+	pub fn get_reaction_compound_phases<TypeOfReacId:CapeStringProviderIn,TypeOfPhaseLabels:CapeArrayStringProviderOut>(&self,reac_id:&TypeOfReacId,phase_labels:&mut TypeOfPhaseLabels) -> Result<(),COBIAError> {
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).GetReactionCompoundPhases.unwrap())((*self.interface).me,(&reac_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&phase_ids.as_cape_array_string_out() as *const crate::C::ICapeArrayString).cast_mut())
+			((*(*self.interface).vTbl).GetReactionCompoundPhases.unwrap())((*self.interface).me,(&reac_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&phase_labels.as_cape_array_string_out() as *const crate::C::ICapeArrayString).cast_mut())
 		};
 		match result_code {
 			COBIAERR_NOERROR => {Ok(())},
@@ -19602,17 +19699,18 @@ impl CapeThermoReactions {
 			((*(*self.interface).vTbl).IsReactionListValid.unwrap())((*self.interface).me,(&reac_ids.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_valid as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_valid)},
+			COBIAERR_NOERROR => {
+				Ok(is_valid)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
 
 
-	/// Gets a reduced Reaction Set.
+	/// Gets a Reduced Reaction Set.
 	///
 	///
 	/// # Arguments
-	/// * `present_compound_ids` - List of compound identifiers of the Compounds that are present (non-zero concentration); UNDEFINED means all Compounds defined on the active Material Object
+	/// * `present_comp_ids` - List of compound identifiers of the Compounds that have non-zero fraction (are available) prior to reacting; UNDEFINED (empty) means all Compounds defined on the active Material Object
 	/// * `reac_ids` - List of active Chemical Reactions identifiers that must be considered
 	/// * `is_equilibrium` - For each of the active Chemical Reactions, a Boolean value stating whether the Chemical Reaction is considered as an Equilibrium Reaction (or Full Conversion Reaction) or not
 	/// * `consider_all_reactions` - True means that Compounds formed by non-equilibrium Reactions should be considered during reduction
@@ -19624,10 +19722,10 @@ impl CapeThermoReactions {
 	/// where
 	///
 	/// * `reduced_reaction_set` - The reduced Reaction Set
-	pub fn get_reduced_reaction_set<TypeOfPresentCompoundIds:CapeArrayStringProviderIn,TypeOfReacIds:CapeArrayStringProviderIn,TypeOfIsEquilibrium:CapeArrayBooleanProviderIn>(&self,present_compound_ids:&TypeOfPresentCompoundIds,reac_ids:&TypeOfReacIds,is_equilibrium:&TypeOfIsEquilibrium,consider_all_reactions:CapeBoolean,over_reduced:&mut CapeBoolean) -> Result<CapeThermoReactionSet,COBIAError> {
+	pub fn get_reduced_reaction_set<TypeOfPresentCompIds:CapeArrayStringProviderIn,TypeOfReacIds:CapeArrayStringProviderIn,TypeOfIsEquilibrium:CapeArrayBooleanProviderIn>(&self,present_comp_ids:&TypeOfPresentCompIds,reac_ids:&TypeOfReacIds,is_equilibrium:&TypeOfIsEquilibrium,consider_all_reactions:CapeBoolean,over_reduced:&mut CapeBoolean) -> Result<CapeThermoReactionSet,COBIAError> {
 		let mut reduced_reaction_set_ptr: *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet=std::ptr::null_mut();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).GetReducedReactionSet.unwrap())((*self.interface).me,(&present_compound_ids.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&reac_ids.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&is_equilibrium.as_cape_array_boolean_in() as *const crate::C::ICapeArrayBoolean).cast_mut(),consider_all_reactions,over_reduced as *mut CapeBoolean,&mut reduced_reaction_set_ptr as *mut *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet)
+			((*(*self.interface).vTbl).GetReducedReactionSet.unwrap())((*self.interface).me,(&present_comp_ids.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&reac_ids.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&is_equilibrium.as_cape_array_boolean_in() as *const crate::C::ICapeArrayBoolean).cast_mut(),consider_all_reactions,over_reduced as *mut CapeBoolean,&mut reduced_reaction_set_ptr as *mut *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet)
 		};
 		match result_code {
 			COBIAERR_NOERROR => {
@@ -19668,15 +19766,15 @@ pub trait ICapeThermoReactionRoutine {
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `property` - The Reaction Property, including Reaction Property derivatives for which availability must be checked for the specified Chemical Reaction
-	/// * `message` - In case of False returned by the operation, single message stating the reason
+	/// * `property` - The identifier of the Reaction Property (or Reaction Property derivative) for which availability must be checked for the specified Chemical Reaction
+	/// * `message` - In case of False returned by the operation, message stating the reason
 	///
 	/// # Returns
 	/// * Result<'is_available',COBIAError> - Ok if successful, Err if there was an error
 	///
 	/// where
 	///
-	/// * `is_available` - True if the specified Reaction Property can be calculated for the specified Chemical Reaction, False otherwise
+	/// * `is_available` - True if the Reaction Property can be calculated for the Chemical Reaction, False otherwise
 	fn check_reaction_property_availability(&mut self,reac_id:&CapeStringIn,property:&CapeStringIn,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError>;
 
 	/// Calculates specified Reaction Properties for the specified Chemical Reactions.
@@ -19684,7 +19782,7 @@ pub trait ICapeThermoReactionRoutine {
 	///
 	/// # Arguments
 	/// * `props` - The Reaction Properties to be calculated
-	/// * `reac_ids` - The identifiers of the Chemical Reactions for which to calculate the specified Reaction Properties
+	/// * `reac_ids` - The identifiers of the Chemical Reactions
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19879,22 +19977,23 @@ impl CapeThermoReactionRoutine {
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `property` - The Reaction Property, including Reaction Property derivatives for which availability must be checked for the specified Chemical Reaction
-	/// * `message` - In case of False returned by the operation, single message stating the reason
+	/// * `property` - The identifier of the Reaction Property (or Reaction Property derivative) for which availability must be checked for the specified Chemical Reaction
+	/// * `message` - In case of False returned by the operation, message stating the reason
 	///
 	/// # Returns
 	/// * Result<'is_available',COBIAError> - Ok if successful, Err if there was an error
 	///
 	/// where
 	///
-	/// * `is_available` - True if the specified Reaction Property can be calculated for the specified Chemical Reaction, False otherwise
+	/// * `is_available` - True if the Reaction Property can be calculated for the Chemical Reaction, False otherwise
 	pub fn check_reaction_property_availability<TypeOfReacId:CapeStringProviderIn,TypeOfProperty:CapeStringProviderIn,TypeOfMessage:CapeStringProviderOut>(&self,reac_id:&TypeOfReacId,property:&TypeOfProperty,message:&mut TypeOfMessage) -> Result<CapeBoolean,COBIAError> {
 		let mut is_available:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
 			((*(*self.interface).vTbl).CheckReactionPropertyAvailability.unwrap())((*self.interface).me,(&reac_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&property.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_available as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_available)},
+			COBIAERR_NOERROR => {
+				Ok(is_available)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -19905,7 +20004,7 @@ impl CapeThermoReactionRoutine {
 	///
 	/// # Arguments
 	/// * `props` - The Reaction Properties to be calculated
-	/// * `reac_ids` - The identifiers of the Chemical Reactions for which to calculate the specified Reaction Properties
+	/// * `reac_ids` - The identifiers of the Chemical Reactions
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -19952,29 +20051,29 @@ impl CapeThermoReactionRoutine {
 
 pub trait ICapeThermoReactionProperties {
 
-	/// Gets the value(s) of the specified Reaction Property for a specified Chemical Reaction.
+	/// Gets Reaction Property values for a specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The identifier of the Reaction Property to get
+	/// * `property` - The identifier of the Reaction Property
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `prop_vals` - The value of the requested Reaction Property
+	/// * `results` - The value of the Reaction Property
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	fn get_reaction_prop(&mut self,property:&CapeStringIn,reac_id:&CapeStringIn,prop_vals:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
+	fn get_reaction_prop(&mut self,property:&CapeStringIn,reac_id:&CapeStringIn,results:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Sets the value(s) of the specified Reaction Property for the specified Chemical Reaction.
+	/// Sets Reaction Property values for the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The identifier of the Reaction Property to set
+	/// * `property` - The identifier of the Reaction Property
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `prop_vals` - The value of the Reaction Property to set
+	/// * `values` - The value of the Reaction Property
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	fn set_reaction_prop(&mut self,property:&CapeStringIn,reac_id:&CapeStringIn,prop_vals:&CapeArrayRealIn) -> Result<(),COBIAError>;
+	fn set_reaction_prop(&mut self,property:&CapeStringIn,reac_id:&CapeStringIn,values:&CapeArrayRealIn) -> Result<(),COBIAError>;
 }
 
 /// COBIA interface implementation for ICapeThermoReactionProperties
@@ -20011,20 +20110,20 @@ pub trait ICapeThermoReactionPropertiesImpl : ICapeThermoReactionProperties {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,reac_id:*mut crate::C::ICapeString,prop_vals:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
-		if prop_vals.is_null() {
+	extern "C" fn raw_get_reaction_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,reac_id:*mut crate::C::ICapeString,results:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+		if results.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
-		if prop_vals.is_null() {
+		if results.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
 		let property=CapeStringIn::new(&property);
 		let reac_id=CapeStringIn::new(&reac_id);
-		let mut prop_vals=unsafe{*((&prop_vals as *const *mut crate::C::ICapeArrayReal) as *mut *mut crate::C::ICapeArrayReal)};
-		let mut prop_vals=CapeArrayRealOut::new(&mut prop_vals);
-		match myself.get_reaction_prop(&property,&reac_id,&mut prop_vals) {
+		let mut results=unsafe{*((&results as *const *mut crate::C::ICapeArrayReal) as *mut *mut crate::C::ICapeArrayReal)};
+		let mut results=CapeArrayRealOut::new(&mut results);
+		match myself.get_reaction_prop(&property,&reac_id,&mut results) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeThermoReactionProperties::GetReactionProp")
 		}
@@ -20035,13 +20134,13 @@ pub trait ICapeThermoReactionPropertiesImpl : ICapeThermoReactionProperties {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_reaction_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,reac_id:*mut crate::C::ICapeString,prop_vals:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	extern "C" fn raw_set_reaction_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,reac_id:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let property=CapeStringIn::new(&property);
 		let reac_id=CapeStringIn::new(&reac_id);
-		let prop_vals=CapeArrayRealIn::new(&prop_vals);
-		match myself.set_reaction_prop(&property,&reac_id,&prop_vals) {
+		let values=CapeArrayRealIn::new(&values);
+		match myself.set_reaction_prop(&property,&reac_id,&values) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeThermoReactionProperties::SetReactionProp")
 		}
@@ -20076,19 +20175,19 @@ pub struct CapeThermoReactionProperties {
 impl CapeThermoReactionProperties {
 
 
-	/// Gets the value(s) of the specified Reaction Property for a specified Chemical Reaction.
+	/// Gets Reaction Property values for a specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The identifier of the Reaction Property to get
+	/// * `property` - The identifier of the Reaction Property
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `prop_vals` - The value of the requested Reaction Property
+	/// * `results` - The value of the Reaction Property
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	pub fn get_reaction_prop<TypeOfProperty:CapeStringProviderIn,TypeOfReacId:CapeStringProviderIn,TypeOfPropVals:CapeArrayRealProviderOut>(&self,property:&TypeOfProperty,reac_id:&TypeOfReacId,prop_vals:&mut TypeOfPropVals) -> Result<(),COBIAError> {
+	pub fn get_reaction_prop<TypeOfProperty:CapeStringProviderIn,TypeOfReacId:CapeStringProviderIn,TypeOfResults:CapeArrayRealProviderOut>(&self,property:&TypeOfProperty,reac_id:&TypeOfReacId,results:&mut TypeOfResults) -> Result<(),COBIAError> {
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).GetReactionProp.unwrap())((*self.interface).me,(&property.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&reac_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&prop_vals.as_cape_array_real_out() as *const crate::C::ICapeArrayReal).cast_mut())
+			((*(*self.interface).vTbl).GetReactionProp.unwrap())((*self.interface).me,(&property.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&reac_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&results.as_cape_array_real_out() as *const crate::C::ICapeArrayReal).cast_mut())
 		};
 		match result_code {
 			COBIAERR_NOERROR => {Ok(())},
@@ -20097,19 +20196,19 @@ impl CapeThermoReactionProperties {
 	}
 
 
-	/// Sets the value(s) of the specified Reaction Property for the specified Chemical Reaction.
+	/// Sets Reaction Property values for the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
-	/// * `property` - The identifier of the Reaction Property to set
+	/// * `property` - The identifier of the Reaction Property
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `prop_vals` - The value of the Reaction Property to set
+	/// * `values` - The value of the Reaction Property
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	pub fn set_reaction_prop<TypeOfProperty:CapeStringProviderIn,TypeOfReacId:CapeStringProviderIn,TypeOfPropVals:CapeArrayRealProviderIn>(&self,property:&TypeOfProperty,reac_id:&TypeOfReacId,prop_vals:&TypeOfPropVals) -> Result<(),COBIAError> {
+	pub fn set_reaction_prop<TypeOfProperty:CapeStringProviderIn,TypeOfReacId:CapeStringProviderIn,TypeOfValues:CapeArrayRealProviderIn>(&self,property:&TypeOfProperty,reac_id:&TypeOfReacId,values:&TypeOfValues) -> Result<(),COBIAError> {
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).SetReactionProp.unwrap())((*self.interface).me,(&property.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&reac_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&prop_vals.as_cape_array_real_in() as *const crate::C::ICapeArrayReal).cast_mut())
+			((*(*self.interface).vTbl).SetReactionProp.unwrap())((*self.interface).me,(&property.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&reac_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&values.as_cape_array_real_in() as *const crate::C::ICapeArrayReal).cast_mut())
 		};
 		match result_code {
 			COBIAERR_NOERROR => {Ok(())},
@@ -20124,7 +20223,7 @@ impl CapeThermoReactionProperties {
 ///
 /// ICapeThermoEquilibriumRoutineEx interface
 ///
-/// Interface that extends ICapeThermoEquilibriumRoutine with Reactive Phase Equilibrium.
+/// Interface that extends ICapeThermoEquilibriumRoutine with Reactive Phase Equilibrium, implemented by any CAPE-OPEN component that calculates Thermodynamic and Reactive Phase Equilibrium.
 ///
 
 pub trait ICapeThermoEquilibriumRoutineEx {
@@ -20133,19 +20232,16 @@ pub trait ICapeThermoEquilibriumRoutineEx {
 	///
 	///
 	/// # Arguments
-	/// * `specification1` - First specification for the Equilibrium calculation
-	/// * `specification2` - Second specification for the Equilibrium calculation
-	/// * `solution_type` - The required solution type
+	/// * `specification1` - The first equilibrium specification
+	/// * `specification2` - The second equilibrium specification
+	/// * `solution_type` - The requested type of phase equilibrium
+	/// * `reaction_mole_ratio` - The ratio of the total number of moles at equilibrium to the total number of moles prior to the equilibrium calculation
 	///
 	/// # Returns
-	/// * Result<'reaction_mole_ratio',COBIAError> - Ok if successful, Err if there was an error
-	///
-	/// where
-	///
-	/// * `reaction_mole_ratio` - The ratio of the total number of moles at equilibrium to the total number of moles prior to the equilibrium calculation
-	fn calc_equilibrium_ex(&mut self,specification1:&CapeArrayStringIn,specification2:&CapeArrayStringIn,solution_type:CapeSolutionType) -> Result<CapeReal,COBIAError>;
+	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
+	fn calc_equilibrium_ex(&mut self,specification1:&CapeArrayStringIn,specification2:&CapeArrayStringIn,solution_type:CapeSolutionType,reaction_mole_ratio:&mut CapeReal) -> Result<(),COBIAError>;
 
-	/// Informs on whether the Equilibrium Server is a Reactive Equilibrium Server or not; True if the overall composition may be changed by CalcEquilibriumEx.
+	/// Checks whether the Equilibrium Server is a Reactive Equilibrium Server.
 	///
 	///
 	/// # Returns
@@ -20154,15 +20250,15 @@ pub trait ICapeThermoEquilibriumRoutineEx {
 	/// where
 	///
 	/// * `is_reactive` - True if the Equilibrium Server is a Reactive Equilibrium Server, False otherwise
-	fn is_reactive(&mut self) -> Result<CapeBoolean,COBIAError>;
+	fn get_is_reactive(&mut self) -> Result<CapeBoolean,COBIAError>;
 
-	/// Checks whether a particular type of Equilibrium Calculation is supported.
+	/// Checks whether a particular type of Equilibrium Calculation is supported, using the present Phases on the current Material Object.
 	///
 	///
 	/// # Arguments
-	/// * `specification1` - First specification for the Equilibrium calculation
-	/// * `specification2` - Second specification for the Equilibrium calculation
-	/// * `solution_type` - The required solution type
+	/// * `specification1` - The first equilibrium specification
+	/// * `specification2` - The second equilibrium specification
+	/// * `solution_type` - The requested type of phase equilibrium
 	///
 	/// # Returns
 	/// * Result<'is_supported',COBIAError> - Ok if successful, Err if there was an error
@@ -20219,8 +20315,9 @@ pub trait ICapeThermoEquilibriumRoutineExImpl : ICapeThermoEquilibriumRoutineEx 
 			Some(_solution_type) => _solution_type,
 			None => {return myself.set_last_error(COBIAError::Message("Invalid enumeration value".to_string()),"ICapeThermoEquilibriumRoutineEx::CalcEquilibriumEx");}
 		};
-		match myself.calc_equilibrium_ex(&specification1,&specification2,solution_type) {
-			Ok(_reaction_mole_ratio) => {
+		let mut _reaction_mole_ratio:CapeReal=0.0;
+		match myself.calc_equilibrium_ex(&specification1,&specification2,solution_type,&mut _reaction_mole_ratio) {
+			Ok(_) => {
 				unsafe{*reaction_mole_ratio=_reaction_mole_ratio;}
 				COBIAERR_NOERROR
 			},
@@ -20228,23 +20325,23 @@ pub trait ICapeThermoEquilibriumRoutineExImpl : ICapeThermoEquilibriumRoutineEx 
 		}
 	}
 
-	/// Interface function pointer for ICapeThermoEquilibriumRoutineEx::IsReactive
+	/// Interface function pointer for ICapeThermoEquilibriumRoutineEx::GetIsReactive
 	///
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_is_reactive(me: *mut std::ffi::c_void,is_reactive:*mut CapeBoolean) -> crate::C::CapeResult {
+	extern "C" fn raw_get_is_reactive(me: *mut std::ffi::c_void,is_reactive:*mut CapeBoolean) -> crate::C::CapeResult {
 		if is_reactive.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
-		match myself.is_reactive() {
+		match myself.get_is_reactive() {
 			Ok(_is_reactive) => {
 				unsafe{*is_reactive=_is_reactive;}
 				COBIAERR_NOERROR
 			},
-			Err(e) => myself.set_last_error(e,"ICapeThermoEquilibriumRoutineEx::IsReactive")
+			Err(e) => myself.set_last_error(e,"ICapeThermoEquilibriumRoutineEx::GetIsReactive")
 		}
 	}
 
@@ -20284,7 +20381,7 @@ pub trait ICapeThermoEquilibriumRoutineExImpl : ICapeThermoEquilibriumRoutineEx 
 				getLastError: Some(Self::T::raw_get_last_error),
 			},
 			CalcEquilibriumEx: Some(Self::T::raw_calc_equilibrium_ex),
-			IsReactive: Some(Self::T::raw_is_reactive),
+			getIsReactive: Some(Self::T::raw_get_is_reactive),
 			CheckEquilibriumSpec: Some(Self::T::raw_check_equilibrium_spec),
 		};
 }
@@ -20292,7 +20389,7 @@ pub trait ICapeThermoEquilibriumRoutineExImpl : ICapeThermoEquilibriumRoutineEx 
 /// Smart pointer for ICapeThermoEquilibriumRoutineEx
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoEquilibriumRoutineEx interface
-/// Interface that extends ICapeThermoEquilibriumRoutine with Reactive Phase Equilibrium.
+/// Interface that extends ICapeThermoEquilibriumRoutine with Reactive Phase Equilibrium, implemented by any CAPE-OPEN component that calculates Thermodynamic and Reactive Phase Equilibrium.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOEQUILIBRIUMROUTINEEX_UUID)]
@@ -20308,29 +20405,25 @@ impl CapeThermoEquilibriumRoutineEx {
 	///
 	///
 	/// # Arguments
-	/// * `specification1` - First specification for the Equilibrium calculation
-	/// * `specification2` - Second specification for the Equilibrium calculation
-	/// * `solution_type` - The required solution type
+	/// * `specification1` - The first equilibrium specification
+	/// * `specification2` - The second equilibrium specification
+	/// * `solution_type` - The requested type of phase equilibrium
+	/// * `reaction_mole_ratio` - The ratio of the total number of moles at equilibrium to the total number of moles prior to the equilibrium calculation
 	///
 	/// # Returns
-	/// * Result<'reaction_mole_ratio',COBIAError> - Ok if successful, Err if there was an error
-	///
-	/// where
-	///
-	/// * `reaction_mole_ratio` - The ratio of the total number of moles at equilibrium to the total number of moles prior to the equilibrium calculation
-	pub fn calc_equilibrium_ex<TypeOfSpecification1:CapeArrayStringProviderIn,TypeOfSpecification2:CapeArrayStringProviderIn>(&self,specification1:&TypeOfSpecification1,specification2:&TypeOfSpecification2,solution_type:CapeSolutionType) -> Result<CapeReal,COBIAError> {
-		let mut reaction_mole_ratio:CapeReal=0.0;
+	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
+	pub fn calc_equilibrium_ex<TypeOfSpecification1:CapeArrayStringProviderIn,TypeOfSpecification2:CapeArrayStringProviderIn>(&self,specification1:&TypeOfSpecification1,specification2:&TypeOfSpecification2,solution_type:CapeSolutionType,reaction_mole_ratio:&mut CapeReal) -> Result<(),COBIAError> {
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).CalcEquilibriumEx.unwrap())((*self.interface).me,(&specification1.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&specification2.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),solution_type as C::CAPEOPEN_1_2_CapeSolutionType,&mut reaction_mole_ratio as *mut CapeReal)
+			((*(*self.interface).vTbl).CalcEquilibriumEx.unwrap())((*self.interface).me,(&specification1.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&specification2.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),solution_type as C::CAPEOPEN_1_2_CapeSolutionType,reaction_mole_ratio as *mut CapeReal)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(reaction_mole_ratio)},
+			COBIAERR_NOERROR => {Ok(())},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
 
 
-	/// Informs on whether the Equilibrium Server is a Reactive Equilibrium Server or not; True if the overall composition may be changed by CalcEquilibriumEx.
+	/// Checks whether the Equilibrium Server is a Reactive Equilibrium Server.
 	///
 	///
 	/// # Returns
@@ -20339,25 +20432,26 @@ impl CapeThermoEquilibriumRoutineEx {
 	/// where
 	///
 	/// * `is_reactive` - True if the Equilibrium Server is a Reactive Equilibrium Server, False otherwise
-	pub fn is_reactive(&self) -> Result<CapeBoolean,COBIAError> {
+	pub fn get_is_reactive(&self) -> Result<CapeBoolean,COBIAError> {
 		let mut is_reactive:CapeBoolean=false as CapeBoolean;
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).IsReactive.unwrap())((*self.interface).me,&mut is_reactive as *mut CapeBoolean)
+			((*(*self.interface).vTbl).getIsReactive.unwrap())((*self.interface).me,&mut is_reactive as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_reactive)},
+			COBIAERR_NOERROR => {
+				Ok(is_reactive)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
 
 
-	/// Checks whether a particular type of Equilibrium Calculation is supported.
+	/// Checks whether a particular type of Equilibrium Calculation is supported, using the present Phases on the current Material Object.
 	///
 	///
 	/// # Arguments
-	/// * `specification1` - First specification for the Equilibrium calculation
-	/// * `specification2` - Second specification for the Equilibrium calculation
-	/// * `solution_type` - The required solution type
+	/// * `specification1` - The first equilibrium specification
+	/// * `specification2` - The second equilibrium specification
+	/// * `solution_type` - The requested type of phase equilibrium
 	///
 	/// # Returns
 	/// * Result<'is_supported',COBIAError> - Ok if successful, Err if there was an error
@@ -20371,7 +20465,8 @@ impl CapeThermoEquilibriumRoutineEx {
 			((*(*self.interface).vTbl).CheckEquilibriumSpec.unwrap())((*self.interface).me,(&specification1.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&specification2.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),solution_type as C::CAPEOPEN_1_2_CapeSolutionType,&mut is_supported as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_supported)},
+			COBIAERR_NOERROR => {
+				Ok(is_supported)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}
@@ -20935,7 +21030,8 @@ impl CapeThermoCompoundSlateUtilities {
 			((*(*self.interface).vTbl).ValidateCompoundList.unwrap())((*self.interface).me,(&compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&compound_list.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&message.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),&mut is_valid as *mut CapeBoolean)
 		};
 		match result_code {
-			COBIAERR_NOERROR => {Ok(is_valid)},
+			COBIAERR_NOERROR => {
+				Ok(is_valid)},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
 	}

@@ -1838,6 +1838,7 @@ int main(int argc,char* argv[]) {
 						code<<')';
 					}
 					code<<",COBIAError> {\n";
+					int return_interface_count{};
 					for (auto* retval:retvals) {
 						if (retval->is_basic_data_type) {
 							code<<"\t\tlet mut "<<retval->name<<':'<<retval->raw_type_name<<'='<<retval->init_value<<";\n";
@@ -1847,6 +1848,9 @@ int main(int argc,char* argv[]) {
 								code<<"_ptr";
 							}
 							code<<": *mut "<<retval->raw_type_name<<"=std::ptr::null_mut();\n";
+							if (retval->is_interface) {
+								return_interface_count++;
+							}
 						}
 					}
 					code<<"\t\tlet result_code = unsafe {\n"
@@ -1880,43 +1884,11 @@ int main(int argc,char* argv[]) {
 						}
 					}
 					code<<")\n\t\t};\n";
-					for (size_t retval_index=0;retval_index<retvals.size();retval_index++) {
-						if ((retvals[retval_index]->is_interface)&&(retvals[retval_index]->from_raw_conversion=="from_object")) {
-							//QI will follow - this argument is an ICapeInterface that carries a reference count
-							// bind to a CapeObject smart pointer without increasing reference count first
-							code<<"\t\tlet "<<retvals[retval_index]->name<<"="<<cobia_module_name<<"::CapeObject::attach("<<retvals[retval_index]->name;
-							if (retvals[retval_index]->is_interface) {
-								code<<"_ptr";
-							}
-							code<<");\n";
-						}
-					}
-					int return_interface_count{};
-					for (size_t retval_index=0;retval_index<retvals.size();retval_index++) {
-						if (retvals[retval_index]->need_unpack_rust_conversion) {
-							if (retvals[retval_index]->is_basic_data_type) {
-								code<<"\t\tlet "<<retvals[retval_index]->name<<"=match "<<retvals[retval_index]->rust_type_name<<"::"<<retvals[retval_index]->from_raw_conversion<<'('<<retvals[retval_index]->name<<") {\n"
-									"\t\t\tSome(_"<<retvals[retval_index]->name<<") => _"<<retvals[retval_index]->name<<",\n"
-									"\t\t\tNone => {return Err(COBIAError::Message(\"Invalid enumeration value\".to_string()));}\n"
-									"\t\t};\n";
-							} else {
-								code<<"\t\tlet "<<retvals[retval_index]->name<<"=match "<<retvals[retval_index]->smart_pointer_type_name_from_pointer()<<'(';
-								if (retvals[retval_index]->from_raw_conversion=="from_object") {
-									code<<'&';
-								}
-								code<<retvals[retval_index]->name<<") {\n"
-									"\t\t\tOk(_"<<retvals[retval_index]->name<<") => _"<<retvals[retval_index]->name<<",\n"
-									"\t\t\tErr(e) => {return Err(e);}\n"
-									"\t\t};\n";
-							}
-						}
-						if (retvals[retval_index]->is_interface) {
-							return_interface_count++;
-						}
-					}
 					code<<"\t\tmatch result_code {\n"
 						"\t\t\tCOBIAERR_NOERROR => {";
+					bool need_tabs=false;
 					if (return_interface_count>0) {
+						need_tabs=true;
 						code<<"\n\t\t\t\tif ";
 						bool first=true;
 						for (size_t retval_index=0;retval_index<retvals.size();retval_index++) {
@@ -1945,8 +1917,48 @@ int main(int argc,char* argv[]) {
 							}
 						}
 						code<<"\t\t\t\t\treturn Err(COBIAError::Code(COBIAERR_NULLPOINTER));\n"
-							"\t\t\t\t}\n"
-							"\t\t\t\t";
+							"\t\t\t\t}\n";
+					}
+					for (size_t retval_index=0;retval_index<retvals.size();retval_index++) {
+						if (!need_tabs) {
+							need_tabs=true;
+							code<<"\n";
+						}
+						if ((retvals[retval_index]->is_interface)&&(retvals[retval_index]->from_raw_conversion=="from_object")) {
+							//QI will follow - this argument is an ICapeInterface that carries a reference count
+							// bind to a CapeObject smart pointer without increasing reference count first
+							code<<"\t\t\t\tlet "<<retvals[retval_index]->name<<"="<<cobia_module_name<<"::CapeObject::attach("<<retvals[retval_index]->name;
+							if (retvals[retval_index]->is_interface) {
+								code<<"_ptr";
+							}
+							code<<");\n";
+						}
+					}
+					for (size_t retval_index=0;retval_index<retvals.size();retval_index++) {
+						if (!need_tabs) {
+							need_tabs=true;
+							code<<"\n";
+						}
+						if (retvals[retval_index]->need_unpack_rust_conversion) {
+							if (retvals[retval_index]->is_basic_data_type) {
+								code<<"\t\t\t\tlet "<<retvals[retval_index]->name<<"=match "<<retvals[retval_index]->rust_type_name<<"::"<<retvals[retval_index]->from_raw_conversion<<'('<<retvals[retval_index]->name<<") {\n"
+									"\t\t\t\t\tSome(_"<<retvals[retval_index]->name<<") => _"<<retvals[retval_index]->name<<",\n"
+									"\t\t\t\t\tNone => {return Err(COBIAError::Message(\"Invalid enumeration value\".to_string()));}\n"
+									"\t\t\t\t};\n";
+							} else {
+								code<<"\t\t\t\tlet "<<retvals[retval_index]->name<<"=match "<<retvals[retval_index]->smart_pointer_type_name_from_pointer()<<'(';
+								if (retvals[retval_index]->from_raw_conversion=="from_object") {
+									code<<'&';
+								}
+								code<<retvals[retval_index]->name<<") {\n"
+									"\t\t\t\t\tOk(_"<<retvals[retval_index]->name<<") => _"<<retvals[retval_index]->name<<",\n"
+									"\t\t\t\t\tErr(e) => {return Err(e);}\n"
+									"\t\t\t\t};\n";
+							}
+						}
+					}
+					if (need_tabs) {
+						code<<"\t\t\t\t";
 					}
 					code<<"Ok(";
 					if (retvals.size()!=1) {
