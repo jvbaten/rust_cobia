@@ -1,5 +1,6 @@
 use crate::C;
 
+#[derive(Default)]
 pub struct CapeWindowId {
 	pub h_wnd : crate::C::HWND
 }

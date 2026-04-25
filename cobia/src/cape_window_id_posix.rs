@@ -7,6 +7,13 @@ pub enum CapeWindowIdType {
 	CapeWindowId_COCOA,
 }
 
+impl std::default::Default for CapeWindowIdType {
+	fn default() -> Self {
+		CapeWindowIdType::CapeWindowId_None
+	}
+}
+
+#[derive(Default)]
 pub struct CapeWindowId {
 	window_id_type: CapeWindowIdType,
 	x11_display_ptr: Option<*mut std::os::raw::c_void>, //X11 display pointer
