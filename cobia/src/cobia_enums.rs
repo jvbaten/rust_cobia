@@ -1,9 +1,6 @@
 use bitflags::bitflags;
 use std::fmt;
 
-///Registry value type
-///
-///The supported types of registry values.
 ///
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -101,9 +98,6 @@ impl fmt::Display for CapeRegistryValueType {
 	}
 }
 
-///CapeValue data types
-///
-///The supported types of CapeValue values.
 ///
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -206,9 +200,6 @@ impl fmt::Display for CapeValueType {
 	}
 }
 
-///Service provider types
-///
-///Service type enumeration for PMC instantiation
 ///
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -321,6 +312,9 @@ bitflags! {
     pub struct CapePMCRegistrationFlags : i32 {
         const None = 0;
         const RestrictedThreading = 1;
+        const NoDefaultCOMInterop = 2;
+        const COMInteropx86 = 4;
+        const COMInteropx64 = 8;
     }
 }
 
@@ -329,6 +323,7 @@ bitflags! {
     pub struct CapePMCCreationFlags : i32 {
         const Default = 0;
         const AllowRestrictedThreading = 1;
+        const IsolatedProcess = 2;
     }
 }
 

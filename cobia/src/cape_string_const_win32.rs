@@ -24,7 +24,7 @@ use crate::cape_result_value::*;
 /// 
 /// Another common use case in CAPE-OPEN is to make hash maps of
 /// strings for case-insentive lookups. A specialized class is
-/// available for this purpose: [`CapeStringHashKey`].
+/// available for this purpose: `CapeStringHashKey`.
 /// 
 /// PartialEq can be directly used to for a CapeStringConstNoCase on
 /// the left, and any object implementing CapeStringConstProvider on

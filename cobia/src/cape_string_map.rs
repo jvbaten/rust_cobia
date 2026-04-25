@@ -6,7 +6,7 @@ use crate::{cape_string_const::CapeStringHashKey,C,CapeStringImpl,CapeStringCons
 /// For COBIA, strings go over the pipeline
 ///  as null terminated. For Windows, COBIA requires UTF-16 encoding.
 ///
-/// The [`CapeStringHashKey`] implementation uses a `Vec<u16>` to store,
+/// The `CapeStringHashKey` implementation uses a `Vec<u16>` to store,
 /// owned string data, or allows reference to data provided by any 
 /// class that implements CapeStringConstProvider, so that a copy of 
 /// the data is not needed for hash lookups.

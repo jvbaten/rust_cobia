@@ -147,6 +147,8 @@ fn main() {
 		// The input header we would like to generate
 		// bindings for.
 		.header(headers_path_str)
+		// turn off comments - they produce a lot of noise in cargo doc
+		.generate_comments(false)
 		//allow CAPE-OPEN stuff only
 		.allowlist_file(".*/(?:COBIA|Cape|cape).*")
 		//tell it to look here

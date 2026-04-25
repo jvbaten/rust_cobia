@@ -329,21 +329,21 @@ impl fmt::Display for CapeParamType {
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapeDimensionality {
-	/// Index of distance/[m] in dimensionality array
+	/// Index of distance/\[m\] in dimensionality array
 	CapeMeter = 0,
-	/// Index of mass/[kg] in dimensionality array
+	/// Index of mass/\[kg\] in dimensionality array
 	CapeKilogram = 1,
-	/// Index of time/[s] in dimensionality array
+	/// Index of time/\[s\] in dimensionality array
 	CapeSecond = 2,
-	/// Index of electric current/[A] in dimensionality array
+	/// Index of electric current/\[A\] in dimensionality array
 	CapeAmpere = 3,
-	/// Index of temperature/[K] in dimensionality array
+	/// Index of temperature/\[K\] in dimensionality array
 	CapeKelvin = 4,
-	/// Index of amount/[mol] in dimensionality array
+	/// Index of amount/\[mol\] in dimensionality array
 	CapeMole = 5,
-	/// Index of luminous intensity/[cd] in dimensionality array
+	/// Index of luminous intensity/\[cd\] in dimensionality array
 	CapeCandela = 6,
-	/// Index of planar angle/[rad] in dimensionality array
+	/// Index of planar angle/\[rad\] in dimensionality array
 	CapeRadian = 7,
 	/// A non-zero value at this index identifies a difference, such as a temperature- or pressure difference
 	CapeDifferenceFlag = 8,
@@ -836,7 +836,7 @@ bitflags! {
 	///
 	/// CapeCalculationCode enumeration
 	///
-	/// Flags to indicate which calculations are performed by CalcAndGetLnPhi().
+	/// Flags to indicate which calculations are performed by CalcAndGetLnPhi\(\).
 
 	#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 	pub struct CapeCalculationCode: u32 {
@@ -848,7 +848,7 @@ bitflags! {
 		const CapeTDerivative = 2;
 		/// Pressure derivatives of log fugacity coefficients are calculated
 		const CapePDerivative = 4;
-		/// Mole number derivatives (for a total number of moles of 1) of log fugacity coefficients are calculated
+		/// Mole number derivatives \(for a total number of moles of 1\) of log fugacity coefficients are calculated
 		const CapeMoleNumbersDerivatives = 8;
 	}
 }
@@ -960,7 +960,7 @@ impl fmt::Display for CapePhaseStatus {
 ///
 /// CapeEditResult enumeration
 ///
-/// Result of ICapeUtilities::Edit() operation.
+/// Result of ICapeUtilities::Edit\(\) operation.
 
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
@@ -1621,7 +1621,7 @@ impl fmt::Display for CapeMonitoringEvent {
 pub enum CapeSolutionType {
 	/// Unspecified solution type
 	CapeUnspecified = 0,
-	/// Normal (not retrograde) solution
+	/// Normal \(not retrograde\) solution
 	CapeNormal = 1,
 	/// Retrograde solution
 	CapeRetrograde = 2,
@@ -2645,7 +2645,7 @@ impl CapeParameter {
 ///
 /// ICapeRealParameter interface
 ///
-/// Interface implemented by parameters of type CAPE_PARAMETER_REAL.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_REAL.
 ///
 
 pub trait ICapeRealParameter {
@@ -2922,7 +2922,7 @@ pub trait ICapeRealParameterImpl : ICapeRealParameter {
 /// Smart pointer for ICapeRealParameter
 ///
 /// This provides rust-callable functions for an externally implemented ICapeRealParameter interface
-/// Interface implemented by parameters of type CAPE_PARAMETER_REAL.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_REAL.
 ///
 
 #[cape_smart_pointer(ICAPEREALPARAMETER_UUID)]
@@ -3092,7 +3092,7 @@ impl CapeRealParameter {
 ///
 /// ICapeIntegerParameter interface
 ///
-/// Interface implemented by parameters of type CAPE_PARAMETER_INTEGER.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_INTEGER.
 ///
 
 pub trait ICapeIntegerParameter {
@@ -3336,7 +3336,7 @@ pub trait ICapeIntegerParameterImpl : ICapeIntegerParameter {
 /// Smart pointer for ICapeIntegerParameter
 ///
 /// This provides rust-callable functions for an externally implemented ICapeIntegerParameter interface
-/// Interface implemented by parameters of type CAPE_PARAMETER_INTEGER.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_INTEGER.
 ///
 
 #[cape_smart_pointer(ICAPEINTEGERPARAMETER_UUID)]
@@ -3487,7 +3487,7 @@ impl CapeIntegerParameter {
 ///
 /// ICapeStringParameter interface
 ///
-/// Interface implemented by parameters of type CAPE_PARAMETER_STRING.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_STRING.
 ///
 
 pub trait ICapeStringParameter {
@@ -3736,7 +3736,7 @@ pub trait ICapeStringParameterImpl : ICapeStringParameter {
 /// Smart pointer for ICapeStringParameter
 ///
 /// This provides rust-callable functions for an externally implemented ICapeStringParameter interface
-/// Interface implemented by parameters of type CAPE_PARAMETER_STRING.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_STRING.
 ///
 
 #[cape_smart_pointer(ICAPESTRINGPARAMETER_UUID)]
@@ -3878,7 +3878,7 @@ impl CapeStringParameter {
 ///
 /// ICapeBooleanParameter interface
 ///
-/// Interface implemented by parameters of type CAPE_PARAMETER_BOOLEAN.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_BOOLEAN.
 ///
 
 pub trait ICapeBooleanParameter {
@@ -4058,7 +4058,7 @@ pub trait ICapeBooleanParameterImpl : ICapeBooleanParameter {
 /// Smart pointer for ICapeBooleanParameter
 ///
 /// This provides rust-callable functions for an externally implemented ICapeBooleanParameter interface
-/// Interface implemented by parameters of type CAPE_PARAMETER_BOOLEAN.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_BOOLEAN.
 ///
 
 #[cape_smart_pointer(ICAPEBOOLEANPARAMETER_UUID)]
@@ -4339,7 +4339,7 @@ impl CapeArrayParameter {
 ///
 /// ICapeArrayRealParameter interface
 ///
-/// Interface implemented by parameters of type CAPE_PARAMETER_ARRAY_REAL.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_REAL.
 ///
 
 pub trait ICapeArrayRealParameter {
@@ -4725,7 +4725,7 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 /// Smart pointer for ICapeArrayRealParameter
 ///
 /// This provides rust-callable functions for an externally implemented ICapeArrayRealParameter interface
-/// Interface implemented by parameters of type CAPE_PARAMETER_ARRAY_REAL.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_REAL.
 ///
 
 #[cape_smart_pointer(ICAPEARRAYREALPARAMETER_UUID)]
@@ -4964,7 +4964,7 @@ impl CapeArrayRealParameter {
 ///
 /// ICapeArrayIntegerParameter interface
 ///
-/// Interface implemented by parameters of type CAPE_PARAMETER_ARRAY_INTEGER.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_INTEGER.
 ///
 
 pub trait ICapeArrayIntegerParameter {
@@ -5317,7 +5317,7 @@ pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 /// Smart pointer for ICapeArrayIntegerParameter
 ///
 /// This provides rust-callable functions for an externally implemented ICapeArrayIntegerParameter interface
-/// Interface implemented by parameters of type CAPE_PARAMETER_ARRAY_INTEGER.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_INTEGER.
 ///
 
 #[cape_smart_pointer(ICAPEARRAYINTEGERPARAMETER_UUID)]
@@ -5537,7 +5537,7 @@ impl CapeArrayIntegerParameter {
 ///
 /// ICapeArrayStringParameter interface
 ///
-/// Interface implemented by parameters of type CAPE_PARAMETER_ARRAY_STRING.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_STRING.
 ///
 
 pub trait ICapeArrayStringParameter {
@@ -5893,7 +5893,7 @@ pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 /// Smart pointer for ICapeArrayStringParameter
 ///
 /// This provides rust-callable functions for an externally implemented ICapeArrayStringParameter interface
-/// Interface implemented by parameters of type CAPE_PARAMETER_ARRAY_STRING.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_STRING.
 ///
 
 #[cape_smart_pointer(ICAPEARRAYSTRINGPARAMETER_UUID)]
@@ -6102,7 +6102,7 @@ impl CapeArrayStringParameter {
 ///
 /// ICapeArrayBooleanParameter interface
 ///
-/// Interface implemented by parameters of type CAPE_PARAMETER_ARRAY_BOOLEAN.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_BOOLEAN.
 ///
 
 pub trait ICapeArrayBooleanParameter {
@@ -6391,7 +6391,7 @@ pub trait ICapeArrayBooleanParameterImpl : ICapeArrayBooleanParameter {
 /// Smart pointer for ICapeArrayBooleanParameter
 ///
 /// This provides rust-callable functions for an externally implemented ICapeArrayBooleanParameter interface
-/// Interface implemented by parameters of type CAPE_PARAMETER_ARRAY_BOOLEAN.
+/// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_BOOLEAN.
 ///
 
 #[cape_smart_pointer(ICAPEARRAYBOOLEANPARAMETER_UUID)]
@@ -6693,7 +6693,7 @@ impl CapeParameterSpecification {
 ///
 /// ICapeRealParameterSpecification interface
 ///
-/// Interface for parameter specifications of type CAPE_PARAMETER_REAL.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_REAL.
 ///
 
 pub trait ICapeRealParameterSpecification {
@@ -6913,7 +6913,7 @@ pub trait ICapeRealParameterSpecificationImpl : ICapeRealParameterSpecification 
 /// Smart pointer for ICapeRealParameterSpecification
 ///
 /// This provides rust-callable functions for an externally implemented ICapeRealParameterSpecification interface
-/// Interface for parameter specifications of type CAPE_PARAMETER_REAL.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_REAL.
 ///
 
 #[cape_smart_pointer(ICAPEREALPARAMETERSPECIFICATION_UUID)]
@@ -7042,7 +7042,7 @@ impl CapeRealParameterSpecification {
 ///
 /// ICapeIntegerParameterSpecification interface
 ///
-/// Interface for parameter specifications of type CAPE_PARAMETER_INTEGER.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_INTEGER.
 ///
 
 pub trait ICapeIntegerParameterSpecification {
@@ -7229,7 +7229,7 @@ pub trait ICapeIntegerParameterSpecificationImpl : ICapeIntegerParameterSpecific
 /// Smart pointer for ICapeIntegerParameterSpecification
 ///
 /// This provides rust-callable functions for an externally implemented ICapeIntegerParameterSpecification interface
-/// Interface for parameter specifications of type CAPE_PARAMETER_INTEGER.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_INTEGER.
 ///
 
 #[cape_smart_pointer(ICAPEINTEGERPARAMETERSPECIFICATION_UUID)]
@@ -7339,7 +7339,7 @@ impl CapeIntegerParameterSpecification {
 ///
 /// ICapeStringParameterSpecification interface
 ///
-/// Interface for parameter specifications of type CAPE_PARAMETER_STRING.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_STRING.
 ///
 
 pub trait ICapeStringParameterSpecification {
@@ -7529,7 +7529,7 @@ pub trait ICapeStringParameterSpecificationImpl : ICapeStringParameterSpecificat
 /// Smart pointer for ICapeStringParameterSpecification
 ///
 /// This provides rust-callable functions for an externally implemented ICapeStringParameterSpecification interface
-/// Interface for parameter specifications of type CAPE_PARAMETER_STRING.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_STRING.
 ///
 
 #[cape_smart_pointer(ICAPESTRINGPARAMETERSPECIFICATION_UUID)]
@@ -7633,7 +7633,7 @@ impl CapeStringParameterSpecification {
 ///
 /// ICapeBooleanParameterSpecification interface
 ///
-/// Interface for parameter specifications of type CAPE_PARAMETER_BOOLEAN.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_BOOLEAN.
 ///
 
 pub trait ICapeBooleanParameterSpecification {
@@ -7756,7 +7756,7 @@ pub trait ICapeBooleanParameterSpecificationImpl : ICapeBooleanParameterSpecific
 /// Smart pointer for ICapeBooleanParameterSpecification
 ///
 /// This provides rust-callable functions for an externally implemented ICapeBooleanParameterSpecification interface
-/// Interface for parameter specifications of type CAPE_PARAMETER_BOOLEAN.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_BOOLEAN.
 ///
 
 #[cape_smart_pointer(ICAPEBOOLEANPARAMETERSPECIFICATION_UUID)]
@@ -7996,7 +7996,7 @@ impl CapeArrayParameterSpecification {
 ///
 /// ICapeArrayRealParameterSpecification interface
 ///
-/// Interface for parameter specifications of type CAPE_PARAMETER_ARRAY_REAL.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_REAL.
 ///
 
 pub trait ICapeArrayRealParameterSpecification {
@@ -8260,7 +8260,7 @@ pub trait ICapeArrayRealParameterSpecificationImpl : ICapeArrayRealParameterSpec
 /// Smart pointer for ICapeArrayRealParameterSpecification
 ///
 /// This provides rust-callable functions for an externally implemented ICapeArrayRealParameterSpecification interface
-/// Interface for parameter specifications of type CAPE_PARAMETER_ARRAY_REAL.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_REAL.
 ///
 
 #[cape_smart_pointer(ICAPEARRAYREALPARAMETERSPECIFICATION_UUID)]
@@ -8416,7 +8416,7 @@ impl CapeArrayRealParameterSpecification {
 ///
 /// ICapeArrayIntegerParameterSpecification interface
 ///
-/// Interface for parameter specifications of type CAPE_PARAMETER_ARRAY_INTEGER.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_INTEGER.
 ///
 
 pub trait ICapeArrayIntegerParameterSpecification {
@@ -8647,7 +8647,7 @@ pub trait ICapeArrayIntegerParameterSpecificationImpl : ICapeArrayIntegerParamet
 /// Smart pointer for ICapeArrayIntegerParameterSpecification
 ///
 /// This provides rust-callable functions for an externally implemented ICapeArrayIntegerParameterSpecification interface
-/// Interface for parameter specifications of type CAPE_PARAMETER_ARRAY_INTEGER.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_INTEGER.
 ///
 
 #[cape_smart_pointer(ICAPEARRAYINTEGERPARAMETERSPECIFICATION_UUID)]
@@ -8784,7 +8784,7 @@ impl CapeArrayIntegerParameterSpecification {
 ///
 /// ICapeArrayStringParameterSpecification interface
 ///
-/// Interface for parameter specifications of type CAPE_PARAMETER_ARRAY_STRING.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_STRING.
 ///
 
 pub trait ICapeArrayStringParameterSpecification {
@@ -9018,7 +9018,7 @@ pub trait ICapeArrayStringParameterSpecificationImpl : ICapeArrayStringParameter
 /// Smart pointer for ICapeArrayStringParameterSpecification
 ///
 /// This provides rust-callable functions for an externally implemented ICapeArrayStringParameterSpecification interface
-/// Interface for parameter specifications of type CAPE_PARAMETER_ARRAY_STRING.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_STRING.
 ///
 
 #[cape_smart_pointer(ICAPEARRAYSTRINGPARAMETERSPECIFICATION_UUID)]
@@ -9149,7 +9149,7 @@ impl CapeArrayStringParameterSpecification {
 ///
 /// ICapeArrayBooleanParameterSpecification interface
 ///
-/// Interface for parameter specifications of type CAPE_PARAMETER_ARRAY_BOOLEAN.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_BOOLEAN.
 ///
 
 pub trait ICapeArrayBooleanParameterSpecification {
@@ -9316,7 +9316,7 @@ pub trait ICapeArrayBooleanParameterSpecificationImpl : ICapeArrayBooleanParamet
 /// Smart pointer for ICapeArrayBooleanParameterSpecification
 ///
 /// This provides rust-callable functions for an externally implemented ICapeArrayBooleanParameterSpecification interface
-/// Interface for parameter specifications of type CAPE_PARAMETER_ARRAY_BOOLEAN.
+/// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_BOOLEAN.
 ///
 
 #[cape_smart_pointer(ICAPEARRAYBOOLEANPARAMETERSPECIFICATION_UUID)]
@@ -11279,7 +11279,7 @@ pub trait ICapeThermoCompounds {
 	///
 	/// # Arguments
 	/// * `props` - The identifiers of the properties
-	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED \(empty\) to get the properties for all defined Compounds
 	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
 	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
@@ -11329,7 +11329,7 @@ pub trait ICapeThermoCompounds {
 	/// # Arguments
 	/// * `props` - The identifiers of the properties
 	/// * `pressure` - Pressure, in Pa
-	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED \(empty\) to get the properties for all defined Compounds
 	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
 	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
@@ -11353,7 +11353,7 @@ pub trait ICapeThermoCompounds {
 	/// # Arguments
 	/// * `props` - The identifiers of the properties
 	/// * `temperature` - Temperature, in K
-	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED \(empty\) to get the properties for all defined Compounds
 	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
 	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
@@ -11643,7 +11643,7 @@ impl CapeThermoCompounds {
 	///
 	/// # Arguments
 	/// * `props` - The identifiers of the properties
-	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED \(empty\) to get the properties for all defined Compounds
 	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
 	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
@@ -11731,7 +11731,7 @@ impl CapeThermoCompounds {
 	/// # Arguments
 	/// * `props` - The identifiers of the properties
 	/// * `pressure` - Pressure, in Pa
-	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED \(empty\) to get the properties for all defined Compounds
 	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
 	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
@@ -11773,7 +11773,7 @@ impl CapeThermoCompounds {
 	/// # Arguments
 	/// * `props` - The identifiers of the properties
 	/// * `temperature` - Temperature, in K
-	/// * `comp_ids` - The compound identifiers, or UNDEFINED (empty) to get the properties for all defined Compounds
+	/// * `comp_ids` - The compound identifiers, or UNDEFINED \(empty\) to get the properties for all defined Compounds
 	/// * `contains_missing_values` - Indicates whether any of the requested property values is missing
 	/// * `prop_vals` - The property values for each Compound for the first property, then for each Compound for the second property, and so on
 	///
@@ -11849,7 +11849,7 @@ pub trait ICapeThermoPhases {
 	/// # Arguments
 	/// * `phase_labels` - The labels of the Phases
 	/// * `state_of_aggregation` - The states of aggregation of the Phases
-	/// * `key_compound_id` - The compound identifiers of the key Compounds (or UNDEFINED) for each Phase
+	/// * `key_compound_id` - The compound identifiers of the key Compounds \(or UNDEFINED\) for each Phase
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12034,7 +12034,7 @@ impl CapeThermoPhases {
 	/// # Arguments
 	/// * `phase_labels` - The labels of the Phases
 	/// * `state_of_aggregation` - The states of aggregation of the Phases
-	/// * `key_compound_id` - The compound identifiers of the key Compounds (or UNDEFINED) for each Phase
+	/// * `key_compound_id` - The compound identifiers of the key Compounds \(or UNDEFINED\) for each Phase
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12069,10 +12069,10 @@ pub trait ICapeThermoPropertyRoutine {
 	/// * `pressure` - The pressure, in Pa
 	/// * `mole_fraction` - The composition, in mol/mol
 	/// * `f_flags` - Flags indicating which fugacity coefficients and/or derivatives to calculate, bits defined by CapeCalculationCode
-	/// * `ln_phi` - The log fugacity coefficients, calculated if fFlags contains CAPE_LOG_FUGACITY_COEFFICIENTS
-	/// * `ln_phi_dt` - The temperature derivatives of log fugacity coefficients, calculated if fFlags contains CAPE_T_DERIVATIVE
-	/// * `ln_phi_dp` - The pressure derivatives of log fugacity coefficients, calculated if fFlags contains CAPE_P_DERIVATIVE
-	/// * `ln_phi_dn` - The mole number derivatives (for a total number of moles of 1) of log fugacity coefficients, calculated if fFlags contains CAPE_MOLE_NUMBERS_DERIVATIVES
+	/// * `ln_phi` - The log fugacity coefficients, calculated if fFlags contains CAPE\_LOG\_FUGACITY\_COEFFICIENTS
+	/// * `ln_phi_dt` - The temperature derivatives of log fugacity coefficients, calculated if fFlags contains CAPE\_T\_DERIVATIVE
+	/// * `ln_phi_dp` - The pressure derivatives of log fugacity coefficients, calculated if fFlags contains CAPE\_P\_DERIVATIVE
+	/// * `ln_phi_dn` - The mole number derivatives \(for a total number of moles of 1\) of log fugacity coefficients, calculated if fFlags contains CAPE\_MOLE\_NUMBERS\_DERIVATIVES
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -12373,10 +12373,10 @@ impl CapeThermoPropertyRoutine {
 	/// * `pressure` - The pressure, in Pa
 	/// * `mole_fraction` - The composition, in mol/mol
 	/// * `f_flags` - Flags indicating which fugacity coefficients and/or derivatives to calculate, bits defined by CapeCalculationCode
-	/// * `ln_phi` - The log fugacity coefficients, calculated if fFlags contains CAPE_LOG_FUGACITY_COEFFICIENTS
-	/// * `ln_phi_dt` - The temperature derivatives of log fugacity coefficients, calculated if fFlags contains CAPE_T_DERIVATIVE
-	/// * `ln_phi_dp` - The pressure derivatives of log fugacity coefficients, calculated if fFlags contains CAPE_P_DERIVATIVE
-	/// * `ln_phi_dn` - The mole number derivatives (for a total number of moles of 1) of log fugacity coefficients, calculated if fFlags contains CAPE_MOLE_NUMBERS_DERIVATIVES
+	/// * `ln_phi` - The log fugacity coefficients, calculated if fFlags contains CAPE\_LOG\_FUGACITY\_COEFFICIENTS
+	/// * `ln_phi_dt` - The temperature derivatives of log fugacity coefficients, calculated if fFlags contains CAPE\_T\_DERIVATIVE
+	/// * `ln_phi_dp` - The pressure derivatives of log fugacity coefficients, calculated if fFlags contains CAPE\_P\_DERIVATIVE
+	/// * `ln_phi_dn` - The mole number derivatives \(for a total number of moles of 1\) of log fugacity coefficients, calculated if fFlags contains CAPE\_MOLE\_NUMBERS\_DERIVATIVES
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
@@ -13114,7 +13114,7 @@ pub trait ICapeUnit {
 	///
 	///
 	/// # Arguments
-	/// * `message` - The message indicating the reason the Unit Operation is not valid, required only for CAPE_INVALID status
+	/// * `message` - The message indicating the reason the Unit Operation is not valid, required only for CAPE\_INVALID status
 	///
 	/// # Returns
 	/// * Result<'is_valid',COBIAError> - Ok if successful, Err if there was an error
@@ -13339,7 +13339,7 @@ impl CapeUnit {
 	///
 	///
 	/// # Arguments
-	/// * `message` - The message indicating the reason the Unit Operation is not valid, required only for CAPE_INVALID status
+	/// * `message` - The message indicating the reason the Unit Operation is not valid, required only for CAPE\_INVALID status
 	///
 	/// # Returns
 	/// * Result<'is_valid',COBIAError> - Ok if successful, Err if there was an error
@@ -15751,7 +15751,7 @@ pub trait ICapeReport {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_report_names(&mut self,names:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
-	/// Gets the list of available report media types (IETF BCP 13) for a given report.
+	/// Gets the list of available report media types \(IETF BCP 13\) for a given report.
 	///
 	///
 	/// # Arguments
@@ -15762,7 +15762,7 @@ pub trait ICapeReport {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn report_types(&mut self,name:&CapeStringIn,types:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
-	/// Gets the list of available locales (IETF BCP 47) for a given report and media type.
+	/// Gets the list of available locales \(IETF BCP 47\) for a given report and media type.
 	///
 	///
 	/// # Arguments
@@ -16033,7 +16033,7 @@ impl CapeReport {
 	}
 
 
-	/// Gets the list of available report media types (IETF BCP 13) for a given report.
+	/// Gets the list of available report media types \(IETF BCP 13\) for a given report.
 	///
 	///
 	/// # Arguments
@@ -16053,7 +16053,7 @@ impl CapeReport {
 	}
 
 
-	/// Gets the list of available locales (IETF BCP 47) for a given report and media type.
+	/// Gets the list of available locales \(IETF BCP 47\) for a given report and media type.
 	///
 	///
 	/// # Arguments
@@ -17750,7 +17750,7 @@ pub trait ICapeThermoMaterialCustomData {
 	/// where
 	///
 	/// * `source` - The Material Object
-	/// * `custom_data_container` - The custom data container associated with the Material Object, created using ICapeCustomDataSource::CreateCustomDataContainer()
+	/// * `custom_data_container` - The custom data container associated with the Material Object, created using ICapeCustomDataSource::CreateCustomDataContainer\(\)
 	fn get_custom_data_container(&mut self,source:crate::CapeObject) -> Result<crate::CapeObject,COBIAError>;
 }
 
@@ -17844,7 +17844,7 @@ impl CapeThermoMaterialCustomData {
 	/// where
 	///
 	/// * `source` - The Material Object
-	/// * `custom_data_container` - The custom data container associated with the Material Object, created using ICapeCustomDataSource::CreateCustomDataContainer()
+	/// * `custom_data_container` - The custom data container associated with the Material Object, created using ICapeCustomDataSource::CreateCustomDataContainer\(\)
 	pub fn get_custom_data_container(&self,source:&crate::CapeObject) -> Result<crate::CapeObject,COBIAError> {
 		let mut custom_data_container_ptr: *mut crate::C::ICapeInterface=std::ptr::null_mut();
 		let result_code = unsafe {
@@ -19029,7 +19029,7 @@ pub trait ICapeThermoReactionSet {
 	///
 	/// where
 	///
-	/// * `number_of_reactions` - The number of Chemical Reactions (zero or more)
+	/// * `number_of_reactions` - The number of Chemical Reactions \(zero or more\)
 	fn get_number_of_reactions(&mut self) -> Result<CapeInteger,COBIAError>;
 
 	/// Identifiers of Chemical Reactions in the set.
@@ -19151,7 +19151,7 @@ impl CapeThermoReactionSet {
 	///
 	/// where
 	///
-	/// * `number_of_reactions` - The number of Chemical Reactions (zero or more)
+	/// * `number_of_reactions` - The number of Chemical Reactions \(zero or more\)
 	pub fn get_number_of_reactions(&self) -> Result<CapeInteger,COBIAError> {
 		let mut number_of_reactions:CapeInteger=0;
 		let result_code = unsafe {
@@ -19206,7 +19206,7 @@ pub trait ICapeThermoReactions {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_reaction_attribute_list(&mut self,reac_id:&CapeStringIn,attribute_list:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
-	/// Gets the the value of the specified attribute of the specified Chemical Reaction.
+	/// Gets the value of the specified attribute of the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
@@ -19284,9 +19284,9 @@ pub trait ICapeThermoReactions {
 	///
 	///
 	/// # Arguments
-	/// * `present_comp_ids` - List of compound identifiers of the Compounds that have non-zero fraction (are available) prior to reacting; UNDEFINED (empty) means all Compounds defined on the active Material Object
+	/// * `present_comp_ids` - List of compound identifiers of the Compounds that have non-zero fraction \(are available\) prior to reacting; UNDEFINED \(empty\) means all Compounds defined on the active Material Object
 	/// * `reac_ids` - List of active Chemical Reactions identifiers that must be considered
-	/// * `is_equilibrium` - For each of the active Chemical Reactions, a Boolean value stating whether the Chemical Reaction is considered as an Equilibrium Reaction (or Full Conversion Reaction) or not
+	/// * `is_equilibrium` - For each of the active Chemical Reactions, a Boolean value stating whether the Chemical Reaction is considered as an Equilibrium Reaction \(or Full Conversion Reaction\) or not
 	/// * `consider_all_reactions` - True means that Compounds formed by non-equilibrium Reactions should be considered during reduction
 	/// * `over_reduced` - True means that too many Chemical Reactions may have been eliminated
 	///
@@ -19574,7 +19574,7 @@ impl CapeThermoReactions {
 	}
 
 
-	/// Gets the the value of the specified attribute of the specified Chemical Reaction.
+	/// Gets the value of the specified attribute of the specified Chemical Reaction.
 	///
 	///
 	/// # Arguments
@@ -19710,9 +19710,9 @@ impl CapeThermoReactions {
 	///
 	///
 	/// # Arguments
-	/// * `present_comp_ids` - List of compound identifiers of the Compounds that have non-zero fraction (are available) prior to reacting; UNDEFINED (empty) means all Compounds defined on the active Material Object
+	/// * `present_comp_ids` - List of compound identifiers of the Compounds that have non-zero fraction \(are available\) prior to reacting; UNDEFINED \(empty\) means all Compounds defined on the active Material Object
 	/// * `reac_ids` - List of active Chemical Reactions identifiers that must be considered
-	/// * `is_equilibrium` - For each of the active Chemical Reactions, a Boolean value stating whether the Chemical Reaction is considered as an Equilibrium Reaction (or Full Conversion Reaction) or not
+	/// * `is_equilibrium` - For each of the active Chemical Reactions, a Boolean value stating whether the Chemical Reaction is considered as an Equilibrium Reaction \(or Full Conversion Reaction\) or not
 	/// * `consider_all_reactions` - True means that Compounds formed by non-equilibrium Reactions should be considered during reduction
 	/// * `over_reduced` - True means that too many Chemical Reactions may have been eliminated
 	///
@@ -19766,7 +19766,7 @@ pub trait ICapeThermoReactionRoutine {
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `property` - The identifier of the Reaction Property (or Reaction Property derivative) for which availability must be checked for the specified Chemical Reaction
+	/// * `property` - The identifier of the Reaction Property \(or Reaction Property derivative\) for which availability must be checked for the specified Chemical Reaction
 	/// * `message` - In case of False returned by the operation, message stating the reason
 	///
 	/// # Returns
@@ -19977,7 +19977,7 @@ impl CapeThermoReactionRoutine {
 	///
 	/// # Arguments
 	/// * `reac_id` - The identifier of the Chemical Reaction
-	/// * `property` - The identifier of the Reaction Property (or Reaction Property derivative) for which availability must be checked for the specified Chemical Reaction
+	/// * `property` - The identifier of the Reaction Property \(or Reaction Property derivative\) for which availability must be checked for the specified Chemical Reaction
 	/// * `message` - In case of False returned by the operation, message stating the reason
 	///
 	/// # Returns
@@ -20483,7 +20483,7 @@ impl CapeThermoEquilibriumRoutineEx {
 
 pub trait ICapeThermoCompoundSlates {
 
-	/// Gets the Compound Slate on which to operate.
+	/// Gets the Compound Slate on which the Compounds Server operates.
 	///
 	///
 	/// # Arguments
@@ -20493,7 +20493,7 @@ pub trait ICapeThermoCompoundSlates {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_active_compound_slate(&mut self,active_compound_slate:&mut CapeStringOut) -> Result<(),COBIAError>;
 
-	/// Sets the Compound Slate on which to operate.
+	/// Sets the Compound Slate on which the Compounds Server operates.
 	///
 	///
 	/// # Arguments
@@ -20513,17 +20513,17 @@ pub trait ICapeThermoCompoundSlates {
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
 	fn get_compound_slate_list(&mut self,compound_slate_list:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
-	/// Gets information describing the Compound Slate.
+	/// Gets information describing a specific Compound Slate.
 	///
 	///
 	/// # Arguments
-	/// * `compound_slate_id` - The name of the Compound Slate
-	/// * `compound_slate_attribute` - The name of the attribute to get
-	/// * `compound_slate_attribute_value` - The value of the requested attribute
+	/// * `compound_slate` - The name of the Compound Slate
+	/// * `compound_slate_attribute` - The identifier of the attribute
+	/// * `compound_slate_attribute_value` - The value of the attribute
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	fn get_compound_slate_info(&mut self,compound_slate_id:&CapeStringIn,compound_slate_attribute:&CapeStringIn,compound_slate_attribute_value:&mut CapeValueOut) -> Result<(),COBIAError>;
+	fn get_compound_slate_info(&mut self,compound_slate:&CapeStringIn,compound_slate_attribute:&CapeStringIn,compound_slate_attribute_value:&mut CapeValueOut) -> Result<(),COBIAError>;
 }
 
 /// COBIA interface implementation for ICapeThermoCompoundSlates
@@ -20619,7 +20619,7 @@ pub trait ICapeThermoCompoundSlatesImpl : ICapeThermoCompoundSlates {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_compound_slate_info(me: *mut std::ffi::c_void,compound_slate_id:*mut crate::C::ICapeString,compound_slate_attribute:*mut crate::C::ICapeString,compound_slate_attribute_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
+	extern "C" fn raw_get_compound_slate_info(me: *mut std::ffi::c_void,compound_slate:*mut crate::C::ICapeString,compound_slate_attribute:*mut crate::C::ICapeString,compound_slate_attribute_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
 		if compound_slate_attribute_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20628,11 +20628,11 @@ pub trait ICapeThermoCompoundSlatesImpl : ICapeThermoCompoundSlates {
 		if compound_slate_attribute_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let compound_slate_id=CapeStringIn::new(&compound_slate_id);
+		let compound_slate=CapeStringIn::new(&compound_slate);
 		let compound_slate_attribute=CapeStringIn::new(&compound_slate_attribute);
 		let mut compound_slate_attribute_value=unsafe{*((&compound_slate_attribute_value as *const *mut crate::C::ICapeValue) as *mut *mut crate::C::ICapeValue)};
 		let mut compound_slate_attribute_value=CapeValueOut::new(&mut compound_slate_attribute_value);
-		match myself.get_compound_slate_info(&compound_slate_id,&compound_slate_attribute,&mut compound_slate_attribute_value) {
+		match myself.get_compound_slate_info(&compound_slate,&compound_slate_attribute,&mut compound_slate_attribute_value) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeThermoCompoundSlates::GetCompoundSlateInfo")
 		}
@@ -20669,7 +20669,7 @@ pub struct CapeThermoCompoundSlates {
 impl CapeThermoCompoundSlates {
 
 
-	/// Gets the Compound Slate on which to operate.
+	/// Gets the Compound Slate on which the Compounds Server operates.
 	///
 	///
 	/// # Arguments
@@ -20688,7 +20688,7 @@ impl CapeThermoCompoundSlates {
 	}
 
 
-	/// Sets the Compound Slate on which to operate.
+	/// Sets the Compound Slate on which the Compounds Server operates.
 	///
 	///
 	/// # Arguments
@@ -20726,19 +20726,19 @@ impl CapeThermoCompoundSlates {
 	}
 
 
-	/// Gets information describing the Compound Slate.
+	/// Gets information describing a specific Compound Slate.
 	///
 	///
 	/// # Arguments
-	/// * `compound_slate_id` - The name of the Compound Slate
-	/// * `compound_slate_attribute` - The name of the attribute to get
-	/// * `compound_slate_attribute_value` - The value of the requested attribute
+	/// * `compound_slate` - The name of the Compound Slate
+	/// * `compound_slate_attribute` - The identifier of the attribute
+	/// * `compound_slate_attribute_value` - The value of the attribute
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	pub fn get_compound_slate_info<TypeOfCompoundSlateId:CapeStringProviderIn,TypeOfCompoundSlateAttribute:CapeStringProviderIn,TypeOfCompoundSlateAttributeValue:CapeValueProviderOut>(&self,compound_slate_id:&TypeOfCompoundSlateId,compound_slate_attribute:&TypeOfCompoundSlateAttribute,compound_slate_attribute_value:&mut TypeOfCompoundSlateAttributeValue) -> Result<(),COBIAError> {
+	pub fn get_compound_slate_info<TypeOfCompoundSlate:CapeStringProviderIn,TypeOfCompoundSlateAttribute:CapeStringProviderIn,TypeOfCompoundSlateAttributeValue:CapeValueProviderOut>(&self,compound_slate:&TypeOfCompoundSlate,compound_slate_attribute:&TypeOfCompoundSlateAttribute,compound_slate_attribute_value:&mut TypeOfCompoundSlateAttributeValue) -> Result<(),COBIAError> {
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).GetCompoundSlateInfo.unwrap())((*self.interface).me,(&compound_slate_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&compound_slate_attribute.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&compound_slate_attribute_value.as_cape_value_out() as *const crate::C::ICapeValue).cast_mut())
+			((*(*self.interface).vTbl).GetCompoundSlateInfo.unwrap())((*self.interface).me,(&compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&compound_slate_attribute.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&compound_slate_attribute_value.as_cape_value_out() as *const crate::C::ICapeValue).cast_mut())
 		};
 		match result_code {
 			COBIAERR_NOERROR => {Ok(())},
@@ -20753,7 +20753,7 @@ impl CapeThermoCompoundSlates {
 ///
 /// ICapeThermoCompoundSlateUtilities interface
 ///
-/// Interface that provides services to the PME and is implemented by components that support multiple Compound Slates.
+/// Interface that provides services to the PME and is implemented by external Compound Severs that support multiple Compound Slates, i.e. a Property Package.
 ///
 
 pub trait ICapeThermoCompoundSlateUtilities {
@@ -20762,22 +20762,22 @@ pub trait ICapeThermoCompoundSlateUtilities {
 	///
 	///
 	/// # Arguments
-	/// * `source_compound_slate` - The name of the source Compound Slate, from which conversion takes place
-	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
+	/// * `source_compound_slate` - The source Compound Slate, from which conversion takes place
+	/// * `target_compound_slate` - The target Compound Slate, to which conversion takes place
 	/// * `source_compound_list` - List of Compounds to be translated from the source Compound Slate to the target Compound Slate
-	/// * `target_compound_list` - List of Compounds in the target Compound Slate that correspond to the input list of Compounds in the source Compound Slate
+	/// * `target_compound_list` - The equivalent list of Compounds in the target Compound Slate
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	fn translate_compound_list(&mut self,source_compound_slate:&CapeStringIn,target_compound_slate:&CapeStringIn,source_compound_list:&CapeStringIn,target_compound_list:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
+	fn translate_compound_list(&mut self,source_compound_slate:&CapeStringIn,target_compound_slate:&CapeStringIn,source_compound_list:&CapeArrayStringIn,target_compound_list:&mut CapeArrayStringOut) -> Result<(),COBIAError>;
 
 	/// Validates a given subset of Compounds for a specified Compound Slate.
 	///
 	///
 	/// # Arguments
-	/// * `compound_slate` - The name of the Compound Slate
-	/// * `compound_list` - The Compounds in the subset considered
-	/// * `message` - If the given subset of Compounds is not valid, a message conveying the reason for that
+	/// * `compound_slate` - The Compound Slate
+	/// * `compound_list` - The subset of Compounds
+	/// * `message` - If the given subset of Compounds is not valid, a message conveying the reason
 	///
 	/// # Returns
 	/// * Result<'is_valid',COBIAError> - Ok if successful, Err if there was an error
@@ -20791,31 +20791,31 @@ pub trait ICapeThermoCompoundSlateUtilities {
 	///
 	///
 	/// # Arguments
-	/// * `phase_id` - Phase labels for which the composition conversion is requested
-	/// * `source_compound_slate` - The name of the target Compound Slate, from which conversion takes place
-	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
+	/// * `phase_label` - Label of the Phase
+	/// * `source_compound_slate` - The source Compound Slate, from which conversion takes place
+	/// * `target_compound_slate` - The target Compound Slate, to which conversion takes place
 	/// * `target_basis` - The basis in which targetComposition is returned
-	/// * `target_composition` - The converted basis
+	/// * `target_composition` - The converted composition
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	fn convert_fraction_single_phase(&mut self,phase_id:&CapeStringIn,source_compound_slate:&CapeStringIn,target_compound_slate:&CapeStringIn,target_basis:&mut CapeStringOut,target_composition:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
+	fn convert_fraction_single_phase(&mut self,phase_label:&CapeStringIn,source_compound_slate:&CapeStringIn,target_compound_slate:&CapeStringIn,target_basis:&mut CapeStringOut,target_composition:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 
-	/// Converts overall composition from one Compound Slate to another Compound Slate, at phase equilibrium, and also converts composition and phase fraction for specified Phases.
+	/// Converts overall composition from one Compound Slate to another Compound Slate, at phase equilibrium, and also converts composition and phase fraction zero or more specified Phases.
 	///
 	///
 	/// # Arguments
-	/// * `source_compound_slate` - The name of the target Compound Slate, from which conversion takes place
-	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
-	/// * `phase_ids` - An optional array of phase labels for which targetPhaseFraction and targetPhaseComposition are to be provided, or UNDEFINED (empty)
-	/// * `target_basis` - The basis in which targetComposition, targetPhaseFraction, targetPhaseComposition values are returned
+	/// * `source_compound_slate` - The source Compound Slate, from which conversion takes place
+	/// * `target_compound_slate` - The target Compound Slate, to which conversion takes place
+	/// * `phase_labels` - An optional array of Phase labels for which targetPhaseFraction and targetPhaseComposition are returned, or UNDEFINED \(empty\)
+	/// * `target_basis` - The basis in which targetComposition, targetPhaseFraction and targetPhaseComposition values are returned
 	/// * `target_composition` - The converted overall composition
-	/// * `target_phase_fraction` - Converted phase fraction for each Phase specified in phase labels
-	/// * `target_phase_composition` - Converted composition for each Phase specified in phaseIDs (composition of the first Phase is followed by the composition of the second Phase, and so on)
+	/// * `target_phase_fraction` - Converted phase fraction for each Phase in phaseLabels
+	/// * `target_phase_composition` - Converted composition for each Phase in phaseLabels \(composition of the first Phase is followed by the composition of the second Phase, and so on\)
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	fn convert_fraction_overall(&mut self,source_compound_slate:&CapeStringIn,target_compound_slate:&CapeStringIn,phase_ids:&CapeArrayStringIn,target_basis:&mut CapeStringOut,target_composition:&mut CapeArrayRealOut,target_phase_fraction:&mut CapeArrayRealOut,target_phase_composition:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
+	fn convert_fraction_overall(&mut self,source_compound_slate:&CapeStringIn,target_compound_slate:&CapeStringIn,phase_labels:&CapeArrayStringIn,target_basis:&mut CapeStringOut,target_composition:&mut CapeArrayRealOut,target_phase_fraction:&mut CapeArrayRealOut,target_phase_composition:&mut CapeArrayRealOut) -> Result<(),COBIAError>;
 }
 
 /// COBIA interface implementation for ICapeThermoCompoundSlateUtilities
@@ -20852,7 +20852,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_translate_compound_list(me: *mut std::ffi::c_void,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,source_compound_list:*mut crate::C::ICapeString,target_compound_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	extern "C" fn raw_translate_compound_list(me: *mut std::ffi::c_void,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,source_compound_list:*mut crate::C::ICapeArrayString,target_compound_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if target_compound_list.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20863,7 +20863,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 		}
 		let source_compound_slate=CapeStringIn::new(&source_compound_slate);
 		let target_compound_slate=CapeStringIn::new(&target_compound_slate);
-		let source_compound_list=CapeStringIn::new(&source_compound_list);
+		let source_compound_list=CapeArrayStringIn::new(&source_compound_list);
 		let mut target_compound_list=unsafe{*((&target_compound_list as *const *mut crate::C::ICapeArrayString) as *mut *mut crate::C::ICapeArrayString)};
 		let mut target_compound_list=CapeArrayStringOut::new(&mut target_compound_list);
 		match myself.translate_compound_list(&source_compound_slate,&target_compound_slate,&source_compound_list,&mut target_compound_list) {
@@ -20904,7 +20904,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_convert_fraction_single_phase(me: *mut std::ffi::c_void,phase_id:*mut crate::C::ICapeString,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,target_basis:*mut crate::C::ICapeString,target_composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	extern "C" fn raw_convert_fraction_single_phase(me: *mut std::ffi::c_void,phase_label:*mut crate::C::ICapeString,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,target_basis:*mut crate::C::ICapeString,target_composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if target_basis.is_null()||target_composition.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20913,14 +20913,14 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 		if target_basis.is_null()||target_composition.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let phase_id=CapeStringIn::new(&phase_id);
+		let phase_label=CapeStringIn::new(&phase_label);
 		let source_compound_slate=CapeStringIn::new(&source_compound_slate);
 		let target_compound_slate=CapeStringIn::new(&target_compound_slate);
 		let mut target_basis=unsafe{*((&target_basis as *const *mut crate::C::ICapeString) as *mut *mut crate::C::ICapeString)};
 		let mut target_basis=CapeStringOut::new(&mut target_basis);
 		let mut target_composition=unsafe{*((&target_composition as *const *mut crate::C::ICapeArrayReal) as *mut *mut crate::C::ICapeArrayReal)};
 		let mut target_composition=CapeArrayRealOut::new(&mut target_composition);
-		match myself.convert_fraction_single_phase(&phase_id,&source_compound_slate,&target_compound_slate,&mut target_basis,&mut target_composition) {
+		match myself.convert_fraction_single_phase(&phase_label,&source_compound_slate,&target_compound_slate,&mut target_basis,&mut target_composition) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeThermoCompoundSlateUtilities::ConvertFractionSinglePhase")
 		}
@@ -20931,7 +20931,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_convert_fraction_overall(me: *mut std::ffi::c_void,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,phase_ids:*mut crate::C::ICapeArrayString,target_basis:*mut crate::C::ICapeString,target_composition:*mut crate::C::ICapeArrayReal,target_phase_fraction:*mut crate::C::ICapeArrayReal,target_phase_composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	extern "C" fn raw_convert_fraction_overall(me: *mut std::ffi::c_void,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString,target_basis:*mut crate::C::ICapeString,target_composition:*mut crate::C::ICapeArrayReal,target_phase_fraction:*mut crate::C::ICapeArrayReal,target_phase_composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if target_basis.is_null()||target_composition.is_null()||target_phase_fraction.is_null()||target_phase_composition.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20942,7 +20942,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 		}
 		let source_compound_slate=CapeStringIn::new(&source_compound_slate);
 		let target_compound_slate=CapeStringIn::new(&target_compound_slate);
-		let phase_ids=CapeArrayStringIn::new(&phase_ids);
+		let phase_labels=CapeArrayStringIn::new(&phase_labels);
 		let mut target_basis=unsafe{*((&target_basis as *const *mut crate::C::ICapeString) as *mut *mut crate::C::ICapeString)};
 		let mut target_basis=CapeStringOut::new(&mut target_basis);
 		let mut target_composition=unsafe{*((&target_composition as *const *mut crate::C::ICapeArrayReal) as *mut *mut crate::C::ICapeArrayReal)};
@@ -20951,7 +20951,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 		let mut target_phase_fraction=CapeArrayRealOut::new(&mut target_phase_fraction);
 		let mut target_phase_composition=unsafe{*((&target_phase_composition as *const *mut crate::C::ICapeArrayReal) as *mut *mut crate::C::ICapeArrayReal)};
 		let mut target_phase_composition=CapeArrayRealOut::new(&mut target_phase_composition);
-		match myself.convert_fraction_overall(&source_compound_slate,&target_compound_slate,&phase_ids,&mut target_basis,&mut target_composition,&mut target_phase_fraction,&mut target_phase_composition) {
+		match myself.convert_fraction_overall(&source_compound_slate,&target_compound_slate,&phase_labels,&mut target_basis,&mut target_composition,&mut target_phase_fraction,&mut target_phase_composition) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeThermoCompoundSlateUtilities::ConvertFractionOverall")
 		}
@@ -20976,7 +20976,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 /// Smart pointer for ICapeThermoCompoundSlateUtilities
 ///
 /// This provides rust-callable functions for an externally implemented ICapeThermoCompoundSlateUtilities interface
-/// Interface that provides services to the PME and is implemented by components that support multiple Compound Slates.
+/// Interface that provides services to the PME and is implemented by external Compound Severs that support multiple Compound Slates, i.e. a Property Package.
 ///
 
 #[cape_smart_pointer(ICAPETHERMOCOMPOUNDSLATEUTILITIES_UUID)]
@@ -20992,16 +20992,16 @@ impl CapeThermoCompoundSlateUtilities {
 	///
 	///
 	/// # Arguments
-	/// * `source_compound_slate` - The name of the source Compound Slate, from which conversion takes place
-	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
+	/// * `source_compound_slate` - The source Compound Slate, from which conversion takes place
+	/// * `target_compound_slate` - The target Compound Slate, to which conversion takes place
 	/// * `source_compound_list` - List of Compounds to be translated from the source Compound Slate to the target Compound Slate
-	/// * `target_compound_list` - List of Compounds in the target Compound Slate that correspond to the input list of Compounds in the source Compound Slate
+	/// * `target_compound_list` - The equivalent list of Compounds in the target Compound Slate
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	pub fn translate_compound_list<TypeOfSourceCompoundSlate:CapeStringProviderIn,TypeOfTargetCompoundSlate:CapeStringProviderIn,TypeOfSourceCompoundList:CapeStringProviderIn,TypeOfTargetCompoundList:CapeArrayStringProviderOut>(&self,source_compound_slate:&TypeOfSourceCompoundSlate,target_compound_slate:&TypeOfTargetCompoundSlate,source_compound_list:&TypeOfSourceCompoundList,target_compound_list:&mut TypeOfTargetCompoundList) -> Result<(),COBIAError> {
+	pub fn translate_compound_list<TypeOfSourceCompoundSlate:CapeStringProviderIn,TypeOfTargetCompoundSlate:CapeStringProviderIn,TypeOfSourceCompoundList:CapeArrayStringProviderIn,TypeOfTargetCompoundList:CapeArrayStringProviderOut>(&self,source_compound_slate:&TypeOfSourceCompoundSlate,target_compound_slate:&TypeOfTargetCompoundSlate,source_compound_list:&TypeOfSourceCompoundList,target_compound_list:&mut TypeOfTargetCompoundList) -> Result<(),COBIAError> {
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).TranslateCompoundList.unwrap())((*self.interface).me,(&source_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&target_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&source_compound_list.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&target_compound_list.as_cape_array_string_out() as *const crate::C::ICapeArrayString).cast_mut())
+			((*(*self.interface).vTbl).TranslateCompoundList.unwrap())((*self.interface).me,(&source_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&target_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&source_compound_list.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&target_compound_list.as_cape_array_string_out() as *const crate::C::ICapeArrayString).cast_mut())
 		};
 		match result_code {
 			COBIAERR_NOERROR => {Ok(())},
@@ -21014,9 +21014,9 @@ impl CapeThermoCompoundSlateUtilities {
 	///
 	///
 	/// # Arguments
-	/// * `compound_slate` - The name of the Compound Slate
-	/// * `compound_list` - The Compounds in the subset considered
-	/// * `message` - If the given subset of Compounds is not valid, a message conveying the reason for that
+	/// * `compound_slate` - The Compound Slate
+	/// * `compound_list` - The subset of Compounds
+	/// * `message` - If the given subset of Compounds is not valid, a message conveying the reason
 	///
 	/// # Returns
 	/// * Result<'is_valid',COBIAError> - Ok if successful, Err if there was an error
@@ -21041,17 +21041,17 @@ impl CapeThermoCompoundSlateUtilities {
 	///
 	///
 	/// # Arguments
-	/// * `phase_id` - Phase labels for which the composition conversion is requested
-	/// * `source_compound_slate` - The name of the target Compound Slate, from which conversion takes place
-	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
+	/// * `phase_label` - Label of the Phase
+	/// * `source_compound_slate` - The source Compound Slate, from which conversion takes place
+	/// * `target_compound_slate` - The target Compound Slate, to which conversion takes place
 	/// * `target_basis` - The basis in which targetComposition is returned
-	/// * `target_composition` - The converted basis
+	/// * `target_composition` - The converted composition
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	pub fn convert_fraction_single_phase<TypeOfPhaseId:CapeStringProviderIn,TypeOfSourceCompoundSlate:CapeStringProviderIn,TypeOfTargetCompoundSlate:CapeStringProviderIn,TypeOfTargetBasis:CapeStringProviderOut,TypeOfTargetComposition:CapeArrayRealProviderOut>(&self,phase_id:&TypeOfPhaseId,source_compound_slate:&TypeOfSourceCompoundSlate,target_compound_slate:&TypeOfTargetCompoundSlate,target_basis:&mut TypeOfTargetBasis,target_composition:&mut TypeOfTargetComposition) -> Result<(),COBIAError> {
+	pub fn convert_fraction_single_phase<TypeOfPhaseLabel:CapeStringProviderIn,TypeOfSourceCompoundSlate:CapeStringProviderIn,TypeOfTargetCompoundSlate:CapeStringProviderIn,TypeOfTargetBasis:CapeStringProviderOut,TypeOfTargetComposition:CapeArrayRealProviderOut>(&self,phase_label:&TypeOfPhaseLabel,source_compound_slate:&TypeOfSourceCompoundSlate,target_compound_slate:&TypeOfTargetCompoundSlate,target_basis:&mut TypeOfTargetBasis,target_composition:&mut TypeOfTargetComposition) -> Result<(),COBIAError> {
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).ConvertFractionSinglePhase.unwrap())((*self.interface).me,(&phase_id.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&source_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&target_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&target_basis.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),(&target_composition.as_cape_array_real_out() as *const crate::C::ICapeArrayReal).cast_mut())
+			((*(*self.interface).vTbl).ConvertFractionSinglePhase.unwrap())((*self.interface).me,(&phase_label.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&source_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&target_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&target_basis.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),(&target_composition.as_cape_array_real_out() as *const crate::C::ICapeArrayReal).cast_mut())
 		};
 		match result_code {
 			COBIAERR_NOERROR => {Ok(())},
@@ -21060,23 +21060,23 @@ impl CapeThermoCompoundSlateUtilities {
 	}
 
 
-	/// Converts overall composition from one Compound Slate to another Compound Slate, at phase equilibrium, and also converts composition and phase fraction for specified Phases.
+	/// Converts overall composition from one Compound Slate to another Compound Slate, at phase equilibrium, and also converts composition and phase fraction zero or more specified Phases.
 	///
 	///
 	/// # Arguments
-	/// * `source_compound_slate` - The name of the target Compound Slate, from which conversion takes place
-	/// * `target_compound_slate` - The name of the target Compound Slate, to which conversion takes place
-	/// * `phase_ids` - An optional array of phase labels for which targetPhaseFraction and targetPhaseComposition are to be provided, or UNDEFINED (empty)
-	/// * `target_basis` - The basis in which targetComposition, targetPhaseFraction, targetPhaseComposition values are returned
+	/// * `source_compound_slate` - The source Compound Slate, from which conversion takes place
+	/// * `target_compound_slate` - The target Compound Slate, to which conversion takes place
+	/// * `phase_labels` - An optional array of Phase labels for which targetPhaseFraction and targetPhaseComposition are returned, or UNDEFINED \(empty\)
+	/// * `target_basis` - The basis in which targetComposition, targetPhaseFraction and targetPhaseComposition values are returned
 	/// * `target_composition` - The converted overall composition
-	/// * `target_phase_fraction` - Converted phase fraction for each Phase specified in phase labels
-	/// * `target_phase_composition` - Converted composition for each Phase specified in phaseIDs (composition of the first Phase is followed by the composition of the second Phase, and so on)
+	/// * `target_phase_fraction` - Converted phase fraction for each Phase in phaseLabels
+	/// * `target_phase_composition` - Converted composition for each Phase in phaseLabels \(composition of the first Phase is followed by the composition of the second Phase, and so on\)
 	///
 	/// # Returns
 	/// * Result<(),COBIAError> - Ok if successful, Err if there was an error
-	pub fn convert_fraction_overall<TypeOfSourceCompoundSlate:CapeStringProviderIn,TypeOfTargetCompoundSlate:CapeStringProviderIn,TypeOfPhaseIds:CapeArrayStringProviderIn,TypeOfTargetBasis:CapeStringProviderOut,TypeOfTargetComposition:CapeArrayRealProviderOut,TypeOfTargetPhaseFraction:CapeArrayRealProviderOut,TypeOfTargetPhaseComposition:CapeArrayRealProviderOut>(&self,source_compound_slate:&TypeOfSourceCompoundSlate,target_compound_slate:&TypeOfTargetCompoundSlate,phase_ids:&TypeOfPhaseIds,target_basis:&mut TypeOfTargetBasis,target_composition:&mut TypeOfTargetComposition,target_phase_fraction:&mut TypeOfTargetPhaseFraction,target_phase_composition:&mut TypeOfTargetPhaseComposition) -> Result<(),COBIAError> {
+	pub fn convert_fraction_overall<TypeOfSourceCompoundSlate:CapeStringProviderIn,TypeOfTargetCompoundSlate:CapeStringProviderIn,TypeOfPhaseLabels:CapeArrayStringProviderIn,TypeOfTargetBasis:CapeStringProviderOut,TypeOfTargetComposition:CapeArrayRealProviderOut,TypeOfTargetPhaseFraction:CapeArrayRealProviderOut,TypeOfTargetPhaseComposition:CapeArrayRealProviderOut>(&self,source_compound_slate:&TypeOfSourceCompoundSlate,target_compound_slate:&TypeOfTargetCompoundSlate,phase_labels:&TypeOfPhaseLabels,target_basis:&mut TypeOfTargetBasis,target_composition:&mut TypeOfTargetComposition,target_phase_fraction:&mut TypeOfTargetPhaseFraction,target_phase_composition:&mut TypeOfTargetPhaseComposition) -> Result<(),COBIAError> {
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).ConvertFractionOverall.unwrap())((*self.interface).me,(&source_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&target_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&phase_ids.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&target_basis.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),(&target_composition.as_cape_array_real_out() as *const crate::C::ICapeArrayReal).cast_mut(),(&target_phase_fraction.as_cape_array_real_out() as *const crate::C::ICapeArrayReal).cast_mut(),(&target_phase_composition.as_cape_array_real_out() as *const crate::C::ICapeArrayReal).cast_mut())
+			((*(*self.interface).vTbl).ConvertFractionOverall.unwrap())((*self.interface).me,(&source_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&target_compound_slate.as_cape_string_in() as *const crate::C::ICapeString).cast_mut(),(&phase_labels.as_cape_array_string_in() as *const crate::C::ICapeArrayString).cast_mut(),(&target_basis.as_cape_string_out() as *const crate::C::ICapeString).cast_mut(),(&target_composition.as_cape_array_real_out() as *const crate::C::ICapeArrayReal).cast_mut(),(&target_phase_fraction.as_cape_array_real_out() as *const crate::C::ICapeArrayReal).cast_mut(),(&target_phase_composition.as_cape_array_real_out() as *const crate::C::ICapeArrayReal).cast_mut())
 		};
 		match result_code {
 			COBIAERR_NOERROR => {Ok(())},

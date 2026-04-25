@@ -1,7 +1,6 @@
 // ThermoClientPMETest.cpp : Defines the entry point for the console application.
 //
 #include <COBIA.h>
-#include <codecvt>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -12,6 +11,59 @@
 #include <unordered_map>
 
 using namespace COBIA;
+
+std::string escape_doc(const char *doc_string) {
+	//escape special markdown characters
+	std::string escaped;
+	bool startline=true;
+	bool digitsonly=true;
+	for (const char *p = doc_string; *p; ++p) {
+		char c = *p;
+		switch (c) {
+		case '#':
+		case '>':
+		case '-':
+		case '*':
+		case '+':
+			//only at start of line
+			if (startline) {
+				escaped+='\\';
+			}
+			break;
+		case '.':
+			//only if preceded by only digits
+			if (digitsonly) {
+				escaped+='\\';
+			}
+			break;
+		case '\\':
+		case '_':
+		case '{':
+		case '}':
+		case '[':
+		case ']':
+		case '(':
+		case ')':
+		case '!':
+			escaped+='\\';
+			break;
+		case '`':
+			escaped+='`';
+			break;
+		case ' ':
+		case '\t':
+			break;
+		default:
+			startline=false;
+			if (!std::isdigit(c)) {
+				digitsonly=false;
+			}
+			break;
+		}
+		escaped+=c;
+	}
+	return escaped;
+}
 
 std::string to_snake_case(const std::string& raw) {
 	bool allow_underscore=false;
@@ -374,7 +426,7 @@ struct MethodArgumentInfo {
 				//doc
 				CapeStringImpl doc_val;
 				arg.AttributeValue(ConstCapeString(COBIATEXT("doc")),doc_val);
-				doc=ToUTF8(doc_val.c_str()).c_str();
+				doc=escape_doc(ToUTF8(doc_val.c_str()).c_str());
 			} else {
 				std::string message="invalid attribute '";
 				message+=ToUTF8(att_name.c_str()).c_str();
@@ -883,7 +935,7 @@ int main(int argc,char* argv[]) {
 		//library ID
 		if (lib.HasAttribute(attr_doc)) {
 			lib.AttributeValue(attr_doc,doc_val);
-			code<<"\n/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n";
+			code<<"\n/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n";
 		}
 		code<<"pub const LIBRARY_ID:CapeUUID="<<lib.Uuid()<<";\n";
 		//category IDs
@@ -893,7 +945,7 @@ int main(int argc,char* argv[]) {
 				auto cat=lib.CategoryID(category_index);
 				if (cat.HasAttribute(attr_doc)) {
 					cat.AttributeValue(attr_doc,doc_val);
-					code<<"\n/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n";
+					code<<"\n/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n";
 				}
 				code<<"pub const CATEGORYID_";
 				CapeStringImpl _cat_name;
@@ -937,7 +989,7 @@ int main(int argc,char* argv[]) {
 						"\t///\n";
 						if (enm.HasAttribute(attr_doc)) {
 							enm.AttributeValue(attr_doc,doc_val);
-							code<<"\t/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n\n";
+							code<<"\t/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n\n";
 						}
 					code<<"\t#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]\n"
 						<<"\tpub struct "<<enm_name<<": u32 {\n";
@@ -948,7 +1000,7 @@ int main(int argc,char* argv[]) {
 						enmv.Name(_item_name);
 						if (enmv.HasAttribute(attr_doc)) {
 							enmv.AttributeValue(attr_doc,doc_val);
-							code<<"\t\t/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n";
+							code<<"\t\t/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n";
 						}
 						std::string item_name=MakeCamelCase(ToUTF8(_item_name.c_str()).c_str());
 						code<<"\t\tconst "<<item_name<<" = "<<value<<";\n";
@@ -962,7 +1014,7 @@ int main(int argc,char* argv[]) {
 						"///\n";
 					if (enm.HasAttribute(attr_doc)) {
 						enm.AttributeValue(attr_doc,doc_val);
-						code<<"/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n\n";
+						code<<"/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n\n";
 					}
 					code<<"#[repr(i32)]\n"
 						"#[derive(Debug,PartialEq,Eq,Clone,Copy)]\n"
@@ -974,7 +1026,7 @@ int main(int argc,char* argv[]) {
 						std::string item_name=MakeCamelCase(ToUTF8(_item_name.c_str()).c_str());
 						if (enmv.HasAttribute(attr_doc)) {
 							enmv.AttributeValue(attr_doc,doc_val);
-							code<<"\t/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n";
+							code<<"\t/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n";
 						}
 						code<<"\t"<<item_name<<" = "<<enmv.Value()<<",\n";
 					}
@@ -1094,7 +1146,7 @@ int main(int argc,char* argv[]) {
 					"///\n";
 				if (iface.HasAttribute(attr_doc)) {
 					iface.AttributeValue(attr_doc,doc_val);
-					code<<"/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n///\n\n";
+					code<<"/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n///\n\n";
 				}
 				code<<"pub trait "<<iface_name;
 				if (iface.TemplateArgCount()>0) {
@@ -1142,7 +1194,7 @@ int main(int argc,char* argv[]) {
 					std::string method_name_snake_case=to_snake_case(method_name);
 					if (method.HasAttribute(attr_doc)) {
 						method.AttributeValue(attr_doc,doc_val);
-						code<<"\n\t/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n\t///\n";
+						code<<"\n\t/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n\t///\n";
 					} else {
 						code<<"\n\t/// "<<method_name_snake_case<<" method\n\t///\n";
 					}
@@ -1634,7 +1686,7 @@ int main(int argc,char* argv[]) {
 					"/// This provides rust-callable functions for an externally implemented "<<iface_name<<" interface\n";
 				if (iface.HasAttribute(attr_doc)) {
 					iface.AttributeValue(attr_doc,doc_val);
-					code<<"/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n///\n";
+					code<<"/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n///\n";
 				}
 				code<<"\n#[cape_smart_pointer("<<upper_case_iface_name<<"_UUID)]\n"
 					"pub struct "<<smart_pointer_name<<templ_args_long<<" {\n"
@@ -1697,7 +1749,7 @@ int main(int argc,char* argv[]) {
 					//header
 					if (method.HasAttribute(attr_doc)) {
 						method.AttributeValue(attr_doc,doc_val);
-						code<<"\n\t/// "<<ToUTF8(doc_val.c_str()).c_str()<<"\n\t///\n";
+						code<<"\n\t/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n\t///\n";
 					} else {
 						code<<"\n\t/// "<<snake_case_method_name<<" method\n\t///\n";
 					}
