@@ -1,12 +1,11 @@
-use crate::shared_unit_data::*;
 use crate::distillation_shortcut_unit::DistillationShortcutUnit;
+use crate::shared_unit_data::*;
 use cobia::*;
 
 /// A collection of parameters for the distillation shortcut unit.
 ///
 /// This collection implements the `ICapeIdentification` and `ICapeCollection<ICapeParameter>` interfaces
 /// and provides methods to manage parameters associated with the unit.
-
 #[cape_object_implementation(
 		interfaces={ 
 			cape_open_1_2::ICapeIdentification,
@@ -19,18 +18,18 @@ use cobia::*;
 			name=CapeStringImpl::from(format!("{} parameter collection",DistillationShortcutUnit::NAME)),
 			description=CapeStringImpl::from(format!("Parameter collection of {}",DistillationShortcutUnit::NAME)),
 		}
-  )] 
+  )]
 pub(crate) struct ParameterCollection {
 	/// The name of the parameter collection.
 	name: CapeStringImpl,
 	/// The description of the parameter collection.
 	description: CapeStringImpl,
 	/// The parameters in the collection.
-	parameters : Vec<cape_open_1_2::CapeParameter>,
+	parameters: Vec<cape_open_1_2::CapeParameter>,
 	/// Shared data for the unit, allowing access to common properties.
-	shared_unit_data: SharedUnitDataRef, 
+	shared_unit_data: SharedUnitDataRef,
 	/// A map to quickly access parameters by their names.
-	parameter_name_map : cobia::CapeOpenMap<usize>,
+	parameter_name_map: cobia::CapeOpenMap<usize>,
 }
 
 impl ParameterCollection {
@@ -38,36 +37,37 @@ impl ParameterCollection {
 	/// Adds a parameter to the collection.
 	///
 	/// The parameter's name is cached for quick look-ups by name.
-	/// 
+	///
 	/// # Arguments
 	/// * `parameter` - A smart pointer to the parameter to be added.
 	///
-
-	pub(crate) fn add_parameter<T:CapeSmartPointer>(&mut self,parameter:T) {
+	pub(crate) fn add_parameter<T: CapeSmartPointer>(&mut self, parameter: T) {
 		//cache the name for look-ups by name
-		let index=self.parameters.len();
-		self.parameters.push(cape_open_1_2::CapeParameter::from_object(&parameter).unwrap());
-		let iden=cape_open_1_2::CapeIdentification::from_object(&parameter).unwrap();
-		let mut name=cobia::CapeStringImpl::new();
+		let index = self.parameters.len();
+		self.parameters
+			.push(cape_open_1_2::CapeParameter::from_object(&parameter).unwrap());
+		let iden = cape_open_1_2::CapeIdentification::from_object(&parameter).unwrap();
+		let mut name = cobia::CapeStringImpl::new();
 		iden.get_component_name(&mut name).unwrap();
-		self.parameter_name_map.insert_from_cape_string(&name,index);
+		self.parameter_name_map
+			.insert_from_cape_string(&name, index);
 	}
 
 	/// Obtain an iterator to iterate over the parameters in the collection.
 	///
 	/// # Returns
 	/// An iterator that yields references to the parameters in the collection.
-
 	pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut cape_open_1_2::CapeParameter> {
 		self.parameters.iter_mut()
 	}
+
 }
 
 impl std::fmt::Display for ParameterCollection {
 
 	/// Formats the parameter collection for display.
 	///
-	/// The std::fmt::Display interface is used when generating the 
+	/// The std::fmt::Display interface is used when generating the
 	/// source name of the object that raises an error.
 	///
 	/// # Arguments
@@ -75,11 +75,14 @@ impl std::fmt::Display for ParameterCollection {
 	///
 	/// # Returns
 	/// A result indicating whether the formatting was successful or not.
-
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"Parameter collection of {} unit '{}'",DistillationShortcutUnit::NAME, self.shared_unit_data.borrow().name)
-    }
-
+		write!(
+			f,
+			"Parameter collection of {} unit '{}'",
+			DistillationShortcutUnit::NAME,
+			self.shared_unit_data.borrow().name
+		)
+	}
 }
 
 impl cape_open_1_2::ICapeIdentification for ParameterCollection {
@@ -91,8 +94,7 @@ impl cape_open_1_2::ICapeIdentification for ParameterCollection {
 	///
 	/// # Returns
 	/// A result indicating success or failure. If successful, the name is set in `name`.
-
-	fn get_component_name(&mut self,name:&mut CapeStringOut) -> Result<(), COBIAError> {
+	fn get_component_name(&mut self, name: &mut CapeStringOut) -> Result<(), COBIAError> {
 		name.set(&self.name)
 	}
 
@@ -103,15 +105,16 @@ impl cape_open_1_2::ICapeIdentification for ParameterCollection {
 	///
 	/// # Returns
 	/// A result indicating success or failure. If successful, the description is set in `description`.
-
-	fn get_component_description(&mut self,description:&mut CapeStringOut) -> Result<(), COBIAError> {
+	fn get_component_description(
+		&mut self,
+		description: &mut CapeStringOut,
+	) -> Result<(), COBIAError> {
 		description.set(&self.description)
 	}
 
 	/// Sets the name of the component.
 	///
 	/// This method is not allowed for this parameter collection implementation and will return an error.
-
 	fn set_component_name(&mut self, _name: &CapeStringIn) -> Result<(), COBIAError> {
 		Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
 	}
@@ -119,10 +122,10 @@ impl cape_open_1_2::ICapeIdentification for ParameterCollection {
 	/// Sets the description of the component.
 	///
 	/// This method is not allowed for this parameter collection implementation and will return an error.
-
 	fn set_component_description(&mut self, _desc: &CapeStringIn) -> Result<(), COBIAError> {
 		Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
 	}
+
 }
 
 impl cape_open_1_2::ICapeCollection<cape_open_1_2::CapeParameter> for ParameterCollection {
@@ -134,9 +137,11 @@ impl cape_open_1_2::ICapeCollection<cape_open_1_2::CapeParameter> for ParameterC
 	///
 	/// # Returns
 	/// A result containing the parameter if found, or an error if the index is out of bounds.
-
-    fn item_by_index(&mut self,index:CapeInteger) -> Result<cape_open_1_2::CapeParameter,COBIAError> {
-		if index<0 || index>=self.parameters.len() as CapeInteger {
+	fn item_by_index(
+		&mut self,
+		index: CapeInteger,
+	) -> Result<cape_open_1_2::CapeParameter, COBIAError> {
+		if index < 0 || index >= self.parameters.len() as CapeInteger {
 			Err(cobia::COBIAError::Code(cobia::COBIAERR_NOSUCHITEM))
 		} else {
 			Ok(self.parameters[index as usize].clone())
@@ -150,18 +155,23 @@ impl cape_open_1_2::ICapeCollection<cape_open_1_2::CapeParameter> for ParameterC
 	///
 	/// # Returns
 	/// A result containing the parameter if found, or an error if the name does not exist in the collection.
-
-    fn item_by_name(&mut self,name:&CapeStringIn) -> Result<cape_open_1_2::CapeParameter,COBIAError> {
-		let parameter_index=self.parameter_name_map.get(name).ok_or(cobia::COBIAError::Code(cobia::COBIAERR_NOSUCHITEM))?;
+	fn item_by_name(
+		&mut self,
+		name: &CapeStringIn,
+	) -> Result<cape_open_1_2::CapeParameter, COBIAError> {
+		let parameter_index = self
+			.parameter_name_map
+			.get(name)
+			.ok_or(cobia::COBIAError::Code(cobia::COBIAERR_NOSUCHITEM))?;
 		Ok(self.parameters[*parameter_index].clone())
-    }
+	}
 
 	/// Gets the number of parameters in the collection.
 	///
 	/// # Returns
 	/// A result containing the number of parameters as a `CapeInteger`.
+	fn get_count(&mut self) -> Result<CapeInteger, COBIAError> {
+		Ok(self.parameters.len() as CapeInteger)
+	}
 
-    fn get_count(&mut self) -> Result<CapeInteger,COBIAError> {
-        Ok(self.parameters.len() as CapeInteger)
-    }
 }

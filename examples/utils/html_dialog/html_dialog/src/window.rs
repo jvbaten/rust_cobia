@@ -11,16 +11,16 @@ use windows::Win32::Foundation::HWND;
 /// - **Windows**: Uses `HWND` from the Windows API as the handle type
 ///
 pub struct Window {
-    /// Native window handle.
-    ///
-    /// On Windows, this is a `HWND` from the Windows API.
-    #[cfg(target_os = "windows")]
-    pub handle: HWND,
+	/// Native window handle.
+	///
+	/// On Windows, this is a `HWND` from the Windows API.
+	#[cfg(target_os = "windows")]
+	pub handle: HWND,
 }
 
 impl From<*mut core::ffi::c_void> for Window {
-    #[cfg(target_os = "windows")]
-    fn from(hwnd: *mut core::ffi::c_void) -> Self {
-        Window { handle: HWND(hwnd) }
-    }
+	#[cfg(target_os = "windows")]
+	fn from(hwnd: *mut core::ffi::c_void) -> Self {
+		Window { handle: HWND(hwnd) }
+	}
 }

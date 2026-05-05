@@ -8,14 +8,12 @@ use crate::*;
 /// in the COBIA registry.
 ///
 /// Typically used only locally, so no Send and Sync traits are implemented.
-
 pub struct CapeRegistrar {
 	/// Pointer to the ICapePMCRegistrar interface
 	pub(crate) interface: *mut C::ICapePMCRegistrar,
 }
 
 impl CapeRegistrar {
-
 	/// Put the (default) name of the component
 	///
 	/// # Arguments
@@ -23,7 +21,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn put_name(&self, name: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putName.unwrap())(
@@ -47,7 +44,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn put_description(&self, description: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putDescription.unwrap())(
@@ -71,7 +67,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn put_cape_version(&self, cape_version: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putCapeVersion.unwrap())(
@@ -95,7 +90,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn put_component_version(&self, component_version: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putComponentVersion.unwrap())(
@@ -119,7 +113,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn put_vendor_url(&self, vendor_url: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putVendorURL.unwrap())(
@@ -143,7 +136,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn put_help_url(&self, help_url: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putHelpURL.unwrap())(
@@ -167,7 +159,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn put_about(&self, about: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putAbout.unwrap())(
@@ -191,7 +182,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn put_uuid(&self, uuid: &CapeUUID) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putUUID.unwrap())(
@@ -215,7 +205,6 @@ impl CapeRegistrar {
 	///
 	/// # Arguments
 	/// * `prog_id` - The ProgID of the component, a string identifier used in COM
-
 	pub fn put_prog_id(&self, prog_id: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putProgId.unwrap())(
@@ -243,7 +232,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn put_version_independent_prog_id(&self, prog_id: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl)
@@ -273,7 +261,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn add_cat_id(&self, cat_id: &CapeUUID) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).addCatID.unwrap())(
@@ -298,7 +285,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn put_flags(&self, flags: CapePMCRegistrationFlags) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putFlags.unwrap())((*self.interface).me, flags.bits())
@@ -323,7 +309,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn add_location(
 		&self,
 		service_type: CapePMCServiceType,
@@ -352,7 +337,6 @@ impl CapeRegistrar {
 	///
 	/// # Returns
 	/// * Result<(), COBIAError> - Ok if successful, Err if there was an error
-
 	pub fn commit(&self) -> Result<(), COBIAError> {
 		let result = unsafe { ((*(*self.interface).vTbl).commit.unwrap())((*self.interface).me) };
 		if result == COBIAERR_NOERROR {
@@ -367,7 +351,6 @@ impl CapeRegistrar {
 ///
 /// ICapeRegistrar derives from ICobiaBase, which contains
 /// addReference() and release(). The Drop trait calls release.
-
 impl Drop for CapeRegistrar {
 	fn drop(&mut self) {
 		unsafe {
@@ -380,7 +363,6 @@ impl Drop for CapeRegistrar {
 ///
 /// ICapeRegistrar derives from ICobiaBase, which contains
 /// addReference() and release(). The Clone trait calls addReference.
-
 impl Clone for CapeRegistrar {
 	fn clone(&self) -> Self {
 		unsafe {

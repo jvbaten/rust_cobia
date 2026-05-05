@@ -5,7 +5,6 @@ use crate::*;
 ///
 /// This is used to get the details of each PMC by name or UUID,
 /// or to get all registered PMCs.
-
 pub struct CapePMCEnumerator {
 	pub(crate) interface: *mut C::ICapePMCEnumerator,
 }
@@ -24,7 +23,6 @@ impl CapePMCEnumerator {
 	/// //...
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn new() -> Result<CapePMCEnumerator, COBIAError> {
 		let mut interface: *mut C::ICapePMCEnumerator = std::ptr::null_mut();
 		let result =
@@ -38,14 +36,14 @@ impl CapePMCEnumerator {
 
 	/// Get a PMC by its UUID.
 	///
-	/// Typically a PME will enumerate PMCs to allow the user to pick one. 
-	/// Then the PME stores the UUID of the PMC that the user picked, so 
+	/// Typically a PME will enumerate PMCs to allow the user to pick one.
+	/// Then the PME stores the UUID of the PMC that the user picked, so
 	/// that in future sessions, it can be re-created.
 	///
-	/// Upon saving a flowsheet, the UUID of the PMC is stored in the 
+	/// Upon saving a flowsheet, the UUID of the PMC is stored in the
 	/// flowsheet, along with the UUID of the PME, and perhaps additional
 	/// information that is needed to re-create the PMC (such as the package
-	/// name in case of a Property Package created from a CAPE-OPEN 1.2 
+	/// name in case of a Property Package created from a CAPE-OPEN 1.2
 	/// Property Package Manager).
 	///
 	/// Then, when restoring the flowsheet, the PMC is created from its
@@ -70,8 +68,10 @@ impl CapePMCEnumerator {
 	/// }
 	/// cobia::cape_open_cleanup();
 	/// ```
-
-	pub fn get_pmc_by_uuid(&self, uuid: &CapeUUID) -> Result<CapePMCRegistrationDetails, COBIAError> {
+	pub fn get_pmc_by_uuid(
+		&self,
+		uuid: &CapeUUID,
+	) -> Result<CapePMCRegistrationDetails, COBIAError> {
 		let mut interface: *mut C::ICapePMCRegistrationDetails = std::ptr::null_mut();
 		let result = unsafe {
 			((*(*self.interface).vTbl).getPMCbyUUID.unwrap())(
@@ -108,7 +108,7 @@ impl CapePMCEnumerator {
 
 	/// Get all registered PMCs of specific type(s).
 	///
-	/// Get a collection of all registered PMCs, of a given type or 
+	/// Get a collection of all registered PMCs, of a given type or
 	/// multiple given types.
 	///
 	/// In a typical scenario the PME is interested in instantiating, and therefore
@@ -133,8 +133,10 @@ impl CapePMCEnumerator {
 	/// }
 	/// cobia::cape_open_cleanup();
 	/// ```
-
-	pub fn pmcs(&self,cat_ids: &[CapeUUID]) -> Result<CobiaCollection<CapePMCRegistrationDetails>,COBIAError> {
+	pub fn pmcs(
+		&self,
+		cat_ids: &[CapeUUID],
+	) -> Result<CobiaCollection<CapePMCRegistrationDetails>, COBIAError> {
 		let mut p: *mut C::ICobiaCollection = std::ptr::null_mut();
 		let result = unsafe {
 			//let cat_ids_repr: std::raw::Slice<CapeUUID> = cat_ids.repr(); TODO std::raw::Slice is unstable, use when available
@@ -144,14 +146,14 @@ impl CapePMCEnumerator {
 				(*self.interface).me,
 				v.as_ptr(),
 				v.len() as C::CapeSize,
-				&mut p as *mut *mut C::ICobiaCollection
+				&mut p as *mut *mut C::ICobiaCollection,
 			)
 		};
 		if result == COBIAERR_NOERROR {
 			if p.is_null() {
 				Err(COBIAError::Code(COBIAERR_NULLPOINTER))
 			} else {
-				Ok(CobiaCollection::attach(p))
+				Ok(unsafe { CobiaCollection::attach(p) })
 			}
 		} else {
 			Err(COBIAError::Code(result))
@@ -181,26 +183,24 @@ impl CapePMCEnumerator {
 	/// }
 	/// cobia::cape_open_cleanup();
 	/// ```
-
-	pub fn all_pmcs(&self) -> Result<CobiaCollection<CapePMCRegistrationDetails>,COBIAError> {
+	pub fn all_pmcs(&self) -> Result<CobiaCollection<CapePMCRegistrationDetails>, COBIAError> {
 		let mut p: *mut C::ICobiaCollection = std::ptr::null_mut();
 		let result = unsafe {
 			((*(*self.interface).vTbl).getAllPMCs.unwrap())(
 				(*self.interface).me,
-				&mut p as *mut *mut C::ICobiaCollection
+				&mut p as *mut *mut C::ICobiaCollection,
 			)
 		};
 		if result == COBIAERR_NOERROR {
 			if p.is_null() {
 				Err(COBIAError::Code(COBIAERR_NULLPOINTER))
 			} else {
-				Ok(CobiaCollection::attach(p))
+				Ok(unsafe { CobiaCollection::attach(p) })
 			}
 		} else {
 			Err(COBIAError::Code(result))
 		}
 	}
-
 }
 
 /// Allow marshaling between threads
@@ -212,7 +212,6 @@ unsafe impl Sync for CapePMCEnumerator {}
 ///
 /// ICapePMCEnumerator derives from ICobiaBase, which contains
 /// addReference() and release(). The Drop trait calls release.
-
 impl Drop for CapePMCEnumerator {
 	fn drop(&mut self) {
 		unsafe {
@@ -225,7 +224,6 @@ impl Drop for CapePMCEnumerator {
 ///
 /// ICapePMCEnumerator derives from ICobiaBase, which contains
 /// addReference() and release(). The Clone trait calls addReference.
-
 impl Clone for CapePMCEnumerator {
 	fn clone(&self) -> Self {
 		unsafe {

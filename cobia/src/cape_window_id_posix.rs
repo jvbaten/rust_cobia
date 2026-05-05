@@ -1,157 +1,221 @@
 use crate::C;
 
-pub enum CapeWindowIdType {
-	CapeWindowId_None,
-	CapeWindowId_X11,
-	CapeWindowId_Wayland,
-	CapeWindowId_COCOA,
+/// CapeWindowId represents a window
+///
+/// X11, Wayland, and COCOA are supported.
+pub enum CapeWindowId {
+	/// No known or unsupported window type
+	CapeWindow_None,
+	/// X11 window
+	CapeWindow_X11 {
+		/// Display string
+		display_string: String,
+		/// Window ID
+		xid: u64,
+	},
+	/// Wayland window
+	CapeWindow_Wayland {
+		/// Wayland display handle
+		handle: String,
+		/// Procol for display handle
+		protocol: C::WaylandForeignProtocol,
+	},
+	/// COCOA window
+	///
+	/// Note that this should only be used from the main thread
+	CapeWindow_COCOA {
+		/// COCOA window pointer
+		window: *mut std::os::raw::c_void,
+	},
 }
 
-impl std::default::Default for CapeWindowIdType {
+impl std::default::Default for CapeWindowId {
 	fn default() -> Self {
-		CapeWindowIdType::CapeWindowId_None
+		CapeWindowId::CapeWindow_None
 	}
 }
 
-#[derive(Default)]
-pub struct CapeWindowId {
-	window_id_type: CapeWindowIdType,
-	x11_display_ptr: Option<*mut std::os::raw::c_void>, //X11 display pointer
-	x11_window_id: Option<u64>, //X11 window id
-	wayland_display_ptr: Option<*mut std::os::raw::c_void>, //Wayland display pointer
-	wayland_shell_surface_ptr: Option<*mut std::os::raw::c_void>, //Wayland shell surface pointer
-	cocoa_window_ptr: Option<*mut std::os::raw::c_void>, //COCOA window pointer
-}
-
-unsafe impl Send for CapeWindowId{}
-unsafe impl Sync for CapeWindowId{}
+unsafe impl Send for CapeWindowId {}
+unsafe impl Sync for CapeWindowId {}
 
 impl CapeWindowId {
+	/// Get a default CapeWindow with no known or unsupported window type
+	///
+	/// # Return
+	/// Default CapeWindow
 	pub fn new() -> CapeWindowId {
-		CapeWindowId {
-			window_id_type: CapeWindowIdType::CapeWindowId_None,
-			x11_display_ptr: None,
-			x11_window_id: None,
-			wayland_display_ptr: None,
-			wayland_shell_surface_ptr: None,
-			cocoa_window_ptr: None,
+		CapeWindowId::CapeWindow_None
+	}
+
+	/// Get an X11 CapeWindowId
+	///
+	/// # Arguments
+	/// * `display_string` - Display string
+	/// * `xid` - Window ID
+	///
+	/// # Return
+	/// X11 CapeWindow
+	pub fn x11(display_string: String, xid: u64) -> CapeWindowId {
+		CapeWindowId::CapeWindow_X11 {
+			display_string,
+			xid,
 		}
 	}
-	pub fn x11(display_ptr: *mut std::os::raw::c_void, window_id: u64) -> CapeWindowId {
-		CapeWindowId {
-			window_id_type: CapeWindowIdType::CapeWindowId_X11,
-			x11_display_ptr: Some(display_ptr),
-			x11_window_id: Some(window_id),
-			wayland_display_ptr: None,
-			wayland_shell_surface_ptr: None,
-			cocoa_window_ptr: None,
-		}
+
+	/// Get a Wayland CapeWindowId
+	///
+	/// # Arguments
+	/// * `handle` - Wayland display handle
+	/// * `protocol` - Protocol for display handle
+	///
+	/// # Return
+	/// Wayland CapeWindowId
+	pub fn wayland(handle: String, protocol: C::WaylandForeignProtocol) -> CapeWindowId {
+		CapeWindowId::CapeWindow_Wayland { handle, protocol }
 	}
-	pub fn wayland(display_ptr: *mut std::os::raw::c_void, shell_surface_ptr: *mut std::os::raw::c_void) -> CapeWindowId {
-		CapeWindowId {
-			window_id_type: CapeWindowIdType::CapeWindowId_Wayland,
-			x11_display_ptr: None,
-			x11_window_id: None,
-			wayland_display_ptr: Some(display_ptr),
-			wayland_shell_surface_ptr: Some(shell_surface_ptr),
-			cocoa_window_ptr: None,
-		}
+
+	/// Get a COCOA CapeWindowId
+	///
+	/// Note that this should only be used from the main thread
+	///
+	/// # Arguments
+	/// * `window` - COCOA window pointer
+	///
+	/// # Return
+	/// COCOA CapeWindow
+	pub fn cocoa(window: *mut std::os::raw::c_void) -> CapeWindowId {
+		CapeWindowId::CapeWindow_COCOA { window }
 	}
-	pub fn cocoa(window_ptr: *mut std::os::raw::c_void) -> CapeWindowId {
-		CapeWindowId {
-			window_id_type: CapeWindowIdType::CapeWindowId_COCOA,
-			x11_display_ptr: None,
-			x11_window_id: None,
-			wayland_display_ptr: None,
-			wayland_shell_surface_ptr: None,
-			cocoa_window_ptr: Some(window_ptr),
+
+	/// Convert to raw window id
+	///
+	/// # Return
+	/// Raw window id
+
+	pub fn AsRaw(&self) -> CapeWindowIdRaw {
+		CapeWindowIdRaw::new(&self)
+	}
+
+	/// Convert raw window id to CapeWindowId
+	///
+	/// # Arguments
+	/// * `window_id` - Raw window id
+	///
+	/// # Return
+	/// CapeWindowId
+
+	pub fn FromRaw(window_id: C::CapeWindowId) -> CapeWindowId {
+		if window_id.is_null() {
+			return CapeWindowId::CapeWindow_None;
+		}
+		let window = unsafe { *window_id };
+		match window.type_ {
+			C::eCapeWindowType_CapeWindow_X11 => unsafe {
+				if window.data.X11.display_string.is_null() || window.data.X11.xid == 0 {
+					return CapeWindowId::CapeWindow_None;
+				}
+				let c_str = std::ffi::CStr::from_ptr(window.data.X11.display_string);
+				CapeWindowId::x11(
+					c_str.to_str().unwrap_or_default().to_string(),
+					window.data.X11.xid,
+				)
+			},
+			C::eCapeWindowType_CapeWindow_Wayland => unsafe {
+				if window.data.Wayland.handle.is_null() {
+					return CapeWindowId::CapeWindow_None;
+				}
+				let c_str = std::ffi::CStr::from_ptr(window.data.X11.display_string);
+				CapeWindowId::wayland(
+					c_str.to_str().unwrap_or_default().to_string(),
+					window.data.Wayland.protocol,
+				)
+			},
+			C::eCapeWindowType_CapeWindow_COCOA => unsafe {
+				if window.data.COCOA.window.is_null() {
+					return CapeWindowId::CapeWindow_None;
+				}
+				CapeWindowId::cocoa(window.data.COCOA.window)
+			},
+			_ => {
+				CapeWindowId::CapeWindow_None //unknown
+			}
 		}
 	}
 }
 
-pub fn CapeWindowIdToRaw(window_id: CapeWindowId) -> C::CapeWindowId {
-	match window_id.window_id_type {
-		CapeWindowIdType::CapeWindowId_None => {
-			C::CapeWindowId {
-				type_: C::eCapeWindowIdType_CapeWindowId_None,
-				data: C::CapeWindowTypeData {
-					X11: C::CapeWindowIdX11 {
-						display: std::ptr::null_mut(),
-						winID: 0,
-					},
+pub struct CapeWindowIdRaw {
+	allocated_string: Option<std::ffi::CString>,
+	raw: C::CapeWindow,
+}
+
+impl CapeWindowIdRaw {
+	fn new(w: &CapeWindowId) -> CapeWindowIdRaw {
+		let mut allocated_string = None;
+		let mut raw = C::CapeWindow {
+			type_: C::eCapeWindowType_CapeWindow_None,
+			data: C::CapeWindowTypeData {
+				X11: C::CapeWindowX11 {
+					//dummy
+					display_string: std::ptr::null(),
+					xid: 0,
+				},
+			},
+		};
+		match w {
+			CapeWindowId::CapeWindow_X11 {
+				display_string,
+				xid,
+			} => {
+				if !display_string.is_empty() && *xid != 0u64 {
+					allocated_string =
+						Some(std::ffi::CString::new(display_string.as_str()).unwrap_or_default());
+					raw = C::CapeWindow {
+						type_: C::eCapeWindowType_CapeWindow_X11,
+						data: C::CapeWindowTypeData {
+							X11: C::CapeWindowX11 {
+								display_string: allocated_string.as_ref().unwrap().as_ptr(),
+								xid: *xid,
+							},
+						},
+					};
 				}
 			}
-		},
-		CapeWindowIdType::CapeWindowId_X11 => {
-			let x11_display = match window_id.x11_display_ptr {
-				Some(ptr) => ptr,
-				None => std::ptr::null_mut(),
-			};
-			let x11_window_id = match window_id.x11_window_id {
-				Some(id) => id,
-				None => 0,
-			};
-			C::CapeWindowId {
-				type_: C::eCapeWindowIdType_CapeWindowId_X11,
-				data: C::CapeWindowTypeData {
-					X11: C::CapeWindowIdX11 {
-						display: x11_display,
-						winID: x11_window_id,
-					},
-				},
+			CapeWindowId::CapeWindow_Wayland { handle, protocol } => {
+				if !handle.is_empty() {
+					allocated_string =
+						Some(std::ffi::CString::new(handle.as_str()).unwrap_or_default());
+					raw = C::CapeWindow {
+						type_: C::eCapeWindowType_CapeWindow_Wayland,
+						data: C::CapeWindowTypeData {
+							Wayland: C::CapeWindowWayland {
+								handle: allocated_string.as_ref().unwrap().as_ptr(),
+								protocol: *protocol,
+							},
+						},
+					};
+				}
 			}
-		},
-		CapeWindowIdType::CapeWindowId_Wayland => {
-			let wayland_display = match window_id.wayland_display_ptr {
-				Some(ptr) => ptr,
-				None => std::ptr::null_mut(),
-			};
-			let wayland_shell_surface = match window_id.wayland_shell_surface_ptr {
-				Some(ptr) => ptr,
-				None => std::ptr::null_mut(),
-			};
-			C::CapeWindowId {
-				type_: C::eCapeWindowIdType_CapeWindowId_Wayland,
-				data: C::CapeWindowTypeData {
-					Wayland: C::CapeWindowIdWayland {
-						display: wayland_display,
-						shellsurface: wayland_shell_surface,
-					},
-				},
+			CapeWindowId::CapeWindow_COCOA { window } => {
+				if !window.is_null() {
+					raw = C::CapeWindow {
+						type_: C::eCapeWindowType_CapeWindow_COCOA,
+						data: C::CapeWindowTypeData {
+							COCOA: C::CapeWindowCOCOA {
+								window: window.clone(),
+							},
+						},
+					};
+				}
 			}
-		},
-		CapeWindowIdType::CapeWindowId_COCOA => {
-			let cocoa_window = match window_id.cocoa_window_ptr {
-				Some(ptr) => ptr,
-				None => std::ptr::null_mut(),
-			};
-			C::CapeWindowId {
-				type_: C::eCapeWindowIdType_CapeWindowId_COCOA,
-				data: C::CapeWindowTypeData {
-					COCOA: C::CapeWindowIdCOCOA {
-						window: cocoa_window,
-					},
-				},
-			}
-		},
+			_ => {}
+		};
+		CapeWindowIdRaw {
+			allocated_string,
+			raw,
+		}
+	}
+	pub fn as_native(&self) -> *mut C::CapeWindow {
+		&(self.raw) as *const C::CapeWindow as *mut C::CapeWindow
 	}
 }
 
-pub fn CapeWindowIdFromRaw(window_id: C::CapeWindowId) -> CapeWindowId {
-	match window_id.type_ {
-		C::eCapeWindowIdType_CapeWindowId_X11 => {
-			unsafe {CapeWindowId::x11(window_id.data.X11.display, window_id.data.X11.winID)}
-		},
-		C::eCapeWindowIdType_CapeWindowId_Wayland => {
-			unsafe {CapeWindowId::wayland(window_id.data.Wayland.display, window_id.data.Wayland.shellsurface)}
-		},
-		C::eCapeWindowIdType_CapeWindowId_COCOA => {
-			unsafe {CapeWindowId::cocoa(window_id.data.COCOA.window)}
-		},
-		_  => {
-			CapeWindowId::new() //unknown
-		},
-	}
-
-
-}

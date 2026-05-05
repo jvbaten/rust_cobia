@@ -11,7 +11,7 @@
 //! Industrial and Engineering Chemistry, Vol. 24: 482, 1932) is used
 //! to estimate distillate and bottoms composition and the minimum number
 //! of stages.
-//! 
+//!
 //! From the slate of components, two components are
 //! selected that are called the Light Key (LK)
 //! component, and Heavy Key (HK) component. The
@@ -38,8 +38,8 @@
 //! </math>
 //!
 //! Initial distillate and bottom compositions are estimated.
-//! 
-//! The separation is based on calculation of the 
+//!
+//! The separation is based on calculation of the
 //! relative volatility for each component:
 //!
 //!  <math>
@@ -52,8 +52,8 @@
 //! </math>
 //!
 //! where the K value for each compound is calculated for the dew point (DP) at
-//! distillate conditions, and bubble point (BP) at bottoms conditions, and the 
-//! average K value is given by 
+//! distillate conditions, and bubble point (BP) at bottoms conditions, and the
+//! average K value is given by
 //!
 //! <math>
 //!     <msub><ms>K</ms><mtext>i</mtext></msub>
@@ -65,7 +65,7 @@
 //! </math>
 //!
 //! The minimum number of stages follows from:
-//! 
+//!
 //!  <math>
 //!     <msub><ms>N</ms><mtext>min</mtext></msub>
 //!     <mo>=</mo>
@@ -111,22 +111,22 @@
 //!   <mo>-</mo><msub><ms>f</ms><mrow><mtext>i</mtext><mo>,</mo><mtext>bot</mtext></mrow></msub>
 //! </math>
 //!
-//! The unit operation operates isobarically, so product pressure equals feed pressure. The distillate 
+//! The unit operation operates isobarically, so product pressure equals feed pressure. The distillate
 //! product is at the dew point temperature for the distillate composition, and the bottoms
-//! product it at the bubble point temperature for the distillate composition. 
+//! product it at the bubble point temperature for the distillate composition.
 //!
 //! Given the new distillate temperature and composition, and the new bottoms temperature
-//! and composition, the K values and relative volatilities are updated, and the above 
+//! and composition, the K values and relative volatilities are updated, and the above
 //! calculation is repeated until converged values are obtained.
 //!
 //! ## Underwood
 //!
 //! The Underwood equation (Underwood, "Fractional distillation of
-//! multi-component mixtures. Calculation of minimum reflux ratio", J. Inst. 
+//! multi-component mixtures. Calculation of minimum reflux ratio", J. Inst.
 //! Petrol., 32, 614, 1946) is used to estimate the minimum reflux ratio.
-//! 
+//!
 //! The minimum reflux ratio is determined from
-//! 
+//!
 //! <math>
 //!     <msub><ms>R</ms><mtext>min</mtext></msub>
 //!     <mo>=</mo>
@@ -147,10 +147,10 @@
 //! </math>
 //!
 //! where Underwood parameter <math>&theta;</math> is the root of equation
-//! 
+//!
 //! <math>
 //!     <mn>1</mn>
-//!		<mo>-</mo>
+//!     <mo>-</mo>
 //!     <ms>q</ms>
 //!     <mo>=</mo>
 //!     <mo>&sum;</mo>
@@ -167,20 +167,20 @@
 //!     </mfrac>
 //! </math>
 //!
-//! where q is the feed quality, defined as 
-//! 
+//! where q is the feed quality, defined as
+//!
 //! <math>
 //!     <ms>q</ms>
 //!     <mo>=</mo>
 //!     <mfrac>
 //!      <mrow>
 //!          <msub><ms>h</ms><mtext>feed,DP</mtext></msub>
-//!			<mo>-</mo>
+//!          <mo>-</mo>
 //!          <msub><ms>h</ms><mtext>feed</mtext></msub>
 //!      </mrow>
 //!      <mrow>
 //!          <msub><ms>h</ms><mtext>feed,DP</mtext></msub>
-//!			<mo>-</mo>
+//!          <mo>-</mo>
 //!          <msub><ms>h</ms><mtext>feed,BP</mtext></msub>
 //!      </mrow>
 //!     </mfrac>
@@ -198,16 +198,16 @@
 //! <math><msub><ms>&alpha;</ms><mtext>LK</mtext></msub></math>, a
 //! warning is issued and the root that is closest to 1 is used.
 //!
-//! The unit does not check whether for retrograde flash results, 
+//! The unit does not check whether for retrograde flash results,
 //! which is outside the scope of this example.
 //!
 //! ## Gilliland
 //!
-//! The Gilliland equation (Gilliland, "Estimate the 
-//! number of theoretical plates as a function of reflux ratio", 
+//! The Gilliland equation (Gilliland, "Estimate the
+//! number of theoretical plates as a function of reflux ratio",
 //! Ind. Eng. Chem. 32(9): 1220-1223, 1940, doi 10.1021/ie50369a035)
 //! is used to estimate the number of stages:
-//! 
+//!
 //! <math>
 //!     <ms>Y</ms>
 //!     <mo>=</mo>
@@ -240,9 +240,9 @@
 //!        <mrow><ms>N</ms><mo>+</mo><mn>1</mn></mrow>
 //!     </mfrac>
 //! </math>
-//! 
+//!
 //! and
-//! 
+//!
 //! <math>
 //!     <ms>X</ms>
 //!     <mo>=</mo>
@@ -251,11 +251,11 @@
 //!        <mrow><ms>R</ms><mo>+</mo><mn>1</mn></mrow>
 //!     </mfrac>
 //! </math>
-//! 
-//! The reflux ratio <math>R</math> is determined from the minimum reflux ratio 
+//!
+//! The reflux ratio <math>R</math> is determined from the minimum reflux ratio
 //! using an adjustable parameter:
 //!
-//! 
+//!
 //! <math>
 //!     <ms>R</ms>
 //!     <mo>=</mo>
@@ -270,7 +270,7 @@
 //! The location of the feed stage is estimated from the Kirkbride correlation
 //! (Kirkbride,  "Process Design Procedure for Multicomponent Fractionators",
 //! Petr. Ref. 23(9), 321, 1944):
-//! 
+//!
 //! <math>
 //!    <mfrac>
 //!        <msub><ms>N</ms><mtext>top</mtext></msub>
@@ -304,21 +304,21 @@
 //!        <mn>0.206</mn>
 //!     </msup>
 //! </math>
-//! 
+//!
 //! where
 //! <math><ms>f</ms></math>
-//! are molar flow rates, 
+//! are molar flow rates,
 //! <math><ms>x</ms></math>
-//! are mole fractions, and the number of trays above the feed 
+//! are mole fractions, and the number of trays above the feed
 //! <math><msub><ms>N</ms><mtext>top</mtext></msub></math>
-//! and the number of trays below the feed 
+//! and the number of trays below the feed
 //! <math><msub><ms>N</ms><mtext>bot</mtext></msub></math>
 //! sum up to the number of trays <math><ms>N</ms></math>.
 //!
 //! # Parameters
 //!
 //! The unit operation has the following input parameters:
-//! 
+//!
 //! * HK: selection of the heavy key component,
 //! * LK: selection of the light key component,
 //! * <math><msub><ms>r</ms><mtext>LK</mtext></msub></math>, light component recovery, mol/mol,
@@ -328,7 +328,7 @@
 //! * the convergence tolerance for the component flow rates relative to the total feed rate; also used for convergence of the Underwood equation
 //!
 //! The unit has the following output parameters:
-//! 
+//!
 //! * <math><ms>N</ms></math>, number of stages
 //! * <math><ms>R</ms></math>, reflux ratio, mol/mol
 //! * <math><msub><ms>N</ms><mtext>feed</mtext></msub></math>, feed stage location.
@@ -341,19 +341,18 @@
 //!
 //! After installation, the unit operation can be used in any CAPE-OPEN compliant flowsheeting environment.
 
-//To build documentation: 
+//To build documentation:
 //  cargo doc --no-deps --document-private-items --package distillation_shortcut_unit --open
 
-use cobia;
-mod shared_unit_data;
 mod distillation_shortcut_unit;
-mod port_collection;
+mod gui;
+mod integer_parameter;
 mod material_port;
 mod parameter_collection;
+mod port_collection;
 mod real_parameter;
+mod shared_unit_data;
 mod string_parameter;
-mod integer_parameter;
-mod gui;
 
 /// This function is called by functions generated by the `pmc_entry_points`
 /// macro to check if the unit operation is registered for all users.
@@ -367,6 +366,8 @@ fn register_pmcs_for_all_users() -> bool {
 }
 
 ///A list of all the PMCs that need to be registered
-static PMCS: &[cobia::PMCInfo] = &[cobia::pmc_info::<distillation_shortcut_unit::DistillationShortcutUnit>()];
+static PMCS: &[cobia::PMCInfo] = &[cobia::pmc_info::<
+	distillation_shortcut_unit::DistillationShortcutUnit,
+>()];
 
 cobia::pmc_entry_points!(PMCS, register_pmcs_for_all_users());

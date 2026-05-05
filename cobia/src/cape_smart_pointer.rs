@@ -1,8 +1,8 @@
-use crate::*;
 use crate::C::*;
+use crate::*;
 
 /// COBIA Smart Pointer
-/// 
+///
 /// External objects implement interfaces that all derive
 /// from ICapeInterface.
 ///
@@ -12,9 +12,8 @@ use crate::C::*;
 ///
 /// An object can implement multiple interfaces, and one
 /// interface wrapper can be converted to that for another
-/// wrapper provided that the object implements the 
+/// wrapper provided that the object implements the
 /// corresponding interface
-
 pub trait CapeSmartPointer {
 	type Interface;
 	/// Get the interface pointer
@@ -23,9 +22,9 @@ pub trait CapeSmartPointer {
 	fn as_interface_pointer(&self) -> *mut Self::Interface;
 	/// Get the ICapeInterface
 	///
-	/// All CAPE-OPEN interfaces are laid out such that the 
+	/// All CAPE-OPEN interfaces are laid out such that the
 	/// first fields correspond to the field of ICapeInterface
-	/// and therefore all interfaces can safely be cast to 
+	/// and therefore all interfaces can safely be cast to
 	/// ICapeInterface.
 	///
 	/// This function provides the ICapeInterface representation
@@ -33,8 +32,8 @@ pub trait CapeSmartPointer {
 	fn as_cape_interface_pointer(&self) -> *mut C::ICapeInterface;
 	/// Get the interface ID
 	///
-	/// All interfaces are identified by a unique ID, which is 
-	/// passed to the queryInterface member function of 
+	/// All interfaces are identified by a unique ID, which is
+	/// passed to the queryInterface member function of
 	/// ICapeInterface to obtain a pointer to that interface.
 	///
 	/// This function exposes the interface ID for the interface
@@ -42,36 +41,38 @@ pub trait CapeSmartPointer {
 	fn get_interface_id() -> &'static CapeUUID;
 	/// Get an interface wrapper instance from another object
 	///
-	/// This function provides an interface wrapper from any 
-	/// object that implements ICapeInterface, provided that the 
+	/// This function provides an interface wrapper from any
+	/// object that implements ICapeInterface, provided that the
 	/// underlying object implements the interface.
 	///
-	/// This function performs a queryInterface on the 
+	/// This function performs a queryInterface on the
 	/// object that is passed as argument, with the interface
 	/// ID returned by as_cape_interface_pointer()
-	fn from_object<T:CapeSmartPointer>(smart_pointer : &T) -> Result<Self,COBIAError>  where Self: Sized;
+	fn from_object<T: CapeSmartPointer>(smart_pointer: &T) -> Result<Self, COBIAError>
+	where
+		Self: Sized;
 	/// Get an interface wrapper instance from an interface pointer of the wrapped type
 	///
-	/// This function provides an interface wrapper directly from 
-	/// the interface pointer. 
-	/// 
-	/// #Safety
+	/// This function provides an interface wrapper directly from
+	/// the interface pointer.
+	///
+	/// # Safety
 	///
 	/// The interface pointer must be valid and must point to an object
 	/// that implements the interface.
 	///
-	/// #Panics
+	/// # Panics
 	///
 	/// Panics if the interface pointer is null.
-	fn from_interface_pointer(interface : *mut Self::Interface) -> Self;
+	unsafe fn from_interface_pointer(interface: *mut Self::Interface) -> Self;
 	/// Get an interface wrapper instance from an interface pointer of the wrapped type, without adding a reference
 	///
-	/// This function provides an interface wrapper directly from 
-	/// the interface pointer. Typical use it to attach a return 
-	/// value from an external function, which must be released by the 
+	/// This function provides an interface wrapper directly from
+	/// the interface pointer. Typical use it to attach a return
+	/// value from an external function, which must be released by the
 	/// receiver, to the smart pointer.
-	/// 
-	/// #Safety
+	///
+	/// # Safety
 	///
 	/// The interface pointer must be valid and must point to an object
 	/// that implements the interface.
@@ -79,17 +80,17 @@ pub trait CapeSmartPointer {
 	/// #Panics
 	///
 	/// Panics if the interface pointer is null.
-	fn attach(interface : *mut Self::Interface) -> Self;
+	unsafe fn attach(interface: *mut Self::Interface) -> Self;
 	/// Return an interface pointer and release ownership, without decreasing a reference
 	///
 	/// This function releases ownership of the object by returning
 	/// the contained pointer. The caller is responsible for releasing the
-	/// object. Typical use is to return the pointer from a function that 
+	/// object. Typical use is to return the pointer from a function that
 	/// is exposed externally.
 	fn detach(self) -> *mut Self::Interface;
 	/// Get an interface wrapper instance from any interface pointer
 	///
-	/// This function provides an interface wrapper directly from 
+	/// This function provides an interface wrapper directly from
 	/// any CAPE-OPEN interface pointer by performing a queryInterface.
 	///
 	/// If the object does not implement the interface, the function
@@ -98,13 +99,15 @@ pub trait CapeSmartPointer {
 	///
 	/// Any CAPE-OPEN interface can be cast to ICapeInterface. This is a
 	/// reinterpret-cast and therefore an unsafe operation.
-	/// 
-	/// #Safety
 	///
-	/// If non-null, the interface pointer must be valid and must point 
+	/// # Safety
+	///
+	/// If non-null, the interface pointer must be valid and must point
 	/// to an object that implements the interface.
 	///
-	fn from_cape_interface_pointer(interface : *mut C::ICapeInterface) -> Result<Self,COBIAError>  where Self: Sized;
+	unsafe fn from_cape_interface_pointer(interface: *mut C::ICapeInterface) -> Result<Self, COBIAError>
+	where
+		Self: Sized;
 	/// Get the last error
 	///
 	/// The last error is available after a function call that

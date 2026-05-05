@@ -1,5 +1,5 @@
-use crate::shared_unit_data::*;
 use crate::distillation_shortcut_unit::DistillationShortcutUnit;
+use crate::shared_unit_data::*;
 use cobia::*;
 
 /// The RealParameter class implements a CAPE-OPEN 1.2 real parameter.
@@ -14,7 +14,6 @@ use cobia::*;
 ///
 /// Any other invalid values (outside the bounds of the parameter) will raise an error when set.
 /// Therefore, any parameter for which the value is not missing, is valid.
-
 #[cape_object_implementation(
 		interfaces = {
 			cape_open_1_2::ICapeIdentification,
@@ -34,33 +33,33 @@ use cobia::*;
 		default_values = {
 			value = default_value,
 		},
-  )] 
+  )]
 pub struct RealParameter {
 	/// The name of the parameter
 	pub(crate) name: CapeStringImpl,
 	/// The description of the parameter
 	description: CapeStringImpl,
 	/// Indicates whether this parameter is an input (true) or an output (false)
-	is_input : bool,
+	is_input: bool,
 	/// Shared data for the unit, containing unit-specific information
-	shared_unit_data: SharedUnitDataRef, 
+	shared_unit_data: SharedUnitDataRef,
 	/// The current value of the parameter
-	pub(crate) value : f64,
+	pub(crate) value: f64,
 	/// Default value of the parameter
-	default_value : f64,
+	default_value: f64,
 	/// Minimum value of the parameter
-	minimum_value : f64,
+	minimum_value: f64,
 	/// Maximum value of the parameter
-	maximum_value : f64,
+	maximum_value: f64,
 	/// Dimensionality of the parameter
-	dimensionality : Vec<f64>,
+	dimensionality: Vec<f64>,
 }
 
 impl std::fmt::Display for RealParameter {
 
 	/// Format the RealParameter as a string for display purposes.
 	///
-	/// The std::fmt::Display interface is used when generating the 
+	/// The std::fmt::Display interface is used when generating the
 	/// source name of the object that raises an error.
 	///
 	/// # Arguments:
@@ -68,11 +67,15 @@ impl std::fmt::Display for RealParameter {
 	///
 	/// # Returns:
 	/// * A `std::fmt::Result` indicating the success or failure of the formatting operation.
-
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"Parameter '{}' of {} unit '{}'",self.name, DistillationShortcutUnit::NAME, self.shared_unit_data.borrow().name)
-    }
-
+		write!(
+			f,
+			"Parameter '{}' of {} unit '{}'",
+			self.name,
+			DistillationShortcutUnit::NAME,
+			self.shared_unit_data.borrow().name
+		)
+	}
 }
 
 impl cape_open_1_2::ICapeIdentification for RealParameter {
@@ -84,8 +87,7 @@ impl cape_open_1_2::ICapeIdentification for RealParameter {
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure. If successful, the name is set in `name`.
-
-	fn get_component_name(&mut self,name:&mut CapeStringOut) -> Result<(), COBIAError> {
+	fn get_component_name(&mut self, name: &mut CapeStringOut) -> Result<(), COBIAError> {
 		name.set(&self.name)
 	}
 
@@ -96,15 +98,16 @@ impl cape_open_1_2::ICapeIdentification for RealParameter {
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure. If successful, the description is set in `description`.
-
-	fn get_component_description(&mut self,description:&mut CapeStringOut) -> Result<(), COBIAError> {
+	fn get_component_description(
+		&mut self,
+		description: &mut CapeStringOut,
+	) -> Result<(), COBIAError> {
 		description.set(&self.description)
 	}
 
 	/// Set the name of the component.
 	///
 	/// This method is not allowed for this parameter implementation and will return an error.
-
 	fn set_component_name(&mut self, _name: &CapeStringIn) -> Result<(), COBIAError> {
 		Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
 	}
@@ -112,7 +115,6 @@ impl cape_open_1_2::ICapeIdentification for RealParameter {
 	/// Set the description of the component.
 	///
 	/// This method is not allowed for this parameter implementation and will return an error.
-
 	fn set_component_description(&mut self, _desc: &CapeStringIn) -> Result<(), COBIAError> {
 		Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
 	}
@@ -122,63 +124,59 @@ impl cape_open_1_2::ICapeParameter for RealParameter {
 
 	/// Get the validation status of the parameter.
 	///
-	/// As this parameter does not accept any values that are not valid, 
+	/// As this parameter does not accept any values that are not valid,
 	/// the parameter is always valid if specified. However, an unspecified
 	/// input value is considered invalid.
-	/// 
+	///
 	/// # Returns:
 	/// * A `Result` containing the validation status, which is always `CapeValid` for this implementation.
-
-    fn get_val_status(&mut self) -> Result<cape_open_1_2::CapeValidationStatus,COBIAError> {
+	fn get_val_status(&mut self) -> Result<cape_open_1_2::CapeValidationStatus, COBIAError> {
 		if self.is_input && self.value.is_nan() {
 			Ok(cape_open_1_2::CapeValidationStatus::CapeInvalid)
 		} else {
 			Ok(cape_open_1_2::CapeValidationStatus::CapeValid)
 		}
-    }
+	}
 
 	/// Get the mode of the parameter.
 	///
 	/// # Returns:
 	/// * A `Result` containing the mode of the parameter, which is either `CapeInput` or `CapeOutput` based on the `is_input` field.
-
-    fn get_mode(&mut self) -> Result<cape_open_1_2::CapeParamMode,COBIAError> {
-        if self.is_input {
+	fn get_mode(&mut self) -> Result<cape_open_1_2::CapeParamMode, COBIAError> {
+		if self.is_input {
 			Ok(cape_open_1_2::CapeParamMode::CapeInput)
 		} else {
 			Ok(cape_open_1_2::CapeParamMode::CapeOutput)
 		}
-    }
+	}
 
 	/// Get the type of the parameter.
 	///
 	/// # Returns:
 	/// * A `Result` containing the type of the parameter, which is always `CapeParameterReal` for this implementation.
-
-    fn get_type(&mut self) -> Result<cape_open_1_2::CapeParamType,COBIAError> {
-        Ok(cape_open_1_2::CapeParamType::CapeParameterReal)
-    }
+	fn get_type(&mut self) -> Result<cape_open_1_2::CapeParamType, COBIAError> {
+		Ok(cape_open_1_2::CapeParamType::CapeParameterReal)
+	}
 
 	/// Validate the parameter.
 	///
-	/// As this parameter does not accept any values that are not valid, 
+	/// As this parameter does not accept any values that are not valid,
 	/// the parameter is always valid if specified. However, an unspecified
 	/// input value is considered invalid.
-	/// 
+	///
 	/// # Arguments:
 	/// * `message` - A mutable reference to a `CapeStringOut` where any validation error messages will be set.
 	///
 	/// # Returns:
 	/// * A `Result` containing a `CapeBoolean` indicating whether the parameter is valid or not. If the input value is not specified, it returns false and sets an error message.
-
-    fn validate(&mut self,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError> {
-        if self.is_input && f64::is_nan(self.value) {
+	fn validate(&mut self, message: &mut CapeStringOut) -> Result<CapeBoolean, COBIAError> {
+		if self.is_input && f64::is_nan(self.value) {
 			message.set_string("Value must be specified")?;
 			Ok(false as CapeBoolean)
 		} else {
 			Ok(true as CapeBoolean)
 		}
-    }
+	}
 
 	/// Reset the parameter to its default value.
 	///
@@ -187,16 +185,16 @@ impl cape_open_1_2::ICapeParameter for RealParameter {
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure. If successful, the value is reset to the default value.
-
-    fn reset(&mut self) -> Result<(),COBIAError> {
-		if self.value!=self.default_value {
-			self.value = self.default_value; 
-			let mut shared=self.shared_unit_data.borrow_mut();
-			shared.dirty=true;
-			shared.validation_status=cape_open_1_2::CapeValidationStatus::CapeNotValidated;
+	fn reset(&mut self) -> Result<(), COBIAError> {
+		if self.value != self.default_value {
+			self.value = self.default_value;
+			let mut shared = self.shared_unit_data.borrow_mut();
+			shared.dirty = true;
+			shared.validation_status = cape_open_1_2::CapeValidationStatus::CapeNotValidated;
 		}
 		Ok(())
 	}
+
 }
 
 impl cape_open_1_2::ICapeRealParameter for RealParameter {
@@ -207,14 +205,13 @@ impl cape_open_1_2::ICapeRealParameter for RealParameter {
 	///
 	/// # Returns:
 	/// * A `Result` containing the current value of the parameter as `CapeReal`.
-
-    fn get_value(&mut self) -> Result<CapeReal,COBIAError> {
-        Ok(self.value)
-    }
+	fn get_value(&mut self) -> Result<CapeReal, COBIAError> {
+		Ok(self.value)
+	}
 
 	/// Set the value of the parameter.
 	///
-	/// This implementation accepts a blank value for the parameters, but 
+	/// This implementation accepts a blank value for the parameters, but
 	/// it does not allow an invalid value to be set.
 	///
 	/// Only input parameters can be set.
@@ -226,27 +223,32 @@ impl cape_open_1_2::ICapeRealParameter for RealParameter {
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure.
-
-    fn set_value(&mut self,value:CapeReal) -> Result<(),COBIAError> {
-        if !self.is_input {
+	fn set_value(&mut self, value: CapeReal) -> Result<(), COBIAError> {
+		if !self.is_input {
 			return Err(COBIAError::Code(COBIAERR_DENIED));
 		}
 		if !f64::is_nan(value) {
 			if !f64::is_nan(self.minimum_value) && value < self.minimum_value {
-				return Err(COBIAError::Message(format!("Value of {} below minimum value of {}",value,self.minimum_value)));
+				return Err(COBIAError::Message(format!(
+					"Value of {} below minimum value of {}",
+					value, self.minimum_value
+				)));
 			}
 			if !f64::is_nan(self.maximum_value) && value > self.maximum_value {
-				return Err(COBIAError::Message(format!("Value of {} above maximum value of {}",value,self.maximum_value)));
+				return Err(COBIAError::Message(format!(
+					"Value of {} above maximum value of {}",
+					value, self.maximum_value
+				)));
 			}
 		}
 		if self.value != value {
 			self.value = value;
-			let mut shared=self.shared_unit_data.borrow_mut();
-			shared.dirty=true;
-			shared.validation_status=cape_open_1_2::CapeValidationStatus::CapeNotValidated;
+			let mut shared = self.shared_unit_data.borrow_mut();
+			shared.dirty = true;
+			shared.validation_status = cape_open_1_2::CapeValidationStatus::CapeNotValidated;
 		}
 		Ok(())
-    }
+	}
 
 	/// Get the default value of the parameter.
 	///
@@ -256,14 +258,13 @@ impl cape_open_1_2::ICapeRealParameter for RealParameter {
 	///
 	/// # Returns:
 	/// * A `Result` containing the default value of the parameter as `CapeReal`, or an error.
-
-    fn get_default_value(&mut self) -> Result<CapeReal,COBIAError> {
-        if f64::is_nan(self.default_value) {
+	fn get_default_value(&mut self) -> Result<CapeReal, COBIAError> {
+		if f64::is_nan(self.default_value) {
 			Err(COBIAError::Message("Default value not available".into()))
 		} else {
 			Ok(self.default_value)
 		}
-    }
+	}
 
 	/// Get the lower bound of the parameter.
 	///
@@ -273,14 +274,13 @@ impl cape_open_1_2::ICapeRealParameter for RealParameter {
 	///
 	/// # Returns:
 	/// * A `Result` containing the lower bound of the parameter as `CapeReal`, or an error.
-
-    fn get_lower_bound(&mut self) -> Result<CapeReal,COBIAError> {
-        if f64::is_nan(self.minimum_value) {
+	fn get_lower_bound(&mut self) -> Result<CapeReal, COBIAError> {
+		if f64::is_nan(self.minimum_value) {
 			Err(COBIAError::Message("No lower bound available".into()))
 		} else {
 			Ok(self.default_value)
 		}
-    }
+	}
 
 	/// Get the upper bound of the parameter.
 	///
@@ -290,48 +290,49 @@ impl cape_open_1_2::ICapeRealParameter for RealParameter {
 	///
 	/// # Returns:
 	/// * A `Result` containing the upper bound of the parameter as `CapeReal`, or an error.
-
-    fn get_upper_bound(&mut self) -> Result<CapeReal,COBIAError> {
-       if f64::is_nan(self.maximum_value) {
-		   Err(COBIAError::Message("No upper bound available".into()))
-	   } else {
-		   Ok(self.maximum_value)
-	   }
-    }
+	fn get_upper_bound(&mut self) -> Result<CapeReal, COBIAError> {
+		if f64::is_nan(self.maximum_value) {
+			Err(COBIAError::Message("No upper bound available".into()))
+		} else {
+			Ok(self.maximum_value)
+		}
+	}
 
 	/// Get the dimensionality of the parameter.
 	///
 	/// This method retrieves the dimensionality of the parameter, as a vector
 	/// of coefficients to the SI units m, kg, S, A, K, mole, cd, rad.
-	/// 
+	///
 	/// An additional relative flag is present at the end of the vector to indicate
-	/// whether the parameter is relative to a reference value (non-zero) or 
+	/// whether the parameter is relative to a reference value (non-zero) or
 	/// absolute (zero); for example a pressure difference or temperature difference
 	/// is relative, and unit conversions should ignore the offset in the unit
 	/// conversion.
-	/// 
-	/// A special case for the use of the relative flag is a dimensionless parameter 
+	///
+	/// A special case for the use of the relative flag is a dimensionless parameter
 	/// with the relative flag set to true, which indicates that the parameter is a
 	/// fraction or percentage, and should be treated as such in unit conversions.
 	///
-	/// Any zero valued trailing coefficients may be omitted, so that the 
+	/// Any zero valued trailing coefficients may be omitted, so that the
 	/// dimensionality vector may have a size of between 0 and 9 elements.
 	///
-	/// This implementation returns the dimensionality of the parameter as 
-	///	passed to the construction of the parameter.
+	/// This implementation returns the dimensionality of the parameter as
+	/// passed to the construction of the parameter.
 	///
 	/// # Arguments:
 	/// * `dimensionality` - A mutable reference to a `CapeArrayRealOut` where the dimensionality will be set.
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure. If successful, the dimensionality is set in `dimensionality`.
-
-    fn get_dimensionality(&mut self,dimensionality:&mut CapeArrayRealOut) -> Result<(),COBIAError> {
-        match dimensionality.put_array(&self.dimensionality) {
+	fn get_dimensionality(
+		&mut self,
+		dimensionality: &mut CapeArrayRealOut,
+	) -> Result<(), COBIAError> {
+		match dimensionality.put_array(&self.dimensionality) {
 			Ok(()) => Ok(()),
 			Err(e) => Err(e),
 		}
-    }
+	}
 
 	/// Validate whether a given value is valid for this parameter.
 	///
@@ -347,22 +348,32 @@ impl cape_open_1_2::ICapeRealParameter for RealParameter {
 	///
 	/// # Returns:
 	/// * A `Result` containing a `CapeBoolean` indicating whether the value is valid or not. If the value is not valid, it sets an error message in `message`.
-
-    fn validate(&mut self,value:CapeReal,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError> {
-        if !self.is_input {
+	fn validate(
+		&mut self,
+		value: CapeReal,
+		message: &mut CapeStringOut,
+	) -> Result<CapeBoolean, COBIAError> {
+		if !self.is_input {
 			return Err(COBIAError::Code(COBIAERR_DENIED));
 		}
 		if f64::is_nan(value) {
 			message.set_string("A value must be specified")?;
 			Ok(false as CapeBoolean)
 		} else if !f64::is_nan(self.minimum_value) && value < self.minimum_value {
-			message.set_string(format!("Value of {} below minimum value of {}",value,self.minimum_value))?;
+			message.set_string(format!(
+				"Value of {} below minimum value of {}",
+				value, self.minimum_value
+			))?;
 			Ok(false as CapeBoolean)
 		} else if !f64::is_nan(self.maximum_value) && value > self.maximum_value {
-			message.set_string(format!("Value of {} above maximum value of {}",value,self.maximum_value))?;
+			message.set_string(format!(
+				"Value of {} above maximum value of {}",
+				value, self.maximum_value
+			))?;
 			Ok(false as CapeBoolean)
 		} else {
 			Ok(true as CapeBoolean)
 		}
-    }
+	}
+
 }

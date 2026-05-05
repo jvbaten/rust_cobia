@@ -10,53 +10,60 @@ enum CapeOpenObjectMacroArg {
 }
 
 impl syn::parse::Parse for CapeOpenObjectMacroArg {
-    fn parse(input: syn::parse::ParseStream) -> syn::parse::Result<Self> {
+	fn parse(input: syn::parse::ParseStream) -> syn::parse::Result<Self> {
 		let name: syn::Ident = input.parse()?;
 		input.parse::<syn::Token![=]>()?;
-		if name=="interfaces" {
+		if name == "interfaces" {
 			let content;
 			syn::braced!(content in input);
-			let paths : syn::punctuated::Punctuated::<syn::Path, syn::Token![,]> = content.parse_terminated(syn::Path::parse)?;
+			let paths: syn::punctuated::Punctuated<syn::Path, syn::Token![,]> =
+				content.parse_terminated(syn::Path::parse)?;
 			//convert paths to vector
-			let mut items : Vec<syn::Path> = Vec::with_capacity(paths.len());
+			let mut items: Vec<syn::Path> = Vec::with_capacity(paths.len());
 			for p in paths {
 				items.push(p);
 			}
 			Ok(CapeOpenObjectMacroArg::Interfaces(items))
-		} else if name=="create_arguments" {
+		} else if name == "create_arguments" {
 			let content;
 			syn::braced!(content in input);
-			let idents : syn::punctuated::Punctuated::<syn::Ident, syn::Token![,]> = content.parse_terminated(syn::Ident::parse)?;
+			let idents: syn::punctuated::Punctuated<syn::Ident, syn::Token![,]> =
+				content.parse_terminated(syn::Ident::parse)?;
 			//convert idents to vector
-			let mut items : Vec<syn::Ident> = Vec::with_capacity(idents.len());
+			let mut items: Vec<syn::Ident> = Vec::with_capacity(idents.len());
 			for p in idents {
 				items.push(p);
 			}
 			Ok(CapeOpenObjectMacroArg::CreateArguments(items))
-		} else if name=="new_arguments" {
+		} else if name == "new_arguments" {
 			let content;
 			syn::braced!(content in input);
-			let idents : syn::punctuated::Punctuated::<syn::Ident, syn::Token![,]> = content.parse_terminated(syn::Ident::parse)?;
+			let idents: syn::punctuated::Punctuated<syn::Ident, syn::Token![,]> =
+				content.parse_terminated(syn::Ident::parse)?;
 			//convert idents to vector
-			let mut items : Vec<syn::Ident> = Vec::with_capacity(idents.len());
+			let mut items: Vec<syn::Ident> = Vec::with_capacity(idents.len());
 			for p in idents {
 				items.push(p);
 			}
 			Ok(CapeOpenObjectMacroArg::NewArguments(items))
-		} else if name=="default_values" {
+		} else if name == "default_values" {
 			let content;
 			syn::braced!(content in input);
-			let assigns : syn::punctuated::Punctuated::<syn::ExprAssign, syn::Token![,]> = content.parse_terminated(syn::ExprAssign::parse)?;
+			let assigns: syn::punctuated::Punctuated<syn::ExprAssign, syn::Token![,]> =
+				content.parse_terminated(syn::ExprAssign::parse)?;
 			//convert expressions to vector
-			let mut items : Vec<syn::ExprAssign> = Vec::with_capacity(assigns.len());
+			let mut items: Vec<syn::ExprAssign> = Vec::with_capacity(assigns.len());
 			for p in assigns {
 				items.push(p);
 			}
 			Ok(CapeOpenObjectMacroArg::DefaultValues(items))
 		} else {
-			Err(syn::parse::Error::new(name.span(),format!("Unknown argument: {}",name)))
+			Err(syn::parse::Error::new(
+				name.span(),
+				format!("Unknown argument: {}", name),
+			))
 		}
-    }
+	}
 }
 
 /// The cape_object_implementation macro generates the necessary code to implement a COBIA object.
@@ -69,33 +76,33 @@ impl syn::parse::Parse for CapeOpenObjectMacroArg {
 ///
 /// Arguments to this macro may include the following:
 /// * `interfaces` - a set of CAPE-OPEN interfaces to be implemented. For each interface
-///                  the raw functions are automatically implemented, and the class is 
-///                  expected to implement the corresponding Impl trait. E.g. when 
-///                  specifying `cape_open_1_2::ICapeIdentification` one must provide
-///                  trait implementation `cape_open_1_2::ICapeIdentificationImpl`.
+///   the raw functions are automatically implemented, and the class is
+///   expected to implement the corresponding Impl trait. E.g. when
+///   specifying `cape_open_1_2::ICapeIdentification` one must provide
+///   trait implementation `cape_open_1_2::ICapeIdentificationImpl`.
 /// * `create_arguments` - if specified, a set of arguments used to intialize the fields
-///                  of the struct. The arguments must match the name of the fields in the
-///                  struct, and will have the same type in the struct. Any arguments present
-///                  in the struct but not in the arguments will be initialized through
-///                  `std::default::Default::default()`, unless the specified default_values 
-///                  contains an expression for the field.
-/// * `new_arguments` - if specified, a set of arguments used to pass to a function `new` 
-///                  that is implemented by the `impl` block of the struct, with the same
-///                  arguments. These arguments must then be passed to the `create` or `try_create`.
-/// * `default_values` - if specified, a set of assignment expressions that are used instead of 
-///					 `std::default::Default::default()` to initialize fields that are not included
-///                  in the `create_arguments`. The left hand side of the assignment must be a field 
-///	                 name, and the right hand side must be an expression that can be used to  
-///                  initialize the field. Cannot be used with `new_arguments` (directly assign
-///                  default values in `new` instead).
+///   of the struct. The arguments must match the name of the fields in the
+///   struct, and will have the same type in the struct. Any arguments present
+///   in the struct but not in the arguments will be initialized through
+///   `std::default::Default::default()`, unless the specified default_values
+///   contains an expression for the field.
+/// * `new_arguments` - if specified, a set of arguments used to pass to a function `new`
+///   that is implemented by the `impl` block of the struct, with the same
+///   arguments. These arguments must then be passed to the `create` or `try_create`.
+/// * `default_values` - if specified, a set of assignment expressions that are used instead of
+///   `std::default::Default::default()` to initialize fields that are not included
+///   in the `create_arguments`. The left hand side of the assignment must be a field
+///   name, and the right hand side must be an expression that can be used to  
+///   initialize the field. Cannot be used with `new_arguments` (directly assign
+///   default values in `new` instead).
 ///
 /// Arguments are separated from their names by an equal sign, e.g.
 ///
 /// ```text
 /// interfaces={
-///			cape_open_1_2::ICapeIdentification,
-///			cape_open_1_2::ICapeCollection<cape_open_1_2::CapeUnitPort>,
-///		}
+///         cape_open_1_2::ICapeIdentification,
+///         cape_open_1_2::ICapeCollection<cape_open_1_2::CapeUnitPort>,
+/// }
 /// ```
 ///
 /// In addition to using this macro, a COBIA object class must also initialize its generated memeber
@@ -110,51 +117,46 @@ impl syn::parse::Parse for CapeOpenObjectMacroArg {
 ///
 /// See the distillation_shortcut_unit.rs file in the examples/distillation_shortcut_unit crate for an example of how to use this macro.
 /// See the salt_water_property_package.rs file in the examples/salt_water crate for an example of how to use this macro.
-
 #[proc_macro_attribute]
 pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> TokenStream {
 	//extract list of interface type identifiers
-	let arguments = syn::punctuated::Punctuated::<CapeOpenObjectMacroArg, syn::Token![,]>::parse_terminated
-		.parse2(attr.into())
-		.expect("Incorrect format of cape_object_implementation attributes");
+	let arguments =
+		syn::punctuated::Punctuated::<CapeOpenObjectMacroArg, syn::Token![,]>::parse_terminated
+			.parse2(attr.into())
+			.expect("Incorrect format of cape_object_implementation attributes");
 	//see which fields are specified
-	let mut interfaces : Vec<syn::Path> = Vec::new();
-	let mut creation_arguments : Option<CapeOpenObjectMacroArg> = None;
-	let mut default_values : Option<CapeOpenObjectMacroArg> =None;
+	let mut interfaces: Vec<syn::Path> = Vec::new();
+	let mut creation_arguments: Option<CapeOpenObjectMacroArg> = None;
+	let mut default_values: Option<CapeOpenObjectMacroArg> = None;
 	for arg in arguments {
 		match arg {
-			CapeOpenObjectMacroArg::Interfaces(ifaces) => {
-				interfaces.extend(ifaces)
-			},
+			CapeOpenObjectMacroArg::Interfaces(ifaces) => interfaces.extend(ifaces),
 			CapeOpenObjectMacroArg::CreateArguments(_args) => {
 				if creation_arguments.is_some() {
 					panic!("Multiple create_arguments or new_arguments specified");
 				}
-				creation_arguments= Some(CapeOpenObjectMacroArg::CreateArguments(_args));
-			},
+				creation_arguments = Some(CapeOpenObjectMacroArg::CreateArguments(_args));
+			}
 			CapeOpenObjectMacroArg::NewArguments(_args) => {
 				if creation_arguments.is_some() {
 					panic!("Multiple create_arguments or new_arguments specified");
 				}
-				creation_arguments= Some(CapeOpenObjectMacroArg::NewArguments(_args));
-			},
+				creation_arguments = Some(CapeOpenObjectMacroArg::NewArguments(_args));
+			}
 			CapeOpenObjectMacroArg::DefaultValues(_args) => {
 				if default_values.is_some() {
 					panic!("Multiple default_values specified");
 				}
-				default_values= Some(CapeOpenObjectMacroArg::DefaultValues(_args));
-			},
+				default_values = Some(CapeOpenObjectMacroArg::DefaultValues(_args));
+			}
 		};
 	}
-	match creation_arguments {
-		Some(CapeOpenObjectMacroArg::NewArguments(_)) => {
-			if default_values.is_some() {
-				panic!("Cannot specify default_values when new_arguments are specified");
-			}
-		},
-		_ => {}
+	if let Some(CapeOpenObjectMacroArg::NewArguments(_)) = creation_arguments
+		&& default_values.is_some()
+	{
+		panic!("Cannot specify default_values when new_arguments are specified");
 	};
-	if interfaces.len()==0 {
+	if interfaces.is_empty() {
 		panic!("No interfaces specified");
 	}
 	let mut struct_desc = syn::parse_macro_input!(item as syn::ItemStruct);
@@ -162,71 +164,77 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 	let (impl_generics, ty_generics, where_clause) = struct_desc.generics.split_for_impl();
 	let cobiainfostruct = quote::format_ident!("{}{}", structname.to_string(), "CobiaObjectData");
 	//come up with a name for the pointer variable that is not likely the same as a field name
-	let ptr_name= structname
+	let ptr_name = structname
 		.to_string()
 		.chars()
-		.map(|c| if c.is_uppercase() { format!("_{}", c.to_lowercase()) } else { c.to_string() })
+		.map(|c| {
+			if c.is_uppercase() {
+				format!("_{}", c.to_lowercase())
+			} else {
+				c.to_string()
+			}
+		})
 		.collect::<String>();
-	let ptr_name= quote::format_ident!("{}_boxed_ptr", ptr_name);
+	let ptr_name = quote::format_ident!("{}_boxed_ptr", ptr_name);
 
 	//println!("   generating {}...", cobiainfostruct);
-
 
 	//add #cobiainfostruct field to struct, by name cobia_object_data
 
 	let mut object_creation = proc_macro2::TokenStream::new();
 	let mut create_arguments_def = proc_macro2::TokenStream::new();
 	let mut create_arguments = proc_macro2::TokenStream::new();
-	
+
 	match struct_desc.fields {
 		syn::Fields::Named(ref mut fields) => {
-			let args=match creation_arguments {
-				Some(CapeOpenObjectMacroArg::CreateArguments(ref args)) | Some(CapeOpenObjectMacroArg::NewArguments(ref args))  => {
-					Some(args.clone())
-				},
+			let args = match creation_arguments {
+				Some(CapeOpenObjectMacroArg::CreateArguments(ref args))
+				| Some(CapeOpenObjectMacroArg::NewArguments(ref args)) => Some(args.clone()),
 				None => None,
 				_ => {
 					unreachable!();
 				}
 			};
-			let defaults=match default_values {
+			let defaults = match default_values {
 				Some(CapeOpenObjectMacroArg::DefaultValues(ref args)) => {
-					let mut map=std::collections::HashMap::<String, Box<syn::Expr>>::new();
+					let mut map = std::collections::HashMap::<String, Box<syn::Expr>>::new();
 					for assign in args {
 						match &*assign.left {
 							syn::Expr::Path(path) => {
-								if path.path.segments.len()!=1 {
-									panic!("Invalid left hand side in default_values: expected a field name");
+								if path.path.segments.len() != 1 {
+									panic!(
+										"Invalid left hand side in default_values: expected a field name"
+									);
 								}
-								let field_name=path.path.segments[0].ident.to_string();
+								let field_name = path.path.segments[0].ident.to_string();
 								map.insert(field_name, assign.right.clone());
-							},
+							}
 							_ => {
-								panic!("Invalid left hand side in default_values: expected a field name");
+								panic!(
+									"Invalid left hand side in default_values: expected a field name"
+								);
 							}
 						}
 					}
 					Some(map)
-				},
+				}
 				None => None,
 				_ => {
 					unreachable!();
 				}
 			};
 			if args.is_none() && defaults.is_none() {
-				object_creation= quote! {
+				object_creation = quote! {
 					std::default::Default::default()
 				};
 			} else {
-				let struct_items : std::collections::HashMap<String, syn::Type> = fields
+				let struct_items: std::collections::HashMap<String, syn::Type> = fields
 					.named
 					.iter()
-					.map(|f| {
-						(f.ident.as_ref().unwrap().to_string(), f.ty.clone())
-					})
+					.map(|f| (f.ident.as_ref().unwrap().to_string(), f.ty.clone()))
 					.collect();
-				if args.is_some() {
-					for id in args.as_ref().unwrap() {
+				if let Some(args) = &args {
+					for id in args {
 						let typ = struct_items.get(&id.to_string());
 						if typ.is_none() {
 							panic!("Field '{}' not found in struct", &id);
@@ -243,39 +251,45 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 				}
 				match creation_arguments {
 					Some(CapeOpenObjectMacroArg::CreateArguments(_)) => {
-						let create_arg_set=std::collections::HashSet::<String>::from_iter(args.unwrap().iter().map(|x| x.to_string()));
+						let create_arg_set = std::collections::HashSet::<String>::from_iter(
+							args.unwrap().iter().map(|x| x.to_string()),
+						);
 						let mut create_arguments = proc_macro2::TokenStream::new();
 						for f in fields.named.iter() {
-							let id=&f.ident;
+							let id = &f.ident;
 							if create_arg_set.contains(&f.ident.as_ref().unwrap().to_string()) {
 								create_arguments.extend(quote! {
 									#id,
 								});
 								//see if not also in default values
-								if default_values.is_some() {
-									if defaults.as_ref().unwrap().contains_key(&id.as_ref().unwrap().to_string()) {
-										panic!("Field '{}' cannot be in both create_arguments and default_values", &id.as_ref().unwrap());
-									}
+								if default_values.is_some()
+									&& defaults
+										.as_ref()
+										.unwrap()
+										.contains_key(&id.as_ref().unwrap().to_string())
+								{
+									panic!(
+										"Field '{}' cannot be in both create_arguments and default_values",
+										&id.as_ref().unwrap()
+									);
 								}
-
 							} else {
 								//see if in default values
 								let mut rhs = quote! {
 									std::default::Default::default()
 								};
-								if defaults.is_some() {
-									if defaults.as_ref().unwrap().contains_key(&id.as_ref().unwrap().to_string()) {
-										let expr=defaults.as_ref().unwrap().get(&id.as_ref().unwrap().to_string()).unwrap();
-										rhs=quote! {
-											#expr
-										};
-									}
+								if let Some(ref def) = defaults && def.contains_key(&id.as_ref().unwrap().to_string()) {
+									let expr = def.get(&id.as_ref().unwrap().to_string())
+										.unwrap();
+									rhs = quote! {
+										#expr
+									};
 								};
 								create_arguments.extend(quote! {
 									#id : #rhs,
 								});
 							}
-						};
+						}
 						create_arguments.extend(quote! {
 							cobia_object_data : std::default::Default::default(),
 						});
@@ -299,7 +313,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 				syn::Field::parse_named
 					.parse2(quote! {
 						/// Cobia object data for this object, which contains generated code to provide the native COBIA interfaces
-						cobia_object_data : #cobiainfostruct  
+						cobia_object_data : #cobiainfostruct
 					})
 					.expect("Unable to format info struct"),
 			);
@@ -329,7 +343,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 	let mut struc_field_init = proc_macro2::TokenStream::new();
 	let mut interface_impls = proc_macro2::TokenStream::new();
 	//keep track of member variable name of cobiainfostruct
-	let mut member_set : std::collections::HashSet<String> = std::collections::HashSet::new();
+	let mut member_set: std::collections::HashSet<String> = std::collections::HashSet::new();
 	member_set.insert("cape_object_data".to_string()); //add the cape_object_data field to the set
 	//loop over all interfaces to be implemented
 	for iface in interfaces {
@@ -339,16 +353,22 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 			quote::format_ident!("{}{}", impl_path.segments.last().unwrap().ident, "Impl");
 		//identifier name - take last two path elements and seprate by underscore. Make lower case
 		let mut struc_member_name: String;
-		if iface.segments.len()==1 {
-			struc_member_name=iface.segments.last().unwrap().ident.to_string();
+		if iface.segments.len() == 1 {
+			struc_member_name = iface.segments.last().unwrap().ident.to_string();
 		} else {
-			struc_member_name=iface.segments[iface.segments.len()-2].ident.to_string();
+			struc_member_name = iface.segments[iface.segments.len() - 2].ident.to_string();
 			struc_member_name.push_str(&iface.segments.last().unwrap().ident.to_string());
 		}
 		//make snake case
 		struc_member_name = struc_member_name
 			.chars()
-			.map(|c| if c.is_uppercase() { format!("_{}", c.to_lowercase()) } else { c.to_string() })
+			.map(|c| {
+				if c.is_uppercase() {
+					format!("_{}", c.to_lowercase())
+				} else {
+					c.to_string()
+				}
+			})
 			.collect::<String>();
 		//make unique
 		let mut i = 1;
@@ -358,8 +378,13 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 		}
 		member_set.insert(struc_member_name.clone());
 		//make into ident
-		let struc_member_name = quote::format_ident!("{}",struc_member_name);
-		let comment:proc_macro2::TokenStream=format!("/// Native {} interface", iface.segments.last().unwrap().ident).parse().unwrap();
+		let struc_member_name = quote::format_ident!("{}", struc_member_name);
+		let comment: proc_macro2::TokenStream = format!(
+			"/// Native {} interface",
+			iface.segments.last().unwrap().ident
+		)
+		.parse()
+		.unwrap();
 		//add field to struct
 		struc_fields.extend(quote! {
 			#comment
@@ -375,14 +400,14 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 		});
 		//interface implementation
 		interface_impls.extend(quote! {
-			impl #impl_generics #impl_path for #structname #ty_generics #where_clause {
-				type T = #structname #ty_generics;
-				fn as_interface_pointer(&mut self) -> *mut cobia::C::ICapeInterface{
-					&mut self.cobia_object_data.#struc_member_name as *mut cobia::C::ICapeInterface
-				}
+		   impl #impl_generics #impl_path for #structname #ty_generics #where_clause {
+			   type T = #structname #ty_generics;
+			   fn as_interface_pointer(&mut self) -> *mut cobia::C::ICapeInterface{
+				   &mut self.cobia_object_data.#struc_member_name as *mut cobia::C::ICapeInterface
+			   }
 
-			}
-		 });
+		   }
+		});
 	}
 	let mut fn_create_instance = proc_macro2::TokenStream::new();
 	fn_create_instance.extend(quote! {
@@ -396,10 +421,10 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 			}
 	});
 	let mut cape_create_instance = proc_macro2::TokenStream::new();
-	let provide_cape_create_instance=match creation_arguments {
+	let provide_cape_create_instance = match creation_arguments {
 		None => true,
-		Some(CapeOpenObjectMacroArg::CreateArguments(args)) => args.len()==0,
-		Some(CapeOpenObjectMacroArg::NewArguments(args)) => args.len()==0,
+		Some(CapeOpenObjectMacroArg::CreateArguments(args)) => args.is_empty(),
+		Some(CapeOpenObjectMacroArg::NewArguments(args)) => args.is_empty(),
 		_ => {
 			unreachable!();
 		}
@@ -443,11 +468,11 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 			pub(crate) fn create<T:cobia::cape_smart_pointer::CapeSmartPointer>(#create_arguments_def) -> T {
 				let mut #ptr_name: *mut C::ICapeInterface=std::ptr::null_mut();
 				Self::create_instance(&mut #ptr_name as *mut *mut C::ICapeInterface,#create_arguments);
-				match T::from_cape_interface_pointer(#ptr_name) {
+				match unsafe {T::from_cape_interface_pointer(#ptr_name)} {
 					Ok(smart_pointer) => smart_pointer,
 					Err(e) => {
 						//add and remove reference to avoid memory leak
-						let _obj=CapeObject::from_interface_pointer(#ptr_name);
+						let _obj=unsafe{CapeObject::from_interface_pointer(#ptr_name)};
 						panic!("Error creating smart pointer: {}", e);
 					},
 				}
@@ -459,7 +484,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 			pub(crate) fn try_create<T:cobia::cape_smart_pointer::CapeSmartPointer>(#create_arguments_def) -> Result<T,COBIAError> {
 				let mut #ptr_name: *mut C::ICapeInterface=std::ptr::null_mut();
 				Self::create_instance(&mut #ptr_name as *mut *mut C::ICapeInterface,#create_arguments);
-				let p=CapeObject::from_interface_pointer(#ptr_name);
+				let p=unsafe {CapeObject::from_interface_pointer(#ptr_name)};
 				T::from_object(&p)
 			}
 			/// Get a reference to the object
@@ -602,39 +627,37 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 	.into()
 }
 
-
 /// The cape_smart_pointer macro generates the necessary code to implement a COBIA smart pointer.
 ///
-/// It exercises the ICapeInterface implementation, provides error handling, handles reference counting 
+/// It exercises the ICapeInterface implementation, provides error handling, handles reference counting
 /// and handles QueryInterface.
 ///
 /// It is expected that the interface data member is named 'interface'. Also the wrapper provides
 ///
-/// fn from_interface_pointer(interface: *mut Interface) ->  Self
+/// unsafe fn from_interface_pointer(interface: *mut Interface) ->  Self
 ///
 /// where Interface is the interface type that the wrapper implements; from_interface_pointer should
-/// increase the reference count of the object. A second construction is needed that does not 
+/// increase the reference count of the object. A second construction is needed that does not
 /// increase the reference count, to construct the smart pointer from a return value that already
-/// has its reference count adjusted (e.g from query_interface or any function that returns an 
+/// has its reference count adjusted (e.g from query_interface or any function that returns an
 /// interface pointer):
 ///
-/// fn attach(interface: *mut Interface) ->  Self
+/// unsafe fn attach(interface: *mut Interface) ->  Self
 ///
-/// The contained interface pointer is released upon Drop, except when the smart pointer is 
+/// The contained interface pointer is released upon Drop, except when the smart pointer is
 /// detached. The smart pointer can be cloned, which increases the reference count of the
 /// contained interface pointer.
 ///
 /// This macro is used for a wrapper class implementation that refer to a COBIA object. This
-/// macro will generate the necessary code to implement the CapeSmartPointer, Drop (=release) 
+/// macro will generate the necessary code to implement the CapeSmartPointer, Drop (=release)
 /// and Clone (=addReference) traits.
 ///
-/// Code that uses the cape_smart_pointer macro is typically provided (CobiaCollectionBase, 
+/// Code that uses the cape_smart_pointer macro is typically provided (CobiaCollectionBase,
 /// CobiaIdentification, ...) or generated from type information (see e.g. the cape_open_1_2 module).
 ///
 /// The attribute passed to the interface is the interface ID. The interface type is derived
 /// from the 'interface' member, which must be a *mut of the interface type.
-/// 
-
+///
 #[proc_macro_attribute]
 pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 	//parse input
@@ -647,7 +670,12 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 		syn::Fields::Named(ref fields) => {
 			//find the interface field
 			for field in fields.named.iter() {
-				if field.ident.as_ref().expect("Unable to obtain field identifier") == "interface" {
+				if field
+					.ident
+					.as_ref()
+					.expect("Unable to obtain field identifier")
+					== "interface"
+				{
 					match field.ty {
 						syn::Type::Ptr(ref type_ptr) => {
 							match type_ptr.mutability {
@@ -686,7 +714,6 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 								.to_compile_error(),
 							);
 						}
-
 					}
 					break;
 				}
@@ -720,38 +747,37 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 			.to_compile_error(),
 		);
 	}
-	let interface_type=interface_type.expect("Invalid interface type");
+	let interface_type = interface_type.expect("Invalid interface type");
 	//a bit of additional code for each interface to be generated
-	let interface_id=proc_macro2::TokenStream::from(attr);
+	let interface_id = proc_macro2::TokenStream::from(attr);
 	let genericdef = struct_desc.generics.clone();
-	let mut genericref = syn::Generics{
-			lt_token: None,
-			params: syn::punctuated::Punctuated::new(),
-			gt_token: None,
-			where_clause: None,
-		};
+	let mut genericref = syn::Generics {
+		lt_token: None,
+		params: syn::punctuated::Punctuated::new(),
+		gt_token: None,
+		where_clause: None,
+	};
 	if !genericdef.params.is_empty() {
-		genericref=genericdef.clone();
+		genericref = genericdef.clone();
 		genericref.params.iter_mut().for_each(|param| {
-			match param {
-				syn::GenericParam::Type(type_param) => {
-					type_param.attrs.clear();
-					type_param.colon_token=None;
-					type_param.bounds=syn::punctuated::Punctuated::new();
-					type_param.eq_token=None;
-					type_param.default=None;
-				},
-				_ => {}
+			if let syn::GenericParam::Type(type_param) = param {
+				type_param.attrs.clear();
+				type_param.colon_token = None;
+				type_param.bounds = syn::punctuated::Punctuated::new();
+				type_param.eq_token = None;
+				type_param.default = None;
 			}
 		});
 	}
-	
 
 	//additional struct initializers
 	let mut extra_initializers = proc_macro2::TokenStream::new();
 	for field in struct_desc.fields.iter() {
-		let field = field.ident.as_ref().expect("Unable to obtain field identifier");
-		if  field == "interface" {
+		let field = field
+			.ident
+			.as_ref()
+			.expect("Unable to obtain field identifier");
+		if field == "interface" {
 			continue;
 		}
 		extra_initializers.extend(quote! {
@@ -784,13 +810,13 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 					if interface.is_null() {
 						Err(COBIAError::Code(COBIAERR_NULLPOINTER))
 					} else {
-						Ok(Self::attach(interface as *mut #interface_type))
+						Ok(unsafe{Self::attach(interface as *mut #interface_type)})
 					}
 				} else {
 					Err(COBIAError::from_object(res,smart_pointer))
 				}
 			}
-			fn from_interface_pointer(interface: *mut Self::Interface) ->  Self {
+			unsafe fn from_interface_pointer(interface: *mut Self::Interface) ->  Self {
 				if interface.is_null() {
 					panic!("Null pointer in creation of CapeSmartPtr");
 				}
@@ -800,7 +826,7 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 					#extra_initializers
 				}
 			}
-			fn attach(interface: *mut Self::Interface) ->  Self {
+			unsafe fn attach(interface: *mut Self::Interface) ->  Self {
 				if interface.is_null() {
 					panic!("Null pointer in creation of CapeSmartPtr");
 				}
@@ -814,7 +840,7 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 				std::mem::forget(self); //don't call drop
 				res
 			}
-			fn from_cape_interface_pointer(interface : *mut C::ICapeInterface) -> Result<Self,COBIAError>  {
+			unsafe fn from_cape_interface_pointer(interface : *mut C::ICapeInterface) -> Result<Self,COBIAError>  {
 				let mut my_interface : * mut C::ICapeInterface=std::ptr::null_mut();
 				let res=unsafe {
 					((*(*interface).vTbl).queryInterface.unwrap())((*interface).me,Self::get_interface_id(),&mut my_interface as *mut *mut C::ICapeInterface)
@@ -823,10 +849,10 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 					if my_interface.is_null() {
 						Err(COBIAError::Code(COBIAERR_NULLPOINTER))
 					} else {
-						Ok(Self::attach(my_interface as *mut #interface_type))
+						Ok(unsafe{Self::attach(my_interface as *mut #interface_type)})
 					}
 				} else {
-					Err(COBIAError::from_cape_interface_pointer(res,interface))
+					Err(unsafe { COBIAError::from_cape_interface_pointer(res,interface) })
 				}
 			}
 			fn last_error(&self) -> Option<CapeError> {
@@ -838,7 +864,7 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 					if interface.is_null() {
 						None
 					} else {
-						Some(CapeError::attach(interface))
+						Some(unsafe{CapeError::attach(interface)})
 					}
 				} else {
 					None
@@ -858,7 +884,7 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 		impl #genericdef Clone for #structname #genericref {
 			fn clone(&self) -> Self {
 				let interface=self.as_cape_interface_pointer();
-				Self::from_interface_pointer(interface as *mut #interface_type)
+				unsafe { Self::from_interface_pointer(interface as *mut #interface_type) }
 			}
 		}
 
@@ -868,4 +894,3 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 	}
 	.into()
 }
-

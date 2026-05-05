@@ -22,10 +22,8 @@ pub(crate) trait CapeRegistryKeyReaderKey {
 /// assert_eq!(lib_key.get_string_value("name",None).unwrap(), "CAPEOPEN_1_2".to_string()); //check its name
 /// cobia::cape_open_cleanup();
 /// ```
-
 #[allow(private_bounds)]
 pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
-
 	/// Get a list of all values names in the key
 	///
 	/// This method returns a list of all value names in the key.
@@ -41,12 +39,14 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 	/// assert!(lib_key.get_values().unwrap().contains(&("name".to_string()))); //see that 'name' is amongst them
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	fn get_values(&self) -> Result<Vec<String>, COBIAError> {
 		let mut sa = CapeArrayStringVec::new();
 		let iface = self.get_read_key();
 		let result = unsafe {
-			((*(*iface).vTbl).getValues.unwrap())((*iface).me,(&sa.as_cape_array_string_out() as *const C::ICapeArrayString).cast_mut())
+			((*(*iface).vTbl).getValues.unwrap())(
+				(*iface).me,
+				(&sa.as_cape_array_string_out() as *const C::ICapeArrayString).cast_mut(),
+			)
 		};
 		if result == COBIAERR_NOERROR {
 			Ok(sa.as_string_vec())
@@ -54,7 +54,7 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 			Err(COBIAError::Code(result))
 		}
 	}
-	
+
 	/// Get a list of all sub key names in the key
 	///
 	/// This method returns a list of all sub key names in the key.
@@ -73,12 +73,15 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 	/// assert!(keys.contains(&("libraries".to_string()))); //see that 'libraries' is amongst them
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	fn get_keys(&self) -> Result<Vec<String>, COBIAError> {
 		let mut sa = CapeArrayStringVec::new();
 		let iface = self.get_read_key();
-		let result =
-			unsafe { ((*(*iface).vTbl).getKeys.unwrap())((*iface).me, (&sa.as_cape_array_string_out() as *const C::ICapeArrayString).cast_mut()) };
+		let result = unsafe {
+			((*(*iface).vTbl).getKeys.unwrap())(
+				(*iface).me,
+				(&sa.as_cape_array_string_out() as *const C::ICapeArrayString).cast_mut(),
+			)
+		};
 		if result == COBIAERR_NOERROR {
 			Ok(sa.as_string_vec())
 		} else {
@@ -100,7 +103,6 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 	/// let lib_key=cobia::CapeRegistryKey::from_path("/types/libraries/{8d1d724f-ab15-48e5-80e4-a612468e68d4}").unwrap(); //points to the CAPE-OPEN 1.2 type library
 	/// assert_eq!(lib_key.get_value_type("name",None).unwrap(), cobia::CapeRegistryValueType::String); //check that 'name' is a string
 	/// cobia::cape_open_cleanup();
-
 	fn get_value_type(
 		&self,
 		value_name: &str,
@@ -108,12 +110,12 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 	) -> Result<CapeRegistryValueType, COBIAError> {
 		let mut val: i32 = 0;
 		let iface = self.get_read_key();
-		let string_constant;  
-		let sub_key=match sub_key {
+		let string_constant;
+		let sub_key = match sub_key {
 			Some(sub_key) => {
-					string_constant=CapeStringImpl::from(sub_key); //must remain in scope
-					string_constant.as_capechar_const()
-				},
+				string_constant = CapeStringImpl::from(sub_key); //must remain in scope
+				string_constant.as_capechar_const()
+			}
 			None => std::ptr::null(),
 		};
 		let result = unsafe {
@@ -164,7 +166,7 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 	/// assert_eq!(lib_key.get_string_value("name",Some("interfaces/{12ebf184-f47a-4407-b52a-7fcc0a70451c}")).unwrap(), "ICapeIdentification".to_string()); //check name of ICapeIdentification interface
 	/// cobia::cape_open_cleanup();
 	/// ```
-	/// 
+	///
 	/// This will not work, as the vlaue is not a string
 	///
 	/// ```should_panic
@@ -176,7 +178,6 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 	/// let str=lib_key.get_string_value("library",None).unwrap(); //fails, this is a uuid
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	fn get_string_value(
 		&self,
 		value_name: &str,
@@ -185,19 +186,21 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 		let mut s = CapeStringImpl::new();
 		let iface = self.get_read_key();
 		let string_constant;
-		let sub_key=match sub_key {
+		let sub_key = match sub_key {
 			Some(sub_key) => {
-					string_constant=CapeStringImpl::from(sub_key); //must remain in scope
-					string_constant.as_capechar_const()
-			},
+				string_constant = CapeStringImpl::from(sub_key); //must remain in scope
+				string_constant.as_capechar_const()
+			}
 			None => std::ptr::null(),
 		};
 		let result = unsafe {
 			((*(*iface).vTbl).getStringValue.unwrap())(
 				(*iface).me,
-				CapeStringImpl::from(value_name).as_capechar_const().cast_mut(),
+				CapeStringImpl::from(value_name)
+					.as_capechar_const()
+					.cast_mut(),
 				sub_key,
-				(&s.as_cape_string_out() as *const C::ICapeString).cast_mut()
+				(&s.as_cape_string_out() as *const C::ICapeString).cast_mut(),
 			)
 		};
 		if result == COBIAERR_NOERROR {
@@ -237,7 +240,6 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 	/// assert_eq!(lib_key.get_integer_value("numberOfTemplateArguments",Some("{b135a443-2ed8-45ef-bb2d-e68d2e631c31}")).unwrap(), 1); //check number of template arguments of ICapeCollection interface
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	fn get_integer_value(
 		&self,
 		value_name: &str,
@@ -246,17 +248,19 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 		let mut i = 0i32;
 		let iface = self.get_read_key();
 		let string_constant;
-		let sub_key=match sub_key {
+		let sub_key = match sub_key {
 			Some(sub_key) => {
-					string_constant=CapeStringImpl::from(sub_key); //must remain in scope
-					string_constant.as_capechar_const()
-			},
+				string_constant = CapeStringImpl::from(sub_key); //must remain in scope
+				string_constant.as_capechar_const()
+			}
 			None => std::ptr::null(),
 		};
 		let result = unsafe {
 			((*(*iface).vTbl).getIntegerValue.unwrap())(
 				(*iface).me,
-				CapeStringImpl::from(value_name).as_capechar_const().cast_mut(),
+				CapeStringImpl::from(value_name)
+					.as_capechar_const()
+					.cast_mut(),
 				sub_key,
 				&mut i as *mut i32,
 			)
@@ -288,24 +292,27 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 	/// assert_eq!(lib_key.get_uuid_value("library",None).unwrap(), cobia::cape_open_1_2::LIBRARY_ID); //check library id
 	/// cobia::cape_open_cleanup();
 	/// ```
-
-	fn get_uuid_value(&self, value_name: &str, sub_key: Option<&str>) -> Result<CapeUUID, COBIAError> {
-		let mut uuid = CapeUUID {
-			data: [0; 16],
-		};
+	fn get_uuid_value(
+		&self,
+		value_name: &str,
+		sub_key: Option<&str>,
+	) -> Result<CapeUUID, COBIAError> {
+		let mut uuid = CapeUUID { data: [0; 16] };
 		let iface = self.get_read_key();
 		let string_constant;
-		let sub_key=match sub_key {
+		let sub_key = match sub_key {
 			Some(sub_key) => {
-					string_constant=CapeStringImpl::from(sub_key); //must remain in scope
-					string_constant.as_capechar_const()
-			},
+				string_constant = CapeStringImpl::from(sub_key); //must remain in scope
+				string_constant.as_capechar_const()
+			}
 			None => std::ptr::null(),
 		};
 		let result = unsafe {
 			((*(*iface).vTbl).getUUIDValue.unwrap())(
 				(*iface).me,
-				CapeStringImpl::from(value_name).as_capechar_const().cast_mut(),
+				CapeStringImpl::from(value_name)
+					.as_capechar_const()
+					.cast_mut(),
 				sub_key,
 				&mut uuid as *mut CapeUUID,
 			)
@@ -336,7 +343,6 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 	/// assert_eq!(icape_collection_key.get_string_value("name",None).unwrap(), "ICapeCollection".to_string()); //check its name
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	fn get_sub_key(&self, key_name: &str) -> Result<CapeRegistryKey, COBIAError> {
 		let mut key: *mut C::ICapeRegistryKey = std::ptr::null_mut();
 		let iface = self.get_read_key();
@@ -369,11 +375,10 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 	/// use cobia::prelude::*;
 	/// cobia::cape_open_initialize().unwrap();
 	/// let lib_key=cobia::CapeRegistryKey::from_path("/types/interfaces/{12ebf184-f47a-4407-b52a-7fcc0a70451c}").unwrap(); //points to the CAPE-OPEN 1.2 ICapeIdentification interface
-	/// println!("The name for  CAPE-OPEN 1.2 ICapeIdentification is in the {} part of the registry", 
-	///             if lib_key.is_all_users("name").unwrap() {"all users"} else {"current user"} ); 
+	/// println!("The name for  CAPE-OPEN 1.2 ICapeIdentification is in the {} part of the registry",
+	///             if lib_key.is_all_users("name").unwrap() {"all users"} else {"current user"} );
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	fn is_all_users(&self, value_name: &str) -> Result<bool, COBIAError> {
 		let mut all_users = 0u32;
 		let iface = self.get_read_key();
@@ -390,7 +395,6 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 			Err(COBIAError::Code(result))
 		}
 	}
-
 }
 
 /// A class that provides access to a COBIA registry key in a read-only manner
@@ -408,7 +412,6 @@ pub trait CapeRegistryKeyReader: CapeRegistryKeyReaderKey {
 /// assert_eq!(lib_key.get_string_value("name",None).unwrap(), "CAPEOPEN_1_2".to_string()); //check its name
 /// cobia::cape_open_cleanup();
 /// ```
-
 pub struct CapeRegistryKey {
 	pub(crate) interface: *mut C::ICapeRegistryKey,
 }
@@ -417,7 +420,6 @@ unsafe impl Send for CapeRegistryKey {}
 unsafe impl Sync for CapeRegistryKey {}
 
 impl CapeRegistryKey {
-
 	/// Get a reference to the root key
 	///
 	/// This method returns a reference to the root key.
@@ -433,7 +435,6 @@ impl CapeRegistryKey {
 	/// assert_eq!(root_key.get_string_value("name",Some("types/libraries/{8d1d724f-ab15-48e5-80e4-a612468e68d4}")).unwrap(), "CAPEOPEN_1_2".to_string()); //check name of CAPE-OPEN 1.2 type library
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn new() -> Result<CapeRegistryKey, COBIAError> {
 		let mut key: *mut C::ICapeRegistryKey = std::ptr::null_mut();
 		let result = unsafe {
@@ -467,7 +468,6 @@ impl CapeRegistryKey {
 	/// assert_eq!(lib_key.get_string_value("name",None).unwrap(), "CAPEOPEN_1_2".to_string()); //check its name
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn from_path(loc: &str) -> Result<CapeRegistryKey, COBIAError> {
 		let mut key: *mut C::ICapeRegistryKey = std::ptr::null_mut();
 		let result = unsafe {
@@ -496,7 +496,6 @@ impl CapeRegistryKeyReader for CapeRegistryKey {}
 ///
 /// ICapeRegistryKey derives from ICobiaBase, which contains
 /// addReference() and release(). The Drop trait calls release.
-
 impl Drop for CapeRegistryKey {
 	fn drop(&mut self) {
 		unsafe {
@@ -509,7 +508,6 @@ impl Drop for CapeRegistryKey {
 ///
 /// ICapeRegistryKey derives from ICobiaBase, which contains
 /// addReference() and release(). The Clone trait calls addReference.
-
 impl Clone for CapeRegistryKey {
 	fn clone(&self) -> Self {
 		unsafe {

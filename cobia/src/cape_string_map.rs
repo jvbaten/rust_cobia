@@ -1,4 +1,4 @@
-use crate::{cape_string_const::CapeStringHashKey,C,CapeStringImpl,CapeStringConstProvider};
+use crate::{C, CapeStringConstProvider, CapeStringImpl, cape_string_const::CapeStringHashKey};
 
 /// Class to store a platform dependent string encoding for use in case
 /// insensitive hash maps or for use of case insensitive comparisons.
@@ -7,18 +7,18 @@ use crate::{cape_string_const::CapeStringHashKey,C,CapeStringImpl,CapeStringCons
 ///  as null terminated. For Windows, COBIA requires UTF-16 encoding.
 ///
 /// The `CapeStringHashKey` implementation uses a `Vec<u16>` to store,
-/// owned string data, or allows reference to data provided by any 
-/// class that implements CapeStringConstProvider, so that a copy of 
+/// owned string data, or allows reference to data provided by any
+/// class that implements CapeStringConstProvider, so that a copy of
 /// the data is not needed for hash lookups.
 ///
 /// A common use case in CAPE-OPEN is to make hash maps of
-/// strings for case-insentive lookups: CapeOpenMap` uses the 
+/// strings for case-insentive lookups: CapeOpenMap` uses the
 /// more performant hasher in the FxHasmap class.
 ///
 /// As the constructors are not const, a construct like for example
-/// LazyLock can be used to make static instances of this class, 
+/// LazyLock can be used to make static instances of this class,
 /// or any class that contains this class.
-/// 
+///
 /// # Examples
 ///
 /// ```
@@ -40,17 +40,20 @@ use crate::{cape_string_const::CapeStringHashKey,C,CapeStringImpl,CapeStringCons
 ///
 /// assert_eq!(map.get(&cobia::CapeStringImpl::from_string("CriticalTemperature")),None);
 /// ```
-
-pub struct CapeOpenMap<V> (std::collections::HashMap<CapeStringHashKey,V,fxhash::FxBuildHasher>);
+pub struct CapeOpenMap<V>(std::collections::HashMap<CapeStringHashKey, V, fxhash::FxBuildHasher>);
 
 impl<V> CapeOpenMap<V> {
-
 	pub fn new() -> Self {
-		Self(std::collections::HashMap::with_hasher(fxhash::FxBuildHasher::default()))
+		Self(std::collections::HashMap::with_hasher(
+			fxhash::FxBuildHasher::default(),
+		))
 	}
 
 	pub fn with_capacity(capacity: usize) -> Self {
-		Self(std::collections::HashMap::with_capacity_and_hasher(capacity,fxhash::FxBuildHasher::default()))
+		Self(std::collections::HashMap::with_capacity_and_hasher(
+			capacity,
+			fxhash::FxBuildHasher::default(),
+		))
 	}
 
 	pub fn capacity(&self) -> usize {
@@ -73,7 +76,10 @@ impl<V> CapeOpenMap<V> {
 		self.0.reserve(additional)
 	}
 
-	pub fn try_reserve(&mut self, additional: usize) -> Result<(), std::collections::TryReserveError> {
+	pub fn try_reserve(
+		&mut self,
+		additional: usize,
+	) -> Result<(), std::collections::TryReserveError> {
 		self.0.try_reserve(additional)
 	}
 
@@ -85,60 +91,63 @@ impl<V> CapeOpenMap<V> {
 		self.0.shrink_to(min_capacity)
 	}
 
-	pub fn get<'a,'b,Q:CapeStringConstProvider>(&'a self, k: &'b Q) -> Option<&'a V> {
+	pub fn get<'a, Q: CapeStringConstProvider>(&'a self, k: &Q) -> Option<&'a V> {
 		let k = CapeStringHashKey::borrowed_from_string_constant(k);
 		self.0.get(&k)
 	}
 
-	pub fn get_mut<'a,'b,Q:CapeStringConstProvider>(&'a mut self, k: &'b Q) -> Option<&'a mut V> {
+	pub fn get_mut<'a, Q: CapeStringConstProvider>(&'a mut self, k: &Q) -> Option<&'a mut V> {
 		let k = CapeStringHashKey::borrowed_from_string_constant(k);
 		self.0.get_mut(&k)
 	}
 
-	pub fn contains_key<Q:CapeStringConstProvider>(&self, k: &Q) -> bool {
+	pub fn contains_key<Q: CapeStringConstProvider>(&self, k: &Q) -> bool {
 		let k = CapeStringHashKey::borrowed_from_string_constant(k);
 		self.0.contains_key(&k)
 	}
 
-	pub fn insert_from_cape_string<T:CapeStringConstProvider>(&mut self, k: &T, v: V) -> Option<V> {
-		let (ptr,size)=k.as_capechar_const_with_length();
-		self.0.insert(CapeStringHashKey::from_cape_char_const(ptr,size),v)
+	pub fn insert_from_cape_string<T: CapeStringConstProvider>(
+		&mut self,
+		k: &T,
+		v: V,
+	) -> Option<V> {
+		let (ptr, size) = k.as_capechar_const_with_length();
+		self.0
+			.insert(CapeStringHashKey::from_cape_char_const(ptr, size), v)
 	}
 
 	pub fn insert(&mut self, k: &str, v: V) -> Option<V> {
-		self.0.insert(CapeStringHashKey::from_string(k),v)
+		self.0.insert(CapeStringHashKey::from_string(k), v)
 	}
 
-	pub fn remove<Q:CapeStringConstProvider>(&mut self, k: &Q) -> Option<V> {
+	pub fn remove<Q: CapeStringConstProvider>(&mut self, k: &Q) -> Option<V> {
 		let k = CapeStringHashKey::borrowed_from_string_constant(k);
 		self.0.remove(&k)
 	}
-
 }
 
-impl<V:Clone> Clone for CapeOpenMap<V> {
+impl<V: Clone> Clone for CapeOpenMap<V> {
 	fn clone(&self) -> Self {
 		Self(self.0.clone())
 	}
 }
 
-impl<V:std::fmt::Debug> std::fmt::Debug for CapeOpenMap<V> {
+impl<V: std::fmt::Debug> std::fmt::Debug for CapeOpenMap<V> {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
 		self.0.fmt(f)
 	}
 }
 
-impl <V> std::default::Default for CapeOpenMap<V> {
+impl<V> std::default::Default for CapeOpenMap<V> {
 	fn default() -> Self {
 		Self::new()
 	}
 }
 
-impl <V:std::cmp::PartialEq> std::cmp::PartialEq for CapeOpenMap<V> {
+impl<V: std::cmp::PartialEq> std::cmp::PartialEq for CapeOpenMap<V> {
 	fn eq(&self, other: &Self) -> bool {
 		self.0.eq(&other.0)
 	}
 }
 
-impl <V:std::cmp::Eq> std::cmp::Eq for CapeOpenMap<V> {}
-
+impl<V: std::cmp::Eq> std::cmp::Eq for CapeOpenMap<V> {}

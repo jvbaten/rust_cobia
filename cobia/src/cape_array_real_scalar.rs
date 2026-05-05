@@ -3,13 +3,13 @@ use crate::*;
 
 /// Scalar based CapeArrayRealOut implementation
 ///
-/// ICapeArrayReal is passed as data container between CAPE-OPEN functions. 
-/// It is up to the caller to provide the interface, and its implementation. 
+/// ICapeArrayReal is passed as data container between CAPE-OPEN functions.
+/// It is up to the caller to provide the interface, and its implementation.
 /// This class provides a default impementation using a scalar CapeReal.
 ///
-/// This class can be used as input and output argument. However, it should 
+/// This class can be used as input and output argument. However, it should
 /// only be used as an output argument in case a scalar value is expected, such
-/// as for getting the density from a material object, as any attempt to 
+/// as for getting the density from a material object, as any attempt to
 /// resize the content to anything else but 1 will result in an error.
 ///
 /// # Examples
@@ -18,16 +18,15 @@ use crate::*;
 /// use cobia::*;
 ///
 /// fn set_content(a: &mut CapeArrayRealOut) {
-///		a.resize(1);
-///		a[0]=2.5;
+///    a.resize(1);
+///    a[0]=2.5;
 /// }
-/// 
+///
 /// let mut arr = cobia::CapeArrayRealScalar::new();
 /// set_content(&mut CapeArrayRealOutFromProvider::from(&mut arr).as_cape_array_real_out());
 /// assert_eq!(arr.value(), 2.5);
 /// ```
-
-#[derive (Clone)]
+#[derive(Clone)]
 pub struct CapeArrayRealScalar {
 	value: CapeReal,
 }
@@ -66,10 +65,8 @@ impl CapeArrayRealScalar {
 	/// let arr = cobia::CapeArrayRealScalar::from(3.14);
 	/// assert_eq!(arr.value(),3.14);
 	/// ```
-	pub fn from(value:CapeReal) -> Self {
-		Self {
-			value,
-		}
+	pub fn from(value: CapeReal) -> Self {
+		Self { value }
 	}
 
 	/// Return value
@@ -83,7 +80,6 @@ impl CapeArrayRealScalar {
 	/// let arr = cobia::CapeArrayRealScalar::from(10.0);
 	/// assert_eq!(arr.value(),10.0);
 	/// ```
-
 	pub fn value(&self) -> CapeReal {
 		self.value
 	}
@@ -104,14 +100,12 @@ impl CapeArrayRealScalar {
 	/// arr.set(11.0);
 	/// assert_eq!(arr.value(),11.0);
 	/// ```
-
-	pub fn set(&mut self,value:CapeReal) {
-		self.value=value;
+	pub fn set(&mut self, value: CapeReal) {
+		self.value = value;
 	}
 
 	/// Interface member function
-
-	extern "C" fn get(
+	unsafe extern "C" fn get(
 		me: *mut ::std::os::raw::c_void,
 		data: *mut *mut CapeReal,
 		size: *mut C::CapeSize,
@@ -125,13 +119,12 @@ impl CapeArrayRealScalar {
 	}
 
 	/// Interface member function
-
-	extern "C" fn setsize(
+	unsafe extern "C" fn setsize(
 		me: *mut ::std::os::raw::c_void,
 		size: C::CapeSize,
 		data: *mut *mut CapeReal,
 	) -> CapeResult {
-		if size!=1 {
+		if size != 1 {
 			COBIAERR_INVALIDARGUMENT //only a size of 1 is allowed
 		} else {
 			let p = me as *mut Self;
@@ -144,12 +137,17 @@ impl CapeArrayRealScalar {
 	}
 
 	/// Interface v-table
-
 	const VTABLE: C::ICapeArrayReal_VTable = C::ICapeArrayReal_VTable {
 		get: Some(Self::get),
 		setsize: Some(Self::setsize),
 	};
 
+}
+
+impl Default for CapeArrayRealScalar {
+	fn default() -> Self {
+		Self::new()
+	}
 }
 
 impl AsMut<CapeReal> for CapeArrayRealScalar {
@@ -166,14 +164,13 @@ impl AsMut<CapeReal> for CapeArrayRealScalar {
 	/// *arr.as_mut()=11.0;
 	/// assert_eq!(arr.value(),11.0);
 	/// ```
-
 	fn as_mut(&mut self) -> &mut CapeReal {
 		&mut self.value
 	}
-
 }
 
 impl CapeArrayRealProviderIn for CapeArrayRealScalar {
+
 	/// Convert to ICapeArrayReal
 	///
 	/// Returns a reference to the ICapeArrayReal interface.
@@ -186,20 +183,20 @@ impl CapeArrayRealProviderIn for CapeArrayRealScalar {
 	/// fn test_content(a: &CapeArrayRealIn) {
 	///     assert_eq!(a[0], 0.0);
 	/// }
-	/// 
+	///
 	/// let arr = cobia::CapeArrayRealScalar::from(0.0);
 	/// test_content(&CapeArrayRealInFromProvider::from(&arr).as_cape_array_real_in());
 	/// ```
-
 	fn as_cape_array_real_in(&self) -> C::ICapeArrayReal {
 		C::ICapeArrayReal {
 			me: (self as *const Self).cast_mut() as *mut ::std::os::raw::c_void,
-			vTbl: (&Self::VTABLE as *const C::ICapeArrayReal_VTable).cast_mut()
+			vTbl: (&Self::VTABLE as *const C::ICapeArrayReal_VTable).cast_mut(),
 		}
 	}
 }
 
 impl CapeArrayRealProviderOut for CapeArrayRealScalar {
+
 	/// Convert to ICapeArrayReal
 	///
 	/// Returns a mutable reference to the ICapeArrayReal interface.
@@ -210,19 +207,18 @@ impl CapeArrayRealProviderOut for CapeArrayRealScalar {
 	/// use cobia::*;
 	///
 	/// fn set_content(a: &mut CapeArrayRealOut) {
-	///		a.resize(1);
-	///		a[0]=2.5;
+	///    a.resize(1);
+	///    a[0]=2.5;
 	/// }
-	/// 
+	///
 	/// let mut arr = cobia::CapeArrayRealScalar::new();
 	/// set_content(&mut CapeArrayRealOutFromProvider::from(&mut arr).as_cape_array_real_out());
 	/// assert_eq!(arr.value(), 2.5);
 	/// ```
-
 	fn as_cape_array_real_out(&mut self) -> C::ICapeArrayReal {
 		C::ICapeArrayReal {
 			me: (self as *const Self).cast_mut() as *mut ::std::os::raw::c_void,
-			vTbl: (&Self::VTABLE as *const C::ICapeArrayReal_VTable).cast_mut()
+			vTbl: (&Self::VTABLE as *const C::ICapeArrayReal_VTable).cast_mut(),
 		}
 	}
 }

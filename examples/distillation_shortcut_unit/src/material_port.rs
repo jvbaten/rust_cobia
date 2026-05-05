@@ -1,12 +1,10 @@
-use crate::shared_unit_data::*;
 use crate::distillation_shortcut_unit::DistillationShortcutUnit;
+use crate::shared_unit_data::*;
 use cobia::*;
 
 /// The MaterialPort class implements a CAPE-OPEN 1.2 material port.
 ///
 /// It connects to a valid CAPE-OPEN 1.2 compliant material object provided by the PME.
-
-
 #[cape_object_implementation(
 		interfaces = {
 			cape_open_1_2::ICapeIdentification,
@@ -18,7 +16,7 @@ use cobia::*;
 			is_inlet,
 			shared_unit_data
 		}
-  )] 
+  )]
 pub struct MaterialPort {
 	/// The name of the port
 	name: CapeStringImpl,
@@ -27,9 +25,9 @@ pub struct MaterialPort {
 	/// The connected material object, if any
 	connected_object: Option<cape_open_1_2::CapeThermoMaterial>,
 	/// Indicates whether this port is an inlet (true) or an outlet (false)
-	is_inlet : bool,
+	is_inlet: bool,
 	/// Shared data for the unit, containing unit-specific information
-	shared_unit_data: SharedUnitDataRef, 
+	shared_unit_data: SharedUnitDataRef,
 }
 
 impl MaterialPort {
@@ -38,7 +36,6 @@ impl MaterialPort {
 	///
 	/// # Returns:
 	/// * The connected material object, or `None` if the port is not connected to any material object.
-
 	pub(crate) fn get_connected_material(&self) -> Option<cape_open_1_2::CapeThermoMaterial> {
 		self.connected_object.clone()
 	}
@@ -47,7 +44,6 @@ impl MaterialPort {
 	///
 	/// # Returns:
 	/// * A reference to the name of the port as a `CapeStringImpl`.
-
 	pub(crate) fn get_name(&self) -> &CapeStringImpl {
 		&self.name
 	}
@@ -58,7 +54,7 @@ impl std::fmt::Display for MaterialPort {
 
 	/// Format the MaterialPort as a string for display purposes.
 	///
-	/// The std::fmt::Display interface is used when generating the 
+	/// The std::fmt::Display interface is used when generating the
 	/// source name of the object that raises an error.
 	///
 	/// # Arguments:
@@ -66,10 +62,15 @@ impl std::fmt::Display for MaterialPort {
 	///
 	/// # Returns:
 	/// * A `std::fmt::Result` indicating the success or failure of the formatting operation.
-
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"Port '{}' of {} unit '{}'",self.name, DistillationShortcutUnit::NAME, self.shared_unit_data.borrow().name)
-    }
+		write!(
+			f,
+			"Port '{}' of {} unit '{}'",
+			self.name,
+			DistillationShortcutUnit::NAME,
+			self.shared_unit_data.borrow().name
+		)
+	}
 
 }
 
@@ -82,8 +83,7 @@ impl cape_open_1_2::ICapeIdentification for MaterialPort {
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure. If successful, the name is set in `name`.
-
-	fn get_component_name(&mut self,name:&mut CapeStringOut) -> Result<(), COBIAError> {
+	fn get_component_name(&mut self, name: &mut CapeStringOut) -> Result<(), COBIAError> {
 		name.set(&self.name)
 	}
 
@@ -94,15 +94,16 @@ impl cape_open_1_2::ICapeIdentification for MaterialPort {
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure. If successful, the description is set in `description`.
-
-	fn get_component_description(&mut self,description:&mut CapeStringOut) -> Result<(), COBIAError> {
+	fn get_component_description(
+		&mut self,
+		description: &mut CapeStringOut,
+	) -> Result<(), COBIAError> {
 		description.set(&self.description)
 	}
 
 	/// Set the name of the component.
 	///
 	/// This method is not allowed for this port implementation and will return an error.
-
 	fn set_component_name(&mut self, _name: &CapeStringIn) -> Result<(), COBIAError> {
 		Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
 	}
@@ -110,10 +111,10 @@ impl cape_open_1_2::ICapeIdentification for MaterialPort {
 	/// Set the description of the component.
 	///
 	/// This method is not allowed for this port implementation and will return an error.
-
 	fn set_component_description(&mut self, _desc: &CapeStringIn) -> Result<(), COBIAError> {
 		Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
 	}
+
 }
 
 impl cape_open_1_2::ICapeUnitPort for MaterialPort {
@@ -122,47 +123,36 @@ impl cape_open_1_2::ICapeUnitPort for MaterialPort {
 	///
 	/// # Returns:
 	/// * A `Result` containing the port type, which is always `CapeMaterial` for this implementation.
-
-    fn get_port_type(&mut self) -> Result<cape_open_1_2::CapePortType,COBIAError> {
-        Ok(cape_open_1_2::CapePortType::CapeMaterial)
-    }
+	fn get_port_type(&mut self) -> Result<cape_open_1_2::CapePortType, COBIAError> {
+		Ok(cape_open_1_2::CapePortType::CapeMaterial)
+	}
 
 	/// Get the direction of the port.
 	///
 	/// # Returns:
 	/// * A `Result` containing the port direction, which is either `CapeInlet` or `CapeOutlet`.
-
-    fn get_direction(&mut self) -> Result<cape_open_1_2::CapePortDirection,COBIAError> {
-        Ok(
-			match self.is_inlet {
-				true => cape_open_1_2::CapePortDirection::CapeInlet,
-				false => cape_open_1_2::CapePortDirection::CapeOutlet,
-			}
-		)
-    }
+	fn get_direction(&mut self) -> Result<cape_open_1_2::CapePortDirection, COBIAError> {
+		Ok(match self.is_inlet {
+			true => cape_open_1_2::CapePortDirection::CapeInlet,
+			false => cape_open_1_2::CapePortDirection::CapeOutlet,
+		})
+	}
 
 	/// Get the connected object of the port.
 	///
 	/// # Returns:
 	/// * A `Result` containing the connected `CapeObject`, or an error if the port is not connected.
-
-    fn get_connected_object(&mut self) -> Result<cobia::CapeObject,COBIAError> {
-        match self.connected_object {
-			Some(ref connected_object) => {
-				match cobia::CapeObject::from_object(connected_object) {
-					Ok(object) => {
-						Ok(object)
-					},
-					Err(_) => {
-						Err(COBIAError::Message("Object does not expose ICapeInterface".into()))
-					}
-				}
+	fn get_connected_object(&mut self) -> Result<cobia::CapeObject, COBIAError> {
+		match self.connected_object {
+			Some(ref connected_object) => match cobia::CapeObject::from_object(connected_object) {
+				Ok(object) => Ok(object),
+				Err(_) => Err(COBIAError::Message(
+					"Object does not expose ICapeInterface".into(),
+				)),
 			},
-			None => {
-				Err(COBIAError::Code(COBIAERR_NOSUCHITEM))
-			}
+			None => Err(COBIAError::Code(COBIAERR_NOSUCHITEM)),
 		}
-    }
+	}
 
 	/// Connect the port to a `CapeObject`.
 	///
@@ -173,27 +163,28 @@ impl cape_open_1_2::ICapeUnitPort for MaterialPort {
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure. If successful, the port is connected to the material object.
-
-    fn connect(&mut self,object_to_connect:cobia::CapeObject) -> Result<(),COBIAError> {
+	fn connect(&mut self, object_to_connect: cobia::CapeObject) -> Result<(), COBIAError> {
 		let material_object = cape_open_1_2::CapeThermoMaterial::from_object(&object_to_connect);
 		match material_object {
 			Ok(material_object) => {
-					self.connected_object=Some(material_object);
-					self.shared_unit_data.borrow_mut().validation_status = cape_open_1_2::CapeValidationStatus::CapeNotValidated;
-					Ok(())
-				},
+				self.connected_object = Some(material_object);
+				self.shared_unit_data.borrow_mut().validation_status =
+					cape_open_1_2::CapeValidationStatus::CapeNotValidated;
+				Ok(())
+			}
 			Err(e) => Err(e),
 		}
-    }
+	}
 
 	/// Disconnect the port from its connected object.
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure; always succeeds.
-
-    fn disconnect(&mut self) -> Result<(),COBIAError> {
-        self.connected_object=None;
-		self.shared_unit_data.borrow_mut().validation_status = cape_open_1_2::CapeValidationStatus::CapeNotValidated;
+	fn disconnect(&mut self) -> Result<(), COBIAError> {
+		self.connected_object = None;
+		self.shared_unit_data.borrow_mut().validation_status =
+			cape_open_1_2::CapeValidationStatus::CapeNotValidated;
 		Ok(())
-    }
+	}
+
 }

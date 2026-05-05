@@ -1,19 +1,24 @@
-use crate::{COBIAError, CapeArrayRealInFromProvider, C};
-use crate::cape_array::{CapeArrayIn,CapeArrayOut,ArrayInterface};
-use crate::{CapeArrayRealProviderIn,CapeArrayRealProviderOut};
+use crate::cape_array::{ArrayInterface, CapeArrayIn, CapeArrayOut};
+use crate::{C, COBIAError, CapeArrayRealInFromProvider};
+use crate::{CapeArrayRealProviderIn, CapeArrayRealProviderOut};
 
 impl ArrayInterface<C::CapeReal> for C::ICapeArrayReal {
-
-	fn get(&mut self,data:&mut *mut C::CapeReal,size:&mut C::CapeSize) {
-		unsafe { (*self.vTbl).get.unwrap()(self.me,data as *mut *mut C::CapeReal,size) };
+	fn get(&mut self, data: &mut *mut C::CapeReal, size: &mut C::CapeSize) {
+		unsafe { (*self.vTbl).get.unwrap()(self.me, data as *mut *mut C::CapeReal, size) };
 	}
 
-	fn set(&mut self,data:&mut *mut C::CapeReal,size:C::CapeSize) -> C::CapeResult {
-		unsafe { (*self.vTbl).setsize.unwrap()(self.me,size,data as *mut *mut C::CapeReal) }
+	fn set(&mut self, data: &mut *mut C::CapeReal, size: C::CapeSize) -> C::CapeResult {
+		unsafe { (*self.vTbl).setsize.unwrap()(self.me, size, data as *mut *mut C::CapeReal) }
 	}
 
-	fn get_const(&self,data:&mut *const C::CapeReal,size:&mut C::CapeSize) {
-		unsafe { (*self.vTbl).get.unwrap()(self.me,data as *mut *const C::CapeReal as *mut *mut C::CapeReal,size) };
+	fn get_const(&self, data: &mut *const C::CapeReal, size: &mut C::CapeSize) {
+		unsafe {
+			(*self.vTbl).get.unwrap()(
+				self.me,
+				data as *mut *const C::CapeReal as *mut *mut C::CapeReal,
+				size,
+			)
+		};
 	}
 }
 
@@ -34,16 +39,15 @@ impl ArrayInterface<C::CapeReal> for C::ICapeArrayReal {
 /// fn test_content(a: &CapeArrayRealIn) {
 ///     assert_eq!(a.as_vec(), vec![4.5,6.5]);
 /// }
-/// 
+///
 /// let arr = cobia::CapeArrayRealSlice::new(&[4.5,6.5]);
 /// test_content(&CapeArrayRealInFromProvider::from(&arr).as_cape_array_real_in());
 /// ```
-
-pub type CapeArrayRealIn<'a> = CapeArrayIn<'a,C::CapeReal,C::ICapeArrayReal>;
+pub type CapeArrayRealIn<'a> = CapeArrayIn<'a, C::CapeReal, C::ICapeArrayReal>;
 
 impl<'a> CapeArrayRealProviderIn for CapeArrayRealIn<'a> {
 	fn as_cape_array_real_in(&self) -> C::ICapeArrayReal {
-		unsafe{**self.interface}
+		unsafe { **self.interface }
 	}
 }
 
@@ -64,13 +68,12 @@ impl<'a> CapeArrayRealProviderIn for CapeArrayRealIn<'a> {
 /// fn set_content(a: &mut CapeArrayRealOut) {
 ///     a.put_array(&[4.5,6.5]).unwrap();
 /// }
-/// 
+///
 /// let mut arr = cobia::CapeArrayRealVec::new();
 /// set_content(&mut CapeArrayRealOutFromProvider::from(&mut arr).as_cape_array_real_out());
 /// assert_eq!(arr.as_vec(), &vec![4.5,6.5]);
 /// ```
-
-pub type CapeArrayRealOut<'a> = CapeArrayOut<'a,C::CapeReal,C::ICapeArrayReal>;
+pub type CapeArrayRealOut<'a> = CapeArrayOut<'a, C::CapeReal, C::ICapeArrayReal>;
 
 impl<'a> CapeArrayRealOut<'a> {
 
@@ -88,17 +91,15 @@ impl<'a> CapeArrayRealOut<'a> {
 	/// CapeArrayRealOutFromProvider::from(&mut arr).as_cape_array_real_out().set(&arr1);
 	/// assert_eq!(arr.as_vec(), &[125.1,-19.4,3.14]);
 	/// ```
-
-	pub fn set<T:CapeArrayRealProviderIn>(&mut self,array:&T) -> Result<(), COBIAError> {
+	pub fn set<T: CapeArrayRealProviderIn>(&mut self, array: &T) -> Result<(), COBIAError> {
 		let mut real_array_in_from_provider = CapeArrayRealInFromProvider::from(array);
-		let real_array=real_array_in_from_provider.as_cape_array_real_in();
+		let real_array = real_array_in_from_provider.as_cape_array_real_in();
 		self.resize(real_array.size())?;
 		for i in 0..real_array.size() {
-			self[i]=real_array[i];
+			self[i] = real_array[i];
 		}
 		Ok(())
 	}
-
 }
 
 impl<'a> CapeArrayRealProviderOut for CapeArrayRealOut<'a> {

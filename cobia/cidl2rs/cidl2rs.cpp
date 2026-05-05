@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <unordered_set>
 #include <unordered_map>
+#include <cassert>
 
 using namespace COBIA;
 
@@ -256,6 +257,7 @@ struct MethodArgumentInfo {
 	bool is_cape_interface{};
 	bool is_data_interface{};
 	bool is_interface{};
+	bool is_window_id{};
 	bool is_in={};
 	bool is_out={};
 	bool is_retval={};
@@ -267,6 +269,7 @@ struct MethodArgumentInfo {
 	std::string smart_pointer_type_name;
 	std::string name;
 	std::string from_raw_conversion;
+	bool from_raw_conversion_requires_unsafe{};
 	std::string init_value;
 	std::string cobia_module_name;
 	std::string doc;
@@ -526,6 +529,7 @@ struct MethodArgumentInfo {
 				smart_pointer_type_name=cobia_module_name+"::CapeObject";
 				to_raw_conversion=".as_cape_interface_pointer()";
 				from_raw_conversion=(is_out)?"attach":"from_interface_pointer";
+				from_raw_conversion_requires_unsafe=true;
 				raw_returned_value=".detach()";
 				is_cape_interface=true;
 			} else {
@@ -565,6 +569,7 @@ struct MethodArgumentInfo {
 				to_raw_conversion=".as_interface_pointer()";
 				raw_returned_value=".detach()";
 				from_raw_conversion=(is_out)?"attach":"from_interface_pointer";
+				from_raw_conversion_requires_unsafe=true;
 			}
 			break;
 		case IDL::CapeIDLDataType::IDLDataType_CapeTemplateArgument:
@@ -704,6 +709,7 @@ struct MethodArgumentInfo {
 			if (is_out) {
 				throw std::runtime_error("CapeWindowId must be [in]");
 			}
+			is_window_id=true;
 			need_raw_conversion=true;
 			break;
 		}
@@ -745,13 +751,13 @@ struct MethodArgumentInfo {
 	std::string convert_to_raw() {
 		assert(need_raw_conversion);
 		//currently only CapeWindowId
-		return cobia_module_name+"::CapeWindowIdToRaw("+name+")";
+		return name+".as_native()";
 	}
 
 	std::string convert_from_raw() {
 		assert(need_raw_conversion);
 		//currently only CapeWindowId
-		return cobia_module_name+"::CapeWindowIdFromRaw("+name+")";
+		return cobia_module_name+"::CapeWindowId::FromRaw("+name+")";
 	}
 
 };
@@ -989,7 +995,7 @@ int main(int argc,char* argv[]) {
 						"\t///\n";
 						if (enm.HasAttribute(attr_doc)) {
 							enm.AttributeValue(attr_doc,doc_val);
-							code<<"\t/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n\n";
+							code<<"\t/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n";
 						}
 					code<<"\t#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]\n"
 						<<"\tpub struct "<<enm_name<<": u32 {\n";
@@ -1014,7 +1020,7 @@ int main(int argc,char* argv[]) {
 						"///\n";
 					if (enm.HasAttribute(attr_doc)) {
 						enm.AttributeValue(attr_doc,doc_val);
-						code<<"/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n\n";
+						code<<"/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n";
 					}
 					code<<"#[repr(i32)]\n"
 						"#[derive(Debug,PartialEq,Eq,Clone,Copy)]\n"
@@ -1146,7 +1152,7 @@ int main(int argc,char* argv[]) {
 					"///\n";
 				if (iface.HasAttribute(attr_doc)) {
 					iface.AttributeValue(attr_doc,doc_val);
-					code<<"/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n///\n\n";
+					code<<"/// "<<escape_doc(ToUTF8(doc_val.c_str()).c_str())<<"\n";
 				}
 				code<<"pub trait "<<iface_name;
 				if (iface.TemplateArgCount()>0) {
@@ -1338,7 +1344,7 @@ int main(int argc,char* argv[]) {
 					templ_args_short+='>';
 				}
 				code<<"}\n\n"
-					"/// COBIA interface implementation for "<<iface_name<<"\n\n"
+					"/// COBIA interface implementation for "<<iface_name<<"\n"
 					"pub trait "<<iface_name<<"Impl"<<templ_args_long<<" : "<<iface_name<<templ_args_short<<" {\n"
 					"\t/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro\n"
 					"\ttype T: ICapeInterfaceImpl+"<<iface_name<<"Impl"<<templ_args_short<<";\n"
@@ -1360,10 +1366,10 @@ int main(int argc,char* argv[]) {
 					"\t\tlet iface: *mut "<<cobia_module_name<<"::C::"<<native_namespace<<'_'<<iface_name<<" =\n"
 					"\t\t\tu.as_interface_pointer() as *mut "<<native_module<<"::"<<native_namespace<<'_'<<iface_name<<";\n"
 					"\t\tunsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };\n"
-					"\t\tu.add_interface(\n"
+					"\t\tunsafe {u.add_interface(\n"
 					"\t\t\tstd::ptr::addr_of!("<<native_module<<"::"<<native_namespace<<'_'<<iface_name<<"_UUID),\n"
 					"\t\t\tiface as *mut "<<cobia_module_name<<"::C::ICapeInterface,\n"
-					"\t\t);\n"
+					"\t\t)};\n"
 					"\t}\n"
 					"\t\n";
 				//methods
@@ -1399,7 +1405,7 @@ int main(int argc,char* argv[]) {
 						"\t/// # Safety\n"
 						"\t///\n"
 						"\t/// This is an extern \"C\" function called from native code. Do not call directly.\n"
-						 "\textern \"C\" fn "<<native_method_names[method_index]<<"(me: *mut std::ffi::c_void";
+						 "\tunsafe extern \"C\" fn "<<native_method_names[method_index]<<"(me: *mut std::ffi::c_void";
 					std::vector<MethodArgumentInfo>& args=method_args[method_index];
 					std::vector<std::string> non_null_arg_names;
 					for (MethodArgumentInfo &arg_info:args) {
@@ -1491,12 +1497,12 @@ int main(int argc,char* argv[]) {
 							} else {
 								code<<"\t\tlet "<<arg_info.name<<"=";
 								if (arg_info.need_unpack_rust_conversion) {
-									code<<"match "<<arg_info.smart_pointer_type_name_from_pointer()<<'('<<arg_info.name<<") {\n"
+									code<<"match "<<((arg_info.from_raw_conversion_requires_unsafe)?"unsafe{":"")<<arg_info.smart_pointer_type_name_from_pointer()<<'('<<arg_info.name<<")"<<((arg_info.from_raw_conversion_requires_unsafe)?"}":"")<<" {\n"
 										"\t\t\tOk(_"<<arg_info.name<<") => _"<<arg_info.name<<",\n"
 										"\t\t\tErr(e) => {return myself.set_last_error(e,\""<<iface_name<<"::"<<method_name<<"\");}\n"
 										"\t\t};\n";
 								} else {
-									code<<arg_info.smart_pointer_type_name_from_pointer()<<'('<<arg_info.name<<");\n";
+									code<<((arg_info.from_raw_conversion_requires_unsafe)?"unsafe{":"")<<arg_info.smart_pointer_type_name_from_pointer()<<'('<<arg_info.name<<")"<<((arg_info.from_raw_conversion_requires_unsafe)?"}":"")<<";\n";
 								}
 							}
 						} else if (arg_info.is_retval) {
@@ -1511,7 +1517,7 @@ int main(int argc,char* argv[]) {
 						} else {
 							assert(arg_info.is_basic_data_type);
 							if (arg_info.need_unpack_rust_conversion) {
-								code<<"\t\tlet "<<arg_info.name<<"=match "<<arg_info.rust_type_name<<"::"<<arg_info.from_raw_conversion<<'('<<arg_info.name<<") {\n"
+								code<<"\t\tlet "<<arg_info.name<<"=match "<<((arg_info.from_raw_conversion_requires_unsafe)?"unsafe{":"")<<arg_info.rust_type_name<<"::"<<arg_info.from_raw_conversion<<'('<<arg_info.name<<")"<<((arg_info.from_raw_conversion_requires_unsafe)?"}":"")<<" {\n"
 									"\t\t\tSome(_"<<arg_info.name<<") => _"<<arg_info.name<<",\n"
 									"\t\t\tNone => {return myself.set_last_error(COBIAError::Message(\"Invalid enumeration value\".to_string()),\""<<iface_name<<"::"<<method_name<<"\");}\n"
 									"\t\t};\n";
@@ -1905,6 +1911,11 @@ int main(int argc,char* argv[]) {
 							}
 						}
 					}
+					for (MethodArgumentInfo& arg_info:method_args[method_index]) {
+						if (arg_info.is_in&&arg_info.is_window_id) {
+							code<<"\t\tlet "<<arg_info.name<<"="<<arg_info.name<<".AsRaw();\n";
+						}
+					}
 					code<<"\t\tlet result_code = unsafe {\n"
 						"\t\t\t((*(*self.interface).vTbl)."<<raw_method_name<<".unwrap())((*self.interface).me";
 					for (MethodArgumentInfo& arg_info:method_args[method_index]) {
@@ -1979,11 +1990,11 @@ int main(int argc,char* argv[]) {
 						if ((retvals[retval_index]->is_interface)&&(retvals[retval_index]->from_raw_conversion=="from_object")) {
 							//QI will follow - this argument is an ICapeInterface that carries a reference count
 							// bind to a CapeObject smart pointer without increasing reference count first
-							code<<"\t\t\t\tlet "<<retvals[retval_index]->name<<"="<<cobia_module_name<<"::CapeObject::attach("<<retvals[retval_index]->name;
+							code<<"\t\t\t\tlet "<<retvals[retval_index]->name<<"=unsafe{"<<cobia_module_name<<"::CapeObject::attach("<<retvals[retval_index]->name;
 							if (retvals[retval_index]->is_interface) {
 								code<<"_ptr";
 							}
-							code<<");\n";
+							code<<")};\n";
 						}
 					}
 					for (size_t retval_index=0;retval_index<retvals.size();retval_index++) {
@@ -1993,16 +2004,16 @@ int main(int argc,char* argv[]) {
 						}
 						if (retvals[retval_index]->need_unpack_rust_conversion) {
 							if (retvals[retval_index]->is_basic_data_type) {
-								code<<"\t\t\t\tlet "<<retvals[retval_index]->name<<"=match "<<retvals[retval_index]->rust_type_name<<"::"<<retvals[retval_index]->from_raw_conversion<<'('<<retvals[retval_index]->name<<") {\n"
+								code<<"\t\t\t\tlet "<<retvals[retval_index]->name<<"=match "<<((retvals[retval_index]->from_raw_conversion_requires_unsafe)?"unsafe{":"")<<retvals[retval_index]->rust_type_name<<"::"<<retvals[retval_index]->from_raw_conversion<<'('<<retvals[retval_index]->name<<")"<<((retvals[retval_index]->from_raw_conversion_requires_unsafe)?"}":"")<<" {\n"
 									"\t\t\t\t\tSome(_"<<retvals[retval_index]->name<<") => _"<<retvals[retval_index]->name<<",\n"
 									"\t\t\t\t\tNone => {return Err(COBIAError::Message(\"Invalid enumeration value\".to_string()));}\n"
 									"\t\t\t\t};\n";
 							} else {
-								code<<"\t\t\t\tlet "<<retvals[retval_index]->name<<"=match "<<retvals[retval_index]->smart_pointer_type_name_from_pointer()<<'(';
+								code<<"\t\t\t\tlet "<<retvals[retval_index]->name<<"=match "<<((retvals[retval_index]->from_raw_conversion_requires_unsafe)?"unsafe{":"")<<retvals[retval_index]->smart_pointer_type_name_from_pointer()<<'(';
 								if (retvals[retval_index]->from_raw_conversion=="from_object") {
 									code<<'&';
 								}
-								code<<retvals[retval_index]->name<<") {\n"
+								code<<retvals[retval_index]->name<<")"<<((retvals[retval_index]->from_raw_conversion_requires_unsafe)?"}":"")<<" {\n"
 									"\t\t\t\t\tOk(_"<<retvals[retval_index]->name<<") => _"<<retvals[retval_index]->name<<",\n"
 									"\t\t\t\t\tErr(e) => {return Err(e);}\n"
 									"\t\t\t\t};\n";
@@ -2023,11 +2034,12 @@ int main(int argc,char* argv[]) {
 						if (retvals[retval_index]->is_basic_data_type||retvals[retval_index]->need_unpack_rust_conversion) {
 							code<<retvals[retval_index]->name;
 						} else {
-							code<<retvals[retval_index]->smart_pointer_type_name_from_pointer()<<'('<<retvals[retval_index]->name;
+							code<<((retvals[retval_index]->from_raw_conversion_requires_unsafe)?"unsafe{":"")<<retvals[retval_index]->smart_pointer_type_name_from_pointer()<<'('<<retvals[retval_index]->name;
 							if (retvals[retval_index]->is_interface) {
 								code<<"_ptr";
 							}
 							code<<')';
+							if (retvals[retval_index]->from_raw_conversion_requires_unsafe) code<<'}';
 						}
 					}
 					if (retvals.size()!=1) {
@@ -2049,7 +2061,6 @@ int main(int argc,char* argv[]) {
 					code<<"impl<Element:CapeSmartPointer> cobia_collection::CollectionInterface<Element> for "<<smart_pointer_name<<"<Element> {\n"
 						"\n"
 						"	/// Get the number of elements in the collection\n"
-						"\n"
 						"	fn size(&self) -> usize {\n"
 						"		match self.get_count() {\n"
 						"			Ok(count) => count as usize,\n"
@@ -2065,7 +2076,6 @@ int main(int argc,char* argv[]) {
 						"	/// or IndexMut trait, as both these traits require returning the \n"
 						"	/// item by reference, which is not possible in this context, as \n"
 						"	/// the returned object owns the interface pointer.\n"
-						"\n"
 						"	fn at(&self,index : usize) -> Result<Element, COBIAError> {\n"
 						"		self.item_by_index(index as CapeInteger)\n"
 						"	}\n"
@@ -2074,7 +2084,6 @@ int main(int argc,char* argv[]) {
 						"	///\n"
 						"	/// The name is case insentive, but must correspond to one of the items\n"
 						"	/// in the collection.\n"
-						"\n"
 						"	fn get(&self,id : &str) -> Result<Element, COBIAError> {\n"
 						"		self.item_by_name(&CapeStringImpl::from_string(id))\n"
 						"	}\n"

@@ -1,9 +1,12 @@
-use crate::{CapeArrayStringProviderIn,CapeArrayStringProviderOut,CapeStringIn,CapeStringOut,CapeArrayStringInFromProvider};
+use crate::{
+	CapeArrayStringInFromProvider, CapeArrayStringProviderIn, CapeArrayStringProviderOut,
+	CapeStringIn, CapeStringOut,
+};
 use std::fmt;
 use std::marker::PhantomData;
 
-use crate::COBIAError;
 use crate::C;
+use crate::COBIAError;
 use crate::cape_result_value::*;
 
 /// CapeArrayStringIn wraps an ICapeArrayString interface pointer in a read-only manner
@@ -23,18 +26,17 @@ use crate::cape_result_value::*;
 /// use cobia::*;
 ///
 /// fn test_content(a: &CapeArrayStringIn) {
-///		assert_eq!(a.as_string_vec(), vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
+///    assert_eq!(a.as_string_vec(), vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 /// }
-/// 
+///
 /// let arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 /// test_content(&CapeArrayStringInFromProvider::from(&arr).as_cape_array_string_in());
 /// ```
-
 pub struct CapeArrayStringIn<'a> {
 	data: *mut *mut C::ICapeString,
 	size: C::CapeSize,
-	interface : &'a *mut C::ICapeArrayString,
-	_lifetime: PhantomData<&'a ()> //even though we do not refer to the interace after contruction, life time is bound to the interface, as each of the elements are
+	interface: &'a *mut C::ICapeArrayString,
+	_lifetime: PhantomData<&'a ()>, //even though we do not refer to the interace after contruction, life time is bound to the interface, as each of the elements are
 }
 
 impl<'a> CapeArrayStringIn<'a> {
@@ -50,19 +52,18 @@ impl<'a> CapeArrayStringIn<'a> {
 	/// use cobia::*;
 	/// use cobia::prelude::*;
 	/// let arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
-	///	let i_cape_array_string=arr.as_cape_array_string_in();
-	///	let mut i_cape_array_string_ptr=(&i_cape_array_string as *const C::ICapeArrayString).cast_mut(); //normally a pointer to the interface is received
-	///	let sa = cobia::CapeArrayStringIn::new(&mut i_cape_array_string_ptr); //CapeArrayStringIn from *mut C::ICapeArrayString
+	/// let i_cape_array_string=arr.as_cape_array_string_in();
+	/// let mut i_cape_array_string_ptr=(&i_cape_array_string as *const C::ICapeArrayString).cast_mut(); //normally a pointer to the interface is received
+	/// let sa = cobia::CapeArrayStringIn::new(&mut i_cape_array_string_ptr); //CapeArrayStringIn from *mut C::ICapeArrayString
 	/// assert_eq!(sa.as_string_vec(), vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// ```
-
 	pub fn new(interface: &'a *mut C::ICapeArrayString) -> CapeArrayStringIn<'a> {
 		if interface.is_null() {
 			CapeArrayStringIn {
 				data: std::ptr::null_mut(),
 				size: 0,
 				interface,
-				_lifetime : std::default::Default::default()
+				_lifetime: std::default::Default::default(),
 			}
 		} else {
 			let mut data: *mut *mut C::ICapeString = std::ptr::null_mut();
@@ -72,7 +73,7 @@ impl<'a> CapeArrayStringIn<'a> {
 				data,
 				size,
 				interface,
-				_lifetime : std::default::Default::default()
+				_lifetime: std::default::Default::default(),
 			}
 		}
 	}
@@ -85,9 +86,9 @@ impl<'a> CapeArrayStringIn<'a> {
 	/// use cobia::*;
 	///
 	/// fn test_size(a: &CapeArrayStringIn) {
-	///		assert_eq!(a.size(), 2);
+	///    assert_eq!(a.size(), 2);
 	/// }
-	/// 
+	///
 	/// let arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// test_size(&CapeArrayStringInFromProvider::from(&arr).as_cape_array_string_in());
 	/// ```
@@ -103,9 +104,9 @@ impl<'a> CapeArrayStringIn<'a> {
 	/// use cobia::*;
 	///
 	/// fn test_empty(a: &CapeArrayStringIn) {
-	///		assert!(a.is_empty());
+	///    assert!(a.is_empty());
 	/// }
-	/// 
+	///
 	/// let arr = cobia::CapeArrayStringVec::new();
 	/// test_empty(&CapeArrayStringInFromProvider::from(&arr).as_cape_array_string_in());
 	/// ```
@@ -121,18 +122,16 @@ impl<'a> CapeArrayStringIn<'a> {
 	/// use cobia::*;
 	///
 	/// fn test_content(a: &CapeArrayStringIn) {
-	///		assert_eq!(a.as_string_vec(), vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
+	///    assert_eq!(a.as_string_vec(), vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// }
-	/// 
+	///
 	/// let arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// test_content(&CapeArrayStringInFromProvider::from(&arr).as_cape_array_string_in());
 	/// ```
-
 	pub fn as_string_vec(&self) -> Vec<String> {
-		let mut vec = Vec::new();
-		vec.reserve(self.size as usize);
+		let mut vec = Vec::with_capacity(self.size as usize);
 		for i in 0..self.size {
-			let p=unsafe { *self.data.add(i as usize) };
+			let p = unsafe { *self.data.add(i as usize) };
 			if p.is_null() {
 				//this provided by the implementor of ICapeArrayString and should not be null
 				vec.push(String::new());
@@ -148,13 +147,13 @@ impl<'a> CapeArrayStringIn<'a> {
 	/// # Arguments
 	///
 	/// * `index` - The index of the element to get
-	/// 
-	/// Note that neither Index and IndexMut is 
+	///
+	/// Note that neither Index and IndexMut is
 	/// provided for CapeArrayStringIn, because these interfaces
 	/// yield a reference to the element, whereas the elements
 	/// of CapeArrayStringIn are represented by an interface,
-	/// which is conveniently wrapped into CapeStringIn. 
-	/// 
+	/// which is conveniently wrapped into CapeStringIn.
+	///
 	/// Note that the life time of the CapeStringIn is tied to the
 	/// life time of the CapeArrayStringIn.
 	///
@@ -164,23 +163,22 @@ impl<'a> CapeArrayStringIn<'a> {
 	/// use cobia::*;
 	///
 	/// fn test_element(a: &CapeArrayStringIn) {
-	///		assert_eq!(a.at(1).unwrap().to_string(), "idealGasEntropy".to_string());
+	///    assert_eq!(a.at(1).unwrap().to_string(), "idealGasEntropy".to_string());
 	/// }
-	/// 
+	///
 	/// let arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// test_element(&CapeArrayStringInFromProvider::from(&arr).as_cape_array_string_in());
 	/// ```
-
 	pub fn at(&self, index: usize) -> Result<CapeStringIn<'a>, COBIAError> {
 		if index >= self.size as usize {
 			return Err(COBIAError::Code(COBIAERR_NOSUCHITEM));
 		}
-		let p=unsafe { self.data.add(index) };
+		let p = unsafe { self.data.add(index) };
 		if (unsafe { *p }).is_null() {
 			//this provided by the implementor of ICapeArrayString and should not be null
 			Err(COBIAError::Code(COBIAERR_NULLPOINTER))
 		} else {
-			Ok(CapeStringIn::new(unsafe { &mut *p} ))
+			Ok(CapeStringIn::new(unsafe { &mut *p }))
 		}
 	}
 }
@@ -213,19 +211,18 @@ impl<'a> CapeArrayStringIn<'a> {
 	/// use cobia::*;
 	///
 	/// fn test_iter(a: &CapeArrayStringIn) {
-	///		let mut iter = a.iter();
-	///		assert_eq!(iter.next().unwrap().to_string(), "idealGasEnthalpy".to_string());
-	///		assert_eq!(iter.next().unwrap().to_string(), "idealGasEntropy".to_string());
-	///		assert!(!iter.next().is_some());
+	///    let mut iter = a.iter();
+	///    assert_eq!(iter.next().unwrap().to_string(), "idealGasEnthalpy".to_string());
+	///    assert_eq!(iter.next().unwrap().to_string(), "idealGasEntropy".to_string());
+	///    assert!(!iter.next().is_some());
 	/// }
-	/// 
+	///
 	/// let arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// test_iter(&CapeArrayStringInFromProvider::from(&arr).as_cape_array_string_in());
 	/// ```
-
 	pub fn iter(&self) -> CapeArrayStringInIterator<'_> {
 		CapeArrayStringInIterator {
-			arr: &self,
+			arr: self,
 			index: 0,
 		}
 	}
@@ -240,13 +237,12 @@ impl<'a> fmt::Display for CapeArrayStringIn<'a> {
 	/// use cobia::*;
 	///
 	/// fn test_format(a: &CapeArrayStringIn) {
-	///		assert_eq!(format!("{}", a), "[\"idealGasEnthalpy\", \"idealGasEntropy\"]");
+	///    assert_eq!(format!("{}", a), "[\"idealGasEnthalpy\", \"idealGasEntropy\"]");
 	/// }
-	/// 
+	///
 	/// let arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// test_format(&CapeArrayStringInFromProvider::from(&arr).as_cape_array_string_in());
 	/// ```
-
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		write!(f, "[")?;
 		for (count, v) in self.iter().enumerate() {
@@ -282,14 +278,13 @@ impl<'a> CapeArrayStringProviderIn for CapeArrayStringIn<'a> {
 /// use cobia::*;
 ///
 /// fn set_content(a: &mut CapeArrayStringOut) {
-///		a.put_array(&["idealGasEnthalpy", "idealGasEntropy"]).unwrap();
+///    a.put_array(&["idealGasEnthalpy", "idealGasEntropy"]).unwrap();
 /// }
-/// 
+///
 /// let mut arr = cobia::CapeArrayStringVec::new();
 /// set_content(&mut CapeArrayStringOutFromProvider::from(&mut arr).as_cape_array_string_out());
 /// assert_eq!(arr.as_string_vec(), vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 /// ```
-
 pub struct CapeArrayStringOut<'a> {
 	interface: &'a mut *mut C::ICapeArrayString,
 	data: *mut *mut C::ICapeString,
@@ -309,12 +304,11 @@ impl<'a> CapeArrayStringOut<'a> {
 	/// use cobia::*;
 	/// use cobia::prelude::*;
 	/// let mut arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
-	///	let i_cape_array_string=arr.as_cape_array_string_out();
-	///	let mut i_cape_array_string_ptr=(&i_cape_array_string as *const C::ICapeArrayString).cast_mut(); //normally a pointer to the interface is received
-	///	let sa = cobia::CapeArrayStringOut::new(&mut i_cape_array_string_ptr); //CapeArrayStringOut from *mut C::ICapeArrayString
+	/// let i_cape_array_string=arr.as_cape_array_string_out();
+	/// let mut i_cape_array_string_ptr=(&i_cape_array_string as *const C::ICapeArrayString).cast_mut(); //normally a pointer to the interface is received
+	/// let sa = cobia::CapeArrayStringOut::new(&mut i_cape_array_string_ptr); //CapeArrayStringOut from *mut C::ICapeArrayString
 	/// assert_eq!(sa.as_string_vec(), vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// ```
-
 	pub fn new(interface: &'a mut *mut C::ICapeArrayString) -> CapeArrayStringOut<'a> {
 		let mut data: *mut *mut C::ICapeString = std::ptr::null_mut();
 		let mut size: C::CapeSize = 0;
@@ -336,17 +330,15 @@ impl<'a> CapeArrayStringOut<'a> {
 	/// use cobia::*;
 	/// use cobia::prelude::*;
 	/// let mut arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
-	///	let i_cape_array_string=arr.as_cape_array_string_out();
-	///	let mut i_cape_array_string_ptr=(&i_cape_array_string as *const C::ICapeArrayString).cast_mut(); //normally a pointer to the interface is received
-	///	let sa = cobia::CapeArrayStringOut::new(&mut i_cape_array_string_ptr); //CapeArrayStringOut from *mut C::ICapeArrayString
+	/// let i_cape_array_string=arr.as_cape_array_string_out();
+	/// let mut i_cape_array_string_ptr=(&i_cape_array_string as *const C::ICapeArrayString).cast_mut(); //normally a pointer to the interface is received
+	/// let sa = cobia::CapeArrayStringOut::new(&mut i_cape_array_string_ptr); //CapeArrayStringOut from *mut C::ICapeArrayString
 	/// assert_eq!(sa.as_string_vec(), vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// ```
-
 	pub fn as_string_vec(&self) -> Vec<String> {
-		let mut vec = Vec::new();
-		vec.reserve(self.size as usize);
+		let mut vec = Vec::with_capacity(self.size as usize);
 		for i in 0..self.size {
-			let p=unsafe { self.data.add(i as usize) };
+			let p = unsafe { self.data.add(i as usize) };
 			if p.is_null() {
 				//this provided by the implementor of ICapeArrayString and should not be null
 				vec.push(String::new());
@@ -365,9 +357,9 @@ impl<'a> CapeArrayStringOut<'a> {
 	/// use cobia::*;
 	///
 	/// fn test_size(a: &mut CapeArrayStringOut) {
-	///		assert_eq!(a.size(), 2);
+	///    assert_eq!(a.size(), 2);
 	/// }
-	/// 
+	///
 	/// let mut arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// test_size(&mut CapeArrayStringOutFromProvider::from(&mut arr).as_cape_array_string_out());
 	/// ```
@@ -383,9 +375,9 @@ impl<'a> CapeArrayStringOut<'a> {
 	/// use cobia::*;
 	///
 	/// fn test_empty(a: &mut CapeArrayStringOut) {
-	///		assert!(a.is_empty());
+	///    assert!(a.is_empty());
 	/// }
-	/// 
+	///
 	/// let mut arr = cobia::CapeArrayStringVec::new();
 	/// test_empty(&mut CapeArrayStringOutFromProvider::from(&mut arr).as_cape_array_string_out());
 	/// ```
@@ -405,16 +397,15 @@ impl<'a> CapeArrayStringOut<'a> {
 	/// use cobia::*;
 	///
 	/// fn set_content(a: &mut CapeArrayStringOut) {
-	///		a.put_array(&["idealGasEnthalpy", "idealGasEntropy"]).unwrap();
+	///    a.put_array(&["idealGasEnthalpy", "idealGasEntropy"]).unwrap();
 	/// }
-	/// 
+	///
 	/// let mut arr = cobia::CapeArrayStringVec::new();
 	/// set_content(&mut CapeArrayStringOutFromProvider::from(&mut arr).as_cape_array_string_out());
 	/// assert_eq!(arr.as_string_vec(), vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// ```
-
 	pub fn put_array<T: AsRef<str>>(&mut self, array: &[T]) -> Result<(), COBIAError> {
-		let mut data:*mut *mut C::ICapeString=std::ptr::null_mut();
+		let mut data: *mut *mut C::ICapeString = std::ptr::null_mut();
 		let res = unsafe {
 			(*(**self.interface).vTbl).setsize.unwrap()(
 				(**self.interface).me,
@@ -424,9 +415,9 @@ impl<'a> CapeArrayStringOut<'a> {
 		};
 		if res == COBIAERR_NOERROR {
 			self.size = array.len() as C::CapeSize;
-			self.data=data;
+			self.data = data;
 			for (i, s) in array.iter().enumerate() {
-				let p=unsafe { self.data.add(i as usize) }; 
+				let p = unsafe { self.data.add(i) };
 				if p.is_null() {
 					//this provided by the implementor of ICapeArrayString and should not be null
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
@@ -445,13 +436,13 @@ impl<'a> CapeArrayStringOut<'a> {
 	/// # Arguments
 	///
 	/// * `index` - The index of the element to get
-	/// 
-	/// Note that neither Index and IndexMut is 
+	///
+	/// Note that neither Index and IndexMut is
 	/// provided for CapeArrayStringOut, because these interfaces
 	/// yield a reference to the element, whereas the elements
 	/// of CapeArrayStringOut are represented by an interface,
-	/// which is conveniently wrapped into CapeStringOut. 
-	/// 
+	/// which is conveniently wrapped into CapeStringOut.
+	///
 	/// Note that the life time of the CapeStringOut is tied to the
 	/// life time of the CapeArrayStringOut.
 	///
@@ -461,23 +452,22 @@ impl<'a> CapeArrayStringOut<'a> {
 	/// use cobia::*;
 	///
 	/// fn test_element(a: &mut CapeArrayStringOut) {
-	///		assert_eq!(a.at(1).unwrap().to_string(), "idealGasEntropy".to_string());
+	///    assert_eq!(a.at(1).unwrap().to_string(), "idealGasEntropy".to_string());
 	/// }
-	/// 
+	///
 	/// let mut arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// test_element(&mut CapeArrayStringOutFromProvider::from(&mut arr).as_cape_array_string_out());
 	/// ```
-
 	pub fn at(&self, index: usize) -> Result<CapeStringOut<'a>, COBIAError> {
 		if index >= self.size as usize {
 			return Err(COBIAError::Code(COBIAERR_NOSUCHITEM));
 		}
-		let p=unsafe { self.data.add(index) };
+		let p = unsafe { self.data.add(index) };
 		if p.is_null() {
 			//this provided by the implementor of ICapeArrayString and should not be null
 			Err(COBIAError::Code(COBIAERR_NULLPOINTER))
 		} else {
-			Ok(CapeStringOut::new(unsafe { &mut *p} ))
+			Ok(CapeStringOut::new(unsafe { &mut *p }))
 		}
 	}
 
@@ -493,18 +483,18 @@ impl<'a> CapeArrayStringOut<'a> {
 	/// use cobia::*;
 	///
 	/// fn set_content(a: &mut CapeArrayStringOut) {
-	///		a.resize(3).unwrap();
-	///		a.at(0).unwrap().set_string("idealGasEnthalpy").unwrap();
-	///		a.at(1).unwrap().set_string("idealGasEntropy").unwrap();
-	///		a.at(2).unwrap().set_string("density").unwrap();
+	///    a.resize(3).unwrap();
+	///    a.at(0).unwrap().set_string("idealGasEnthalpy").unwrap();
+	///    a.at(1).unwrap().set_string("idealGasEntropy").unwrap();
+	///    a.at(2).unwrap().set_string("density").unwrap();
 	/// }
-	/// 
+	///
 	/// let mut arr = cobia::CapeArrayStringVec::new();
 	/// set_content(&mut CapeArrayStringOutFromProvider::from(&mut arr).as_cape_array_string_out());
 	/// assert_eq!(arr.as_string_vec(), ["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string(), "density".to_string()]); //the values have been stored on the object that implements ICapeArrayString
 	/// ```
 	pub fn resize(&mut self, size: usize) -> Result<(), COBIAError> {
-		let mut data:*mut *mut C::ICapeString=std::ptr::null_mut();
+		let mut data: *mut *mut C::ICapeString = std::ptr::null_mut();
 		let res = unsafe {
 			(*(**self.interface).vTbl).setsize.unwrap()(
 				(**self.interface).me,
@@ -514,7 +504,7 @@ impl<'a> CapeArrayStringOut<'a> {
 		};
 		if res == COBIAERR_NOERROR {
 			self.size = size as C::CapeSize;
-			self.data=data;
+			self.data = data;
 			Ok(())
 		} else {
 			Err(COBIAError::Code(res))
@@ -534,12 +524,12 @@ impl<'a> CapeArrayStringOut<'a> {
 	/// use cobia::*;
 	///
 	/// fn set_content(a: &mut CapeArrayStringOut) {
-	///		a.resize(3).unwrap();
-	///		a.at(0).unwrap().set_string("idealGasEnthalpy").unwrap();
-	///		a.at(1).unwrap().set_string("idealGasEntropy").unwrap();
-	///		a.at(2).unwrap().set_string("density").unwrap();
+	///    a.resize(3).unwrap();
+	///    a.at(0).unwrap().set_string("idealGasEnthalpy").unwrap();
+	///    a.at(1).unwrap().set_string("idealGasEntropy").unwrap();
+	///    a.at(2).unwrap().set_string("density").unwrap();
 	/// }
-	/// 
+	///
 	/// let mut arr = cobia::CapeArrayStringVec::new();
 	/// set_content(&mut CapeArrayStringOutFromProvider::from(&mut arr).as_cape_array_string_out());
 	/// assert_eq!(arr.as_string_vec(), ["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string(), "density".to_string()]); //the values have been stored on the object that implements ICapeArrayString
@@ -548,7 +538,7 @@ impl<'a> CapeArrayStringOut<'a> {
 		if index >= self.size as usize {
 			return Err(COBIAError::Code(COBIAERR_NOSUCHITEM));
 		}
-		let p=unsafe { self.data.add(index) };
+		let p = unsafe { self.data.add(index) };
 		if p.is_null() {
 			//this provided by the implementor of ICapeArrayString and should not be null
 			return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
@@ -571,17 +561,15 @@ impl<'a> CapeArrayStringOut<'a> {
 	/// CapeArrayStringOutFromProvider::from(&mut arr).as_cape_array_string_out().set(&arr1);
 	/// assert_eq!(arr.as_string_vec(), ["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]); //the values have been stored on the object that implements ICapeArrayString
 	/// ```
-
-	pub fn set<T:CapeArrayStringProviderIn>(&mut self,array:&T) -> Result<(), COBIAError> {
+	pub fn set<T: CapeArrayStringProviderIn>(&mut self, array: &T) -> Result<(), COBIAError> {
 		let mut string_array_in_from_provider = CapeArrayStringInFromProvider::from(array);
-		let string_array=string_array_in_from_provider.as_cape_array_string_in();
+		let string_array = string_array_in_from_provider.as_cape_array_string_in();
 		self.resize(string_array.size())?;
 		for i in 0..string_array.size() {
 			self.at(i)?.set(&string_array.at(i)?)?;
 		}
 		Ok(())
 	}
-
 }
 
 pub struct CapeArrayStringIterator<'a> {
@@ -612,19 +600,18 @@ impl<'a> CapeArrayStringOut<'a> {
 	/// use cobia::*;
 	///
 	/// fn test_iter(a: &mut CapeArrayStringOut) {
-	///		let mut iter = a.iter();
-	///		assert_eq!(iter.next().unwrap().to_string(), "idealGasEnthalpy".to_string());
-	///		assert_eq!(iter.next().unwrap().to_string(), "idealGasEntropy".to_string());
-	///		assert!(!iter.next().is_some());
+	///    let mut iter = a.iter();
+	///    assert_eq!(iter.next().unwrap().to_string(), "idealGasEnthalpy".to_string());
+	///    assert_eq!(iter.next().unwrap().to_string(), "idealGasEntropy".to_string());
+	///    assert!(!iter.next().is_some());
 	/// }
-	/// 
+	///
 	/// let mut arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// test_iter(&mut CapeArrayStringOutFromProvider::from(&mut arr).as_cape_array_string_out());
 	/// ```
-
 	pub fn iter(&self) -> CapeArrayStringIterator<'_> {
 		CapeArrayStringIterator {
-			arr: &self,
+			arr: self,
 			index: 0,
 		}
 	}
@@ -639,13 +626,12 @@ impl<'a> fmt::Display for CapeArrayStringOut<'a> {
 	/// use cobia::*;
 	///
 	/// fn test_format(a: &mut CapeArrayStringOut) {
-	///		assert_eq!(format!("{}", a), "[\"idealGasEnthalpy\", \"idealGasEntropy\"]");
+	///    assert_eq!(format!("{}", a), "[\"idealGasEnthalpy\", \"idealGasEntropy\"]");
 	/// }
-	/// 
+	///
 	/// let mut arr = cobia::CapeArrayStringVec::from_slice(&vec!["idealGasEnthalpy".to_string(), "idealGasEntropy".to_string()]);
 	/// test_format(&mut CapeArrayStringOutFromProvider::from(&mut arr).as_cape_array_string_out());
 	/// ```
-
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		write!(f, "[")?;
 		for (count, v) in self.iter().enumerate() {
@@ -658,7 +644,7 @@ impl<'a> fmt::Display for CapeArrayStringOut<'a> {
 	}
 }
 
-impl<'a> CapeArrayStringProviderOut  for CapeArrayStringOut<'a> {
+impl<'a> CapeArrayStringProviderOut for CapeArrayStringOut<'a> {
 	fn as_cape_array_string_out(&mut self) -> C::ICapeArrayString {
 		unsafe { **self.interface }
 	}

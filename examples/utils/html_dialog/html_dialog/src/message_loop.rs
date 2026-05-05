@@ -6,10 +6,8 @@
 //! (EdgeView2 and external process) to handle Windows messages.
 
 use windows::{
-    core::*,
-    Win32::{
-        UI::WindowsAndMessaging::{self, MSG, PM_REMOVE},
-    },
+	Win32::UI::WindowsAndMessaging::{self, MSG, PM_REMOVE},
+	core::*,
 };
 
 /// Processes pending Windows messages in a non-blocking manner.
@@ -22,23 +20,24 @@ use windows::{
 /// * `true` - some messages were processed
 /// * `false` - no messages were processed
 pub(crate) fn pump() -> bool {
-    // Initialize message structure and activity tracker
-    let mut msg = MSG::default();
-    let mut any: bool = false;
-    // Process all pending messages
-    loop {
-        // PeekMessageW checks for messages without blocking
-        // Returns 0 (FALSE) if no messages are available
-        if unsafe { WindowsAndMessaging::PeekMessageW(&mut msg, None, 0, 0, PM_REMOVE) } == BOOL(0) {
-            break;
-        }
-        // At least one message was processed
-        any = true;
-        // TranslateMessage converts virtual-key messages to character messages
-        let _ = unsafe { WindowsAndMessaging::TranslateMessage(&msg) };
-        // DispatchMessageW sends the message to the window procedure
-        unsafe { WindowsAndMessaging::DispatchMessageW(&msg) };    
-    };
-    // Return whether any messages were processed
-    any
+	// Initialize message structure and activity tracker
+	let mut msg = MSG::default();
+	let mut any: bool = false;
+	// Process all pending messages
+	loop {
+		// PeekMessageW checks for messages without blocking
+		// Returns 0 (FALSE) if no messages are available
+		if unsafe { WindowsAndMessaging::PeekMessageW(&mut msg, None, 0, 0, PM_REMOVE) } == BOOL(0)
+		{
+			break;
+		}
+		// At least one message was processed
+		any = true;
+		// TranslateMessage converts virtual-key messages to character messages
+		let _ = unsafe { WindowsAndMessaging::TranslateMessage(&msg) };
+		// DispatchMessageW sends the message to the window procedure
+		unsafe { WindowsAndMessaging::DispatchMessageW(&msg) };
+	}
+	// Return whether any messages were processed
+	any
 }

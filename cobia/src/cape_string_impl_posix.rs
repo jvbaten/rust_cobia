@@ -1,23 +1,22 @@
-use crate::cape_data_traits::*;
 use crate::C;
+use crate::cape_data_traits::*;
 use crate::cape_result_value::*;
 use std::fmt;
 
 /// Default ICapeString implementation
 ///
 /// For COBIA, strings go over the pipeline as null terminated.
-/// For most systems, COBIA requires UTF-8 encoding 
+/// For most systems, COBIA requires UTF-8 encoding
 ///
 /// Rust uses non-null-terminated strings that are UTF-8 encoded.
 ///
-/// Because this translation is always required, there is no 
+/// Because this translation is always required, there is no
 /// read-only string implementation that refers to a string slice.
 ///
-/// This implementation uses a `String` to store the string data, 
+/// This implementation uses a `String` to store the string data,
 /// and the null character is explicitly added to the string.
 ///
-
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct CapeStringImpl {
 	data: String, //always ends in a null character
 }
@@ -50,14 +49,12 @@ impl CapeStringImpl {
 	/// use cobia;
 	/// let s=cobia::CapeStringImpl::from_string("idealGasEnthalpy");
 	/// ```
-	pub fn from_string<T:AsRef<str>>(s: T) -> Self {
-		let s=s.as_ref();
-		let mut data=String::with_capacity(s.len()+1);
+	pub fn from_string<T: AsRef<str>>(s: T) -> Self {
+		let s = s.as_ref();
+		let mut data = String::with_capacity(s.len() + 1);
 		data.push_str(s);
 		data.push('\0');
-		CapeStringImpl {
-			data
-		}
+		CapeStringImpl { data }
 	}
 	///Construct from raw data
 	///
@@ -66,9 +63,15 @@ impl CapeStringImpl {
 	/// * `data` - A pointer to the string data, with null terminated character
 	/// * `size` - The size of the string data, exlucing the null terminated character
 	///
+	/// # Safety
+	///
+	/// The caller must ensure that the pointer is valid and points to a null terminated string of the specified size.
 	pub unsafe fn from_raw_data(data: *const C::CapeCharacter, size: C::CapeSize) -> Self {
 		CapeStringImpl {
-			data:String::from_utf8_lossy(unsafe{std::slice::from_raw_parts(data as *const u8, (size as usize)+1)}).into()
+			data: String::from_utf8_lossy(unsafe {
+				std::slice::from_raw_parts(data as *const u8, (size as usize) + 1)
+			})
+			.into(),
 		}
 	}
 
@@ -99,12 +102,16 @@ impl CapeStringImpl {
 	/// s.set(&cobia::CapeStringImpl::from_string("idealGasEnthalpy"));
 	/// assert_eq!(s.as_string(),"idealGasEnthalpy");
 	/// ```
-
 	pub fn set<T: CapeStringConstProvider>(&mut self, s: &T) {
-		let(ptr,size)=s.as_capechar_const_with_length();
+		let (ptr, size) = s.as_capechar_const_with_length();
 		self.data.clear();
 		self.data.reserve(size as usize + 1);
-		self.data.extend(String::from_utf8_lossy(unsafe { std::slice::from_raw_parts(ptr as *const u8, size as usize) }).chars());
+		self.data.extend(
+			String::from_utf8_lossy(unsafe {
+				std::slice::from_raw_parts(ptr as *const u8, size as usize)
+			})
+			.chars(),
+		);
 		self.data.push('\0');
 	}
 
@@ -122,7 +129,7 @@ impl CapeStringImpl {
 	/// assert_eq!(s.is_empty(),false);
 	/// ```
 	pub fn is_empty(&self) -> bool {
-		self.data.as_bytes()[0]==0u8
+		self.data.as_bytes()[0] == 0u8
 	}
 
 	///Set string
@@ -139,16 +146,15 @@ impl CapeStringImpl {
 	/// s.set_string("idealGasEnthalpy");
 	/// assert_eq!(s.as_string(),"idealGasEnthalpy");
 	/// ```
-
 	pub fn set_string<T: AsRef<str>>(&mut self, s: T) {
-		let s=s.as_ref();
+		let s = s.as_ref();
 		self.data.clear();
-		self.data.reserve(s.len()+1);
+		self.data.reserve(s.len() + 1);
 		self.data.extend(s.chars());
 		self.data.push('\0');
 	}
 
-	extern "C" fn string_get(
+	unsafe extern "C" fn string_get(
 		me: *mut ::std::os::raw::c_void,
 		data: *mut *const C::CapeCharacter,
 		size: *mut C::CapeSize,
@@ -161,7 +167,7 @@ impl CapeStringImpl {
 		}
 	}
 
-	extern "C" fn string_set(
+	unsafe extern "C" fn string_set(
 		me: *mut ::std::os::raw::c_void,
 		data: *const C::CapeCharacter,
 		size: C::CapeSize,
@@ -169,12 +175,17 @@ impl CapeStringImpl {
 		let p = me as *mut CapeStringImpl;
 		let s: &mut CapeStringImpl = unsafe { &mut *p };
 		s.data.clear();
-		let new_size=(size as usize)+1;
-		if new_size>s.data.capacity() {
-			s.data.reserve_exact(new_size-s.data.capacity());
+		let new_size = (size as usize) + 1;
+		if new_size > s.data.capacity() {
+			s.data.reserve_exact(new_size - s.data.capacity());
 		}
 		if size > 0 {
-			s.data.extend(String::from_utf8_lossy(&unsafe { std::slice::from_raw_parts(data as *const u8, size as usize) }).chars());
+			s.data.extend(
+				String::from_utf8_lossy(&unsafe {
+					std::slice::from_raw_parts(data as *const u8, size as usize)
+				})
+				.chars(),
+			);
 		}
 		s.data.push('\0'); //null terminator
 		COBIAERR_NOERROR
@@ -199,7 +210,6 @@ impl CapeStringImpl {
 	/// let s=cobia::CapeStringImpl::from_string("idealGasEnthalpy");
 	/// assert_eq!(s.to_lowercase(),cobia::CapeStringImpl::from_string("idealgasenthalpy"));
 	/// ```
-
 	pub fn to_lowercase(&self) -> Self {
 		CapeStringImpl {
 			data: self.data.to_lowercase(),
@@ -220,7 +230,6 @@ impl CapeStringImpl {
 	/// let s=cobia::CapeStringImpl::from_string("idealGasEnthalpy");
 	/// assert_eq!(s.to_uppercase(),cobia::CapeStringImpl::from_string("IDEALGASENTHALPY"));
 	/// ```
-
 	pub fn to_uppercase(&self) -> Self {
 		CapeStringImpl {
 			data: self.data.to_uppercase(),
@@ -228,9 +237,9 @@ impl CapeStringImpl {
 	}
 
 	/// Case insentitive comparison
-	/// 
+	///
 	/// # Arguments
-	///	
+	///
 	/// * `other` - The other string to compare to
 	///
 	/// # Examples
@@ -241,30 +250,31 @@ impl CapeStringImpl {
 	/// let s2=cobia::CapeStringImpl::from_string("IDEALGASENTHALPY");
 	/// assert_eq!(s1.eq_ignore_case(&s2),true);
 	/// ```
-	pub fn eq_ignore_case<T:CapeStringConstProvider>(&self, other: &T) -> bool {
-		let mut it1=self.data.chars();
-		let (other_ptr,other_len)=other.as_capechar_const_with_length();
-		let other_slice=unsafe{std::slice::from_raw_parts(other_ptr as *const u8,other_len as usize)};
-		let other_str=String::from_utf8_lossy(other_slice);
-		let mut it2=other_str.chars();
+	pub fn eq_ignore_case<T: CapeStringConstProvider>(&self, other: &T) -> bool {
+		let mut it1 = self.data.chars();
+		let (other_ptr, other_len) = other.as_capechar_const_with_length();
+		let other_slice =
+			unsafe { std::slice::from_raw_parts(other_ptr as *const u8, other_len as usize) };
+		let other_str = String::from_utf8_lossy(other_slice);
+		let mut it2 = other_str.chars();
 		loop {
-			match (it1.next(),it2.next()) {
-				(Some(c1),Some(c2)) => {
+			match (it1.next(), it2.next()) {
+				(Some(c1), Some(c2)) => {
 					if c1.to_lowercase().next().unwrap() != c2.to_lowercase().next().unwrap() {
 						return false;
 					}
 				}
-				(Some(c1),None) => return (c1=='\0')&&(it1.next()==None),
-				(None,Some(_)) => return false,
-				(None,None) => return true,
+				(Some(c1), None) => return (c1 == '\0') && (it1.next() == None),
+				(None, Some(_)) => return false,
+				(None, None) => return true,
 			}
 		}
 	}
 
 	/// Case sentitive comparison
-	/// 
+	///
 	/// # Arguments
-	///	
+	///
 	/// * `other` - The other string to compare to
 	///
 	/// # Examples
@@ -277,28 +287,30 @@ impl CapeStringImpl {
 	/// let s3=cobia::CapeStringImpl::from_string("idealGasEnthalpy");
 	/// assert_eq!(s1.eq(&s3),true);
 	/// ```
-	pub fn eq<T:CapeStringConstProvider>(&self, other: &T) -> bool {
-		let mut it1=self.data.chars();
-		let (other_ptr,other_len)=other.as_capechar_const_with_length();
-		let other_slice=unsafe{std::slice::from_raw_parts(other_ptr as *const u8,other_len as usize)};
-		let other_str=String::from_utf8_lossy(other_slice);
-		let mut it2=other_str.chars();
+	pub fn eq<T: CapeStringConstProvider>(&self, other: &T) -> bool {
+		let mut it1 = self.data.chars();
+		let (other_ptr, other_len) = other.as_capechar_const_with_length();
+		let other_slice =
+			unsafe { std::slice::from_raw_parts(other_ptr as *const u8, other_len as usize) };
+		let other_str = String::from_utf8_lossy(other_slice);
+		let mut it2 = other_str.chars();
 		loop {
-			match (it1.next(),it2.next()) {
-				(Some(c1),Some(c2)) => {
+			match (it1.next(), it2.next()) {
+				(Some(c1), Some(c2)) => {
 					if c1 != c2 {
 						return false;
 					}
 				}
-				(Some(c1),None) => return (c1=='\0')&&(it1.next()==None),
-				(None,Some(_)) => return false,
-				(None,None) => return true,
+				(Some(c1), None) => return (c1 == '\0') && (it1.next() == None),
+				(None, Some(_)) => return false,
+				(None, None) => return true,
 			}
 		}
 	}
 }
 
 impl CapeStringConstProvider for CapeStringImpl {
+
 	///Return as CapeCharacter const pointer with length
 	///
 	/// The caller must ensure that the lifetime of the CapeStringImpl
@@ -314,7 +326,10 @@ impl CapeStringConstProvider for CapeStringImpl {
 	/// assert_eq!(len,16);
 	/// ```
 	fn as_capechar_const_with_length(&self) -> (*const C::CapeCharacter, C::CapeSize) {
-		(self.data.as_ptr() as *const C::CapeCharacter, (self.data.len() - 1) as C::CapeSize) //length without the terminating null
+		(
+			self.data.as_ptr() as *const C::CapeCharacter,
+			(self.data.len() - 1) as C::CapeSize,
+		) //length without the terminating null
 	}
 	///Return as CapeCharacter const pointer with length
 	///
@@ -359,8 +374,8 @@ impl fmt::Display for CapeStringImpl {
 impl CapeStringProviderIn for CapeStringImpl {
 	fn as_cape_string_in(&self) -> C::ICapeString {
 		C::ICapeString {
-			vTbl:(&CapeStringImpl::CAPE_STRING_VTABLE as *const C::ICapeString_VTable).cast_mut(),
-			me:(self as *const CapeStringImpl).cast_mut() as *mut ::std::os::raw::c_void
+			vTbl: (&CapeStringImpl::CAPE_STRING_VTABLE as *const C::ICapeString_VTable).cast_mut(),
+			me: (self as *const CapeStringImpl).cast_mut() as *mut ::std::os::raw::c_void,
 		}
 	}
 }
@@ -368,14 +383,13 @@ impl CapeStringProviderIn for CapeStringImpl {
 impl CapeStringProviderOut for CapeStringImpl {
 	fn as_cape_string_out(&mut self) -> C::ICapeString {
 		C::ICapeString {
-			vTbl:(&CapeStringImpl::CAPE_STRING_VTABLE as *const C::ICapeString_VTable).cast_mut(),
-			me:(self as *const CapeStringImpl).cast_mut() as *mut ::std::os::raw::c_void
+			vTbl: (&CapeStringImpl::CAPE_STRING_VTABLE as *const C::ICapeString_VTable).cast_mut(),
+			me: (self as *const CapeStringImpl).cast_mut() as *mut ::std::os::raw::c_void,
 		}
 	}
 }
 
-impl<T:CapeStringConstProvider> PartialEq<T> for CapeStringImpl {
-
+impl<T: CapeStringConstProvider> PartialEq<T> for CapeStringImpl {
 	/// Case sensitive comparison
 	///
 	/// # Arguments
@@ -385,7 +399,7 @@ impl<T:CapeStringConstProvider> PartialEq<T> for CapeStringImpl {
 	/// * true if the strings are equal, false otherwise.
 	///
 	/// # Examples
-	/// 
+	///
 	/// ```
 	/// use cobia;
 	/// let s1=cobia::CapeStringImpl::from_string("idealGasEnthalpy");
@@ -395,27 +409,28 @@ impl<T:CapeStringConstProvider> PartialEq<T> for CapeStringImpl {
 	/// assert_eq!(s1==s3,false);
 	/// ```
 	fn eq(&self, other: &T) -> bool {
-		let (ptr,len)=other.as_capechar_const_with_length();
-		let mut self_len:usize=self.data.len();
-		if self_len>0 {self_len-=1;}
-		let len=len as usize;
+		let (ptr, len) = other.as_capechar_const_with_length();
+		let mut self_len: usize = self.data.len();
+		if self_len > 0 {
+			self_len -= 1;
+		}
+		let len = len as usize;
 		if self_len == len {
-			let mut ptr1=ptr;
-			let bytes=self.data.as_bytes();
+			let mut ptr1 = ptr;
+			let bytes = self.data.as_bytes();
 			for i in 0..(len as usize) {
 				if unsafe { *ptr1 } as u8 != bytes[i] {
 					return false;
 				}
-				ptr1=unsafe { ptr1.add(1) };
+				ptr1 = unsafe { ptr1.add(1) };
 			}
-			return true;			
+			return true;
 		}
 		false
 	}
 }
 
-impl Eq for CapeStringImpl {
-}
+impl Eq for CapeStringImpl {}
 
 impl std::hash::Hash for CapeStringImpl {
 	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {

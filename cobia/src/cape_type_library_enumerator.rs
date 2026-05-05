@@ -5,13 +5,11 @@ use crate::*;
 ///
 /// This is used to get the details of each library by name or UUID,
 /// or to get all libraries.
-
 pub struct CapeTypeLibraries {
 	pub(crate) interface: *mut C::ICapeLibraryEnumerator,
 }
 
 impl CapeTypeLibraries {
-
 	/// Create a new library enumerator.
 	///
 	/// # Examples
@@ -24,7 +22,6 @@ impl CapeTypeLibraries {
 	/// //...
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn new() -> Result<CapeTypeLibraries, COBIAError> {
 		let mut key: *mut C::ICapeLibraryEnumerator = std::ptr::null_mut();
 		let result =
@@ -52,8 +49,10 @@ impl CapeTypeLibraries {
 	/// assert_eq!(library_details.get_name().unwrap(),"CAPEOPEN_1_2");
 	/// cobia::cape_open_cleanup();
 	/// ```
-
-	pub fn get_library_by_library_id(&self, library_id: &CapeUUID) -> Result<CapeLibraryDetails, COBIAError> {
+	pub fn get_library_by_library_id(
+		&self,
+		library_id: &CapeUUID,
+	) -> Result<CapeLibraryDetails, COBIAError> {
 		let mut key: *mut C::ICapeLibraryDetails = std::ptr::null_mut();
 		let result = unsafe {
 			((*(*self.interface).vTbl).getLibraryByUUID.unwrap())(
@@ -85,7 +84,6 @@ impl CapeTypeLibraries {
 	/// assert_eq!(library_details.get_name().unwrap(),"CAPEOPEN_1_2");
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn get_library_by_name(&self, lib_name: &str) -> Result<CapeLibraryDetails, COBIAError> {
 		let mut key: *mut C::ICapeLibraryDetails = std::ptr::null_mut();
 		let result = unsafe {
@@ -118,8 +116,10 @@ impl CapeTypeLibraries {
 	/// assert_eq!(library_details.get_name().unwrap(),"CAPEOPEN_1_2");
 	/// cobia::cape_open_cleanup();
 	/// ```
-
-	pub fn get_library_by_interface_id(&self, interface_id: &CapeUUID) -> Result<CapeLibraryDetails, COBIAError> {
+	pub fn get_library_by_interface_id(
+		&self,
+		interface_id: &CapeUUID,
+	) -> Result<CapeLibraryDetails, COBIAError> {
 		let mut key: *mut C::ICapeLibraryDetails = std::ptr::null_mut();
 		let result = unsafe {
 			((*(*self.interface).vTbl).getLibraryByInterfaceUUID.unwrap())(
@@ -150,33 +150,30 @@ impl CapeTypeLibraries {
 	/// assert!(libraries.size() > 0); //normally the CAPE-OPEN type libraries are registered
 	/// cobia::cape_open_cleanup();
 	/// ```
-
-	pub fn libraries(&self) -> Result<CobiaCollection<CapeLibraryDetails>,COBIAError> {
+	pub fn libraries(&self) -> Result<CobiaCollection<CapeLibraryDetails>, COBIAError> {
 		let mut p: *mut C::ICobiaCollection = std::ptr::null_mut();
 		let result = unsafe {
 			((*(*self.interface).vTbl).getAllLibraries.unwrap())(
 				(*self.interface).me,
-				&mut p as *mut *mut C::ICobiaCollection
+				&mut p as *mut *mut C::ICobiaCollection,
 			)
 		};
 		if result == COBIAERR_NOERROR {
 			if p.is_null() {
 				Err(COBIAError::Code(COBIAERR_NULLPOINTER))
 			} else {
-				Ok(CobiaCollection::attach(p))
+				Ok(unsafe { CobiaCollection::attach(p) })
 			}
 		} else {
 			Err(COBIAError::Code(result))
 		}
 	}
-	
 }
 
 /// Release pointer
 ///
 /// ICapeTypeLibraries derives from ICobiaBase, which contains
 /// addReference() and release(). The Drop trait calls release.
-
 impl Drop for CapeTypeLibraries {
 	fn drop(&mut self) {
 		unsafe {
@@ -189,7 +186,6 @@ impl Drop for CapeTypeLibraries {
 ///
 /// ICapeTypeLibraries derives from ICobiaBase, which contains
 /// addReference() and release(). The Clone trait calls addReference.
-
 impl Clone for CapeTypeLibraries {
 	fn clone(&self) -> Self {
 		unsafe {
@@ -200,4 +196,3 @@ impl Clone for CapeTypeLibraries {
 		}
 	}
 }
-

@@ -1,5 +1,5 @@
-use crate::shared_unit_data::*;
 use crate::distillation_shortcut_unit::DistillationShortcutUnit;
+use crate::shared_unit_data::*;
 use cobia::*;
 
 /// The IntegerParameter class implements a CAPE-OPEN 1.2 integer parameter.
@@ -16,7 +16,6 @@ use cobia::*;
 ///
 /// Any invalid values (outside the bounds of the parameter) will raise an error when set.
 /// Therefore, any parameter is valid.
-
 #[cape_object_implementation(
 		interfaces = {
 			cape_open_1_2::ICapeIdentification,
@@ -35,31 +34,31 @@ use cobia::*;
 		default_values = {
 			value=default_value,
 		},
-  )] 
+  )]
 pub struct IntegerParameter {
 	/// The name of the parameter
 	pub(crate) name: CapeStringImpl,
 	/// The description of the parameter
 	description: CapeStringImpl,
 	/// Indicates whether this parameter is an input (true) or an output (false)
-	is_input : bool,
+	is_input: bool,
 	/// Shared data for the unit, containing unit-specific information
-	shared_unit_data: SharedUnitDataRef, 
+	shared_unit_data: SharedUnitDataRef,
 	/// The current value of the parameter
-	pub(crate) value : i32,
+	pub(crate) value: i32,
 	/// Default value of the parameter
-	default_value : i32,
+	default_value: i32,
 	/// Minimum value of the parameter
-	minimum_value : i32,
+	minimum_value: i32,
 	/// Maximum value of the parameter
-	maximum_value : i32,
+	maximum_value: i32,
 }
 
 impl std::fmt::Display for IntegerParameter {
 
 	/// Format the IntegerParameter as a string for display purposes.
 	///
-	/// The std::fmt::Display interface is used when generating the 
+	/// The std::fmt::Display interface is used when generating the
 	/// source name of the object that raises an error.
 	///
 	/// # Arguments:
@@ -67,11 +66,15 @@ impl std::fmt::Display for IntegerParameter {
 	///
 	/// # Returns:
 	/// * A `std::fmt::Result` indicating the success or failure of the formatting operation.
-
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"Parameter '{}' of {} unit '{}'",self.name, DistillationShortcutUnit::NAME, self.shared_unit_data.borrow().name)
-    }
-
+		write!(
+			f,
+			"Parameter '{}' of {} unit '{}'",
+			self.name,
+			DistillationShortcutUnit::NAME,
+			self.shared_unit_data.borrow().name
+		)
+	}
 }
 
 impl cape_open_1_2::ICapeIdentification for IntegerParameter {
@@ -83,8 +86,7 @@ impl cape_open_1_2::ICapeIdentification for IntegerParameter {
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure. If successful, the name is set in `name`.
-
-	fn get_component_name(&mut self,name:&mut CapeStringOut) -> Result<(), COBIAError> {
+	fn get_component_name(&mut self, name: &mut CapeStringOut) -> Result<(), COBIAError> {
 		name.set(&self.name)
 	}
 
@@ -95,15 +97,16 @@ impl cape_open_1_2::ICapeIdentification for IntegerParameter {
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure. If successful, the description is set in `description`.
-
-	fn get_component_description(&mut self,description:&mut CapeStringOut) -> Result<(), COBIAError> {
+	fn get_component_description(
+		&mut self,
+		description: &mut CapeStringOut,
+	) -> Result<(), COBIAError> {
 		description.set(&self.description)
 	}
 
 	/// Set the name of the component.
 	///
 	/// This method is not allowed for this parameter implementation and will return an error.
-
 	fn set_component_name(&mut self, _name: &CapeStringIn) -> Result<(), COBIAError> {
 		Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
 	}
@@ -111,62 +114,58 @@ impl cape_open_1_2::ICapeIdentification for IntegerParameter {
 	/// Set the description of the component.
 	///
 	/// This method is not allowed for this parameter implementation and will return an error.
-
 	fn set_component_description(&mut self, _desc: &CapeStringIn) -> Result<(), COBIAError> {
 		Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
 	}
+
 }
 
 impl cape_open_1_2::ICapeParameter for IntegerParameter {
 
 	/// Get the validation status of the parameter.
 	///
-	/// As this parameter does not accept any values that are not valid, 
+	/// As this parameter does not accept any values that are not valid,
 	/// the parameter is always valid.
-	/// 
+	///
 	/// # Returns:
 	/// * A `Result` containing the validation status, which is always `CapeValid` for this implementation.
-
-    fn get_val_status(&mut self) -> Result<cape_open_1_2::CapeValidationStatus,COBIAError> {
+	fn get_val_status(&mut self) -> Result<cape_open_1_2::CapeValidationStatus, COBIAError> {
 		Ok(cape_open_1_2::CapeValidationStatus::CapeValid)
-    }
+	}
 
 	/// Get the mode of the parameter.
 	///
 	/// # Returns:
 	/// * A `Result` containing the mode of the parameter, which is either `CapeInput` or `CapeOutput` based on the `is_input` field.
-
-    fn get_mode(&mut self) -> Result<cape_open_1_2::CapeParamMode,COBIAError> {
-        if self.is_input {
+	fn get_mode(&mut self) -> Result<cape_open_1_2::CapeParamMode, COBIAError> {
+		if self.is_input {
 			Ok(cape_open_1_2::CapeParamMode::CapeInput)
 		} else {
 			Ok(cape_open_1_2::CapeParamMode::CapeOutput)
 		}
-    }
+	}
 
 	/// Get the type of the parameter.
 	///
 	/// # Returns:
 	/// * A `Result` containing the type of the parameter, which is always `CapeParameterInteger` for this implementation.
-
-    fn get_type(&mut self) -> Result<cape_open_1_2::CapeParamType,COBIAError> {
-        Ok(cape_open_1_2::CapeParamType::CapeParameterInteger)
-    }
+	fn get_type(&mut self) -> Result<cape_open_1_2::CapeParamType, COBIAError> {
+		Ok(cape_open_1_2::CapeParamType::CapeParameterInteger)
+	}
 
 	/// Validate the parameter.
 	///
-	/// As this parameter does not accept any values that are not valid, 
+	/// As this parameter does not accept any values that are not valid,
 	/// the parameter is always valid.
-	/// 
+	///
 	/// # Arguments:
 	/// * `message` - A mutable reference to a `CapeStringOut` where any validation error messages will be set.
 	///
 	/// # Returns:
 	/// * A `Result` containing a `CapeBoolean` indicating whether the parameter is valid or not.
-
-    fn validate(&mut self,_message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError> {
+	fn validate(&mut self, _message: &mut CapeStringOut) -> Result<CapeBoolean, COBIAError> {
 		Ok(true as CapeBoolean)
-    }
+	}
 
 	/// Reset the parameter to its default value.
 	///
@@ -175,13 +174,12 @@ impl cape_open_1_2::ICapeParameter for IntegerParameter {
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure. If successful, the value is reset to the default value.
-
-    fn reset(&mut self) -> Result<(),COBIAError> {
-		if self.value!=self.default_value {
-			self.value = self.default_value; 
-			let mut shared=self.shared_unit_data.borrow_mut();
-			shared.dirty=true;
-			shared.validation_status=cape_open_1_2::CapeValidationStatus::CapeNotValidated;
+	fn reset(&mut self) -> Result<(), COBIAError> {
+		if self.value != self.default_value {
+			self.value = self.default_value;
+			let mut shared = self.shared_unit_data.borrow_mut();
+			shared.dirty = true;
+			shared.validation_status = cape_open_1_2::CapeValidationStatus::CapeNotValidated;
 		}
 		Ok(())
 	}
@@ -195,14 +193,13 @@ impl cape_open_1_2::ICapeIntegerParameter for IntegerParameter {
 	///
 	/// # Returns:
 	/// * A `Result` containing the current value of the parameter as `CapeInteger`.
-
-    fn get_value(&mut self) -> Result<CapeInteger,COBIAError> {
-        Ok(self.value)
-    }
+	fn get_value(&mut self) -> Result<CapeInteger, COBIAError> {
+		Ok(self.value)
+	}
 
 	/// Set the value of the parameter.
 	///
-	/// This implementation accepts a blank value for the parameters, but 
+	/// This implementation accepts a blank value for the parameters, but
 	/// it does not allow an invalid value to be set.
 	///
 	/// Only input parameters can be set.
@@ -214,25 +211,30 @@ impl cape_open_1_2::ICapeIntegerParameter for IntegerParameter {
 	///
 	/// # Returns:
 	/// * A `Result` indicating success or failure.
-
-    fn set_value(&mut self,value:CapeInteger) -> Result<(),COBIAError> {
-        if !self.is_input {
+	fn set_value(&mut self, value: CapeInteger) -> Result<(), COBIAError> {
+		if !self.is_input {
 			return Err(COBIAError::Code(COBIAERR_DENIED));
 		}
 		if value < self.minimum_value {
-			return Err(COBIAError::Message(format!("Value of {} below minimum value of {}",value,self.minimum_value)));
+			return Err(COBIAError::Message(format!(
+				"Value of {} below minimum value of {}",
+				value, self.minimum_value
+			)));
 		}
 		if value > self.maximum_value {
-			return Err(COBIAError::Message(format!("Value of {} above maximum value of {}",value,self.maximum_value)));
+			return Err(COBIAError::Message(format!(
+				"Value of {} above maximum value of {}",
+				value, self.maximum_value
+			)));
 		}
 		if self.value != value {
 			self.value = value;
-			let mut shared=self.shared_unit_data.borrow_mut();
-			shared.dirty=true;
-			shared.validation_status=cape_open_1_2::CapeValidationStatus::CapeNotValidated;
+			let mut shared = self.shared_unit_data.borrow_mut();
+			shared.dirty = true;
+			shared.validation_status = cape_open_1_2::CapeValidationStatus::CapeNotValidated;
 		}
 		Ok(())
-    }
+	}
 
 	/// Get the default value of the parameter.
 	///
@@ -240,10 +242,9 @@ impl cape_open_1_2::ICapeIntegerParameter for IntegerParameter {
 	///
 	/// # Returns:
 	/// * A `Result` containing the default value of the parameter as `CapeInteger`, or an error.
-
-    fn get_default_value(&mut self) -> Result<CapeInteger,COBIAError> {
+	fn get_default_value(&mut self) -> Result<CapeInteger, COBIAError> {
 		Ok(self.default_value)
-    }
+	}
 
 	/// Get the lower bound of the parameter.
 	///
@@ -251,10 +252,9 @@ impl cape_open_1_2::ICapeIntegerParameter for IntegerParameter {
 	///
 	/// # Returns:
 	/// * A `Result` containing the lower bound of the parameter as `CapeInteger`, or an error.
-
-    fn get_lower_bound(&mut self) -> Result<CapeInteger,COBIAError> {
+	fn get_lower_bound(&mut self) -> Result<CapeInteger, COBIAError> {
 		Ok(self.default_value)
-    }
+	}
 
 	/// Get the upper bound of the parameter.
 	///
@@ -262,10 +262,9 @@ impl cape_open_1_2::ICapeIntegerParameter for IntegerParameter {
 	///
 	/// # Returns:
 	/// * A `Result` containing the upper bound of the parameter as `CapeInteger`, or an error.
-
-    fn get_upper_bound(&mut self) -> Result<CapeInteger,COBIAError> {
-       Ok(self.maximum_value)
-    }
+	fn get_upper_bound(&mut self) -> Result<CapeInteger, COBIAError> {
+		Ok(self.maximum_value)
+	}
 
 	/// Validate whether a given value is valid for this parameter.
 	///
@@ -279,19 +278,28 @@ impl cape_open_1_2::ICapeIntegerParameter for IntegerParameter {
 	///
 	/// # Returns:
 	/// * A `Result` containing a `CapeBoolean` indicating whether the value is valid or not. If the value is not valid, it sets an error message in `message`.
-
-    fn validate(&mut self,value:CapeInteger,message:&mut CapeStringOut) -> Result<CapeBoolean,COBIAError> {
-        if !self.is_input {
+	fn validate(
+		&mut self,
+		value: CapeInteger,
+		message: &mut CapeStringOut,
+	) -> Result<CapeBoolean, COBIAError> {
+		if !self.is_input {
 			return Err(COBIAError::Code(COBIAERR_DENIED));
 		}
 		if value < self.minimum_value {
-			message.set_string(format!("Value of {} below minimum value of {}",value,self.minimum_value))?;
+			message.set_string(format!(
+				"Value of {} below minimum value of {}",
+				value, self.minimum_value
+			))?;
 			Ok(false as CapeBoolean)
 		} else if value > self.maximum_value {
-			message.set_string(format!("Value of {} above maximum value of {}",value,self.maximum_value))?;
+			message.set_string(format!(
+				"Value of {} above maximum value of {}",
+				value, self.maximum_value
+			))?;
 			Ok(false as CapeBoolean)
 		} else {
 			Ok(true as CapeBoolean)
 		}
-    }
+	}
 }

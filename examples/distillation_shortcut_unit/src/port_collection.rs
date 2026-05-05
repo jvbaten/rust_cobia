@@ -1,12 +1,11 @@
-use crate::shared_unit_data::*;
-use crate::material_port::MaterialPort;
 use crate::distillation_shortcut_unit::DistillationShortcutUnit;
+use crate::material_port::MaterialPort;
+use crate::shared_unit_data::*;
 use cobia::*;
 
 /// The PortCollection class implements a CAPE-OPEN 1.2 collection of unit ports for the DistillationShortcutUnit.
 ///
 /// It provides methods to manage and access the ports associated with the unit.
-
 #[cape_object_implementation(
 		interfaces={ 
 			cape_open_1_2::ICapeIdentification,
@@ -19,16 +18,16 @@ use cobia::*;
 			name=CapeStringImpl::from(format!("{} port collection",DistillationShortcutUnit::NAME)),
 			description=CapeStringImpl::from(format!("Port collection of {}",DistillationShortcutUnit::NAME)),
 		}
-  )] 
+  )]
 pub(crate) struct PortCollection {
 	/// The name of the port collection
 	name: CapeStringImpl,
 	/// The description of the port collection
 	description: CapeStringImpl,
 	/// The ports contained in this collection
-	ports : Vec<cape_open_1_2::CapeUnitPort>,
+	ports: Vec<cape_open_1_2::CapeUnitPort>,
 	/// Shared data for the unit, allowing access to common properties.
-	shared_unit_data: SharedUnitDataRef, 
+	shared_unit_data: SharedUnitDataRef,
 }
 
 impl PortCollection {
@@ -37,8 +36,7 @@ impl PortCollection {
 	///
 	/// # Arguments
 	/// * `port` - The port to be added to the collection.
-
-	pub(crate) fn add_port(&mut self,port:cape_open_1_2::CapeUnitPort) {
+	pub(crate) fn add_port(&mut self, port: cape_open_1_2::CapeUnitPort) {
 		self.ports.push(port);
 	}
 
@@ -46,7 +44,6 @@ impl PortCollection {
 	///
 	/// # Returns
 	/// An iterator that yields references to the ports in the collection.
-
 	pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut cape_open_1_2::CapeUnitPort> {
 		self.ports.iter_mut()
 	}
@@ -57,7 +54,7 @@ impl std::fmt::Display for PortCollection {
 
 	/// Formats the port collection for display.
 	///
-	/// The std::fmt::Display interface is used when generating the 
+	/// The std::fmt::Display interface is used when generating the
 	/// source name of the object that raises an error.
 	///
 	/// # Arguments
@@ -65,11 +62,14 @@ impl std::fmt::Display for PortCollection {
 	///
 	/// # Returns
 	/// A result indicating whether the formatting was successful or not.
-
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"Port collection of {} unit '{}'",DistillationShortcutUnit::NAME, self.shared_unit_data.borrow().name)
-    }
-
+		write!(
+			f,
+			"Port collection of {} unit '{}'",
+			DistillationShortcutUnit::NAME,
+			self.shared_unit_data.borrow().name
+		)
+	}
 }
 
 impl cape_open_1_2::ICapeIdentification for PortCollection {
@@ -81,8 +81,7 @@ impl cape_open_1_2::ICapeIdentification for PortCollection {
 	///
 	/// # Returns
 	/// * A `Result` indicating success or failure. If successful, the name is set in `name`.
-
-	fn get_component_name(&mut self,name:&mut CapeStringOut) -> Result<(), COBIAError> {
+	fn get_component_name(&mut self, name: &mut CapeStringOut) -> Result<(), COBIAError> {
 		name.set(&self.name)
 	}
 
@@ -93,8 +92,10 @@ impl cape_open_1_2::ICapeIdentification for PortCollection {
 	///
 	/// # Returns
 	/// * A `Result` indicating success or failure. If successful, the description is set in `description`.
-
-	fn get_component_description(&mut self,description:&mut CapeStringOut) -> Result<(), COBIAError> {
+	fn get_component_description(
+		&mut self,
+		description: &mut CapeStringOut,
+	) -> Result<(), COBIAError> {
 		description.set(&self.description)
 	}
 
@@ -105,7 +106,6 @@ impl cape_open_1_2::ICapeIdentification for PortCollection {
 	///
 	/// # Returns
 	/// * A `Result` indicating success or failure. This method is not allowed for this port implementation and will return an error.
-
 	fn set_component_name(&mut self, _name: &CapeStringIn) -> Result<(), COBIAError> {
 		Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
 	}
@@ -117,10 +117,10 @@ impl cape_open_1_2::ICapeIdentification for PortCollection {
 	///
 	/// # Returns
 	/// * A `Result` indicating success or failure. This method is not allowed for this port implementation and will return an error.
-
 	fn set_component_description(&mut self, _desc: &CapeStringIn) -> Result<(), COBIAError> {
 		Err(cobia::COBIAError::Code(cobia::COBIAERR_DENIED))
 	}
+
 }
 
 impl cape_open_1_2::ICapeCollection<cape_open_1_2::CapeUnitPort> for PortCollection {
@@ -132,9 +132,11 @@ impl cape_open_1_2::ICapeCollection<cape_open_1_2::CapeUnitPort> for PortCollect
 	///
 	/// # Returns
 	/// * A `Result` containing the port if found, or an error if the index is out of bounds.
-
-    fn item_by_index(&mut self,index:CapeInteger) -> Result<cape_open_1_2::CapeUnitPort,COBIAError> {
-		if index<0 || index>=self.ports.len() as CapeInteger {
+	fn item_by_index(
+		&mut self,
+		index: CapeInteger,
+	) -> Result<cape_open_1_2::CapeUnitPort, COBIAError> {
+		if index < 0 || index >= self.ports.len() as CapeInteger {
 			Err(cobia::COBIAError::Code(cobia::COBIAERR_NOSUCHITEM))
 		} else {
 			Ok(self.ports[index as usize].clone())
@@ -148,9 +150,11 @@ impl cape_open_1_2::ICapeCollection<cape_open_1_2::CapeUnitPort> for PortCollect
 	///
 	/// # Returns
 	/// * A `Result` containing the port if found, or an error if no such item exists.
-
-    fn item_by_name(&mut self,name:&CapeStringIn) -> Result<cape_open_1_2::CapeUnitPort,COBIAError> {
-		//in a generic implementation we could obtain the item names from the ports via ICapeIdentification, 
+	fn item_by_name(
+		&mut self,
+		name: &CapeStringIn,
+	) -> Result<cape_open_1_2::CapeUnitPort, COBIAError> {
+		//in a generic implementation we could obtain the item names from the ports via ICapeIdentification,
 		// but this involves copying the string. In this particular implementation, there is only one port
 		// class to we cast the object to its class and use the name directly
 		//alternatively, for a more performant implementation if the collection is expected to contain more
@@ -159,20 +163,20 @@ impl cape_open_1_2::ICapeCollection<cape_open_1_2::CapeUnitPort> for PortCollect
 		for port in self.ports.iter() {
 			//unsafe because we must guarantee that the implementing object is MaterialPort:
 			//  (it is, as this is the only object in the collection)
-			let material_port=unsafe { MaterialPort::borrow(port) }; 
+			let material_port = unsafe { MaterialPort::borrow(port) };
 			if material_port.get_name().eq_ignore_case(name) {
 				return Ok(port.clone());
 			}
 		}
 		Err(cobia::COBIAError::Code(cobia::COBIAERR_NOSUCHITEM))
-    }
+	}
 
 	/// Retrieves the number of ports in the collection.
 	///
 	/// # Returns
 	/// * A `Result` containing the number of ports as a `CapeInteger`.
+	fn get_count(&mut self) -> Result<CapeInteger, COBIAError> {
+		Ok(self.ports.len() as CapeInteger)
+	}
 
-    fn get_count(&mut self) -> Result<CapeInteger,COBIAError> {
-        Ok(self.ports.len() as CapeInteger)
-    }
 }

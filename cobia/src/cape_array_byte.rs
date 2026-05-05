@@ -1,21 +1,25 @@
-use crate::{C,COBIAError,CapeArrayByteInFromProvider};
-use crate::cape_array::{ArrayInterface,CapeArrayIn,CapeArrayOut};
-use crate::{CapeArrayByteProviderIn,CapeArrayByteProviderOut};
+use crate::cape_array::{ArrayInterface, CapeArrayIn, CapeArrayOut};
+use crate::{C, COBIAError, CapeArrayByteInFromProvider};
+use crate::{CapeArrayByteProviderIn, CapeArrayByteProviderOut};
 
 impl ArrayInterface<C::CapeByte> for C::ICapeArrayByte {
-
-	fn get(&mut self,data:&mut *mut C::CapeByte,size:&mut C::CapeSize) {
-		unsafe { (*self.vTbl).get.unwrap()(self.me,data as *mut *mut C::CapeByte,size) };
+	fn get(&mut self, data: &mut *mut C::CapeByte, size: &mut C::CapeSize) {
+		unsafe { (*self.vTbl).get.unwrap()(self.me, data as *mut *mut C::CapeByte, size) };
 	}
 
-	fn set(&mut self,data:&mut *mut C::CapeByte,size:C::CapeSize) -> C::CapeResult {
-		unsafe { (*self.vTbl).setsize.unwrap()(self.me,size,data as *mut *mut C::CapeByte) }
+	fn set(&mut self, data: &mut *mut C::CapeByte, size: C::CapeSize) -> C::CapeResult {
+		unsafe { (*self.vTbl).setsize.unwrap()(self.me, size, data as *mut *mut C::CapeByte) }
 	}
 
-	fn get_const(&self,data:&mut *const C::CapeByte,size:&mut C::CapeSize) {
-		unsafe { (*self.vTbl).get.unwrap()(self.me,data as *mut *const C::CapeByte as *mut *mut C::CapeByte,size) };
+	fn get_const(&self, data: &mut *const C::CapeByte, size: &mut C::CapeSize) {
+		unsafe {
+			(*self.vTbl).get.unwrap()(
+				self.me,
+				data as *mut *const C::CapeByte as *mut *mut C::CapeByte,
+				size,
+			)
+		};
 	}
-
 }
 
 /// CapeArrayByteIn wraps an ICapeArrayByte interface pointer.
@@ -35,13 +39,11 @@ impl ArrayInterface<C::CapeByte> for C::ICapeArrayByte {
 /// fn test_content(a: &CapeArrayByteIn) {
 ///     assert_eq!(a.as_vec(), vec![2u8,8u8,10u8]);
 /// }
-/// 
+///
 /// let arr = cobia::CapeArrayByteVec::from_slice(&[2u8,8u8,10u8]);
 /// test_content(&CapeArrayByteInFromProvider::from(&arr).as_cape_array_byte_in())
 /// ```
-
-pub type CapeArrayByteIn<'a> = CapeArrayIn<'a,C::CapeByte,C::ICapeArrayByte>;
-
+pub type CapeArrayByteIn<'a> = CapeArrayIn<'a, C::CapeByte, C::ICapeArrayByte>;
 
 impl<'a> CapeArrayByteProviderIn for CapeArrayByteIn<'a> {
 	fn as_cape_array_byte_in(&self) -> C::ICapeArrayByte {
@@ -64,15 +66,14 @@ impl<'a> CapeArrayByteProviderIn for CapeArrayByteIn<'a> {
 /// use cobia::*;
 ///
 /// fn set_content(a: &mut CapeArrayByteOut) {
-///		a.put_array(&[2u8,8u8,10u8]).unwrap();
+///    a.put_array(&[2u8,8u8,10u8]).unwrap();
 /// }
-/// 
+///
 /// let mut arr = cobia::CapeArrayByteVec::new();
 /// set_content(&mut CapeArrayByteOutFromProvider::from(&mut arr).as_cape_array_byte_out());
 /// assert_eq!(arr.as_vec(), &vec![2u8,8u8,10u8]);
 /// ```
-
-pub type CapeArrayByteOut<'a> = CapeArrayOut<'a,C::CapeByte,C::ICapeArrayByte>;
+pub type CapeArrayByteOut<'a> = CapeArrayOut<'a, C::CapeByte, C::ICapeArrayByte>;
 
 impl<'a> CapeArrayByteOut<'a> {
 
@@ -90,17 +91,15 @@ impl<'a> CapeArrayByteOut<'a> {
 	/// CapeArrayByteOutFromProvider::from(&mut arr).as_cape_array_byte_out().set(&arr1);
 	/// assert_eq!(arr.as_vec(), &[2u8,8u8,10u8]);
 	/// ```
-
-	pub fn set<T:CapeArrayByteProviderIn>(&mut self,array:&T) -> Result<(), COBIAError> {
+	pub fn set<T: CapeArrayByteProviderIn>(&mut self, array: &T) -> Result<(), COBIAError> {
 		let mut byte_array_in_from_provider = CapeArrayByteInFromProvider::from(array);
-		let byte_array=byte_array_in_from_provider.as_cape_array_byte_in();
+		let byte_array = byte_array_in_from_provider.as_cape_array_byte_in();
 		self.resize(byte_array.size())?;
 		for i in 0..byte_array.size() {
-			self[i]=byte_array[i];
+			self[i] = byte_array[i];
 		}
 		Ok(())
 	}
-
 }
 
 impl<'a> CapeArrayByteProviderOut for CapeArrayByteOut<'a> {
@@ -108,6 +107,3 @@ impl<'a> CapeArrayByteProviderOut for CapeArrayByteOut<'a> {
 		unsafe { **self.interface }
 	}
 }
-
-
-

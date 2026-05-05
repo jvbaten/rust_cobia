@@ -10,13 +10,11 @@ use crate::*;
 ///
 /// This class it not marked Send or Sync because the validity of the underlying
 /// error is typically short and local.
-
 pub struct CapeError {
 	pub(crate) interface: *mut C::ICapeError,
 }
 
 impl CapeError {
-
 	/// Create a new CapeError from an ICapeError interface pointer.
 	///
 	/// The CapeError object is not typically used directly. Errors
@@ -35,15 +33,12 @@ impl CapeError {
 	/// # Panics
 	///
 	/// Panics if the interface pointer is null.
-
-	pub fn from_interface_pointer(interface: *mut C::ICapeError) ->  Self {
+	pub unsafe fn from_interface_pointer(interface: *mut C::ICapeError) -> Self {
 		if interface.is_null() {
 			panic!("Null pointer in creation of CapeError");
 		}
-		unsafe {((*(*interface).vTbl).base.addReference.unwrap())((*interface).me)};
-		Self {
-			interface
-		}
+		unsafe { ((*(*interface).vTbl).base.addReference.unwrap())((*interface).me) };
+		Self { interface }
 	}
 
 	/// Create a new CapeError from an ICapeError interface pointer without adding a reference.
@@ -64,25 +59,24 @@ impl CapeError {
 	/// # Panics
 	///
 	/// Panics if the interface pointer is null.
-
-	pub fn attach(interface: *mut C::ICapeError) ->  Self {
+	pub unsafe fn attach(interface: *mut C::ICapeError) -> Self {
 		if interface.is_null() {
 			panic!("Null pointer in creation of CapeError");
 		}
-		Self {
-			interface
-		}
+		Self { interface }
 	}
 
 	/// Get the error text
 	///
 	/// Gets the error text from the error interface. The error text
 	/// is descriptive information about the nature of the error.
-
 	pub fn get_error_text(&self) -> Result<String, COBIAError> {
 		let mut s = CapeStringImpl::new();
 		let result = unsafe {
-			((*(*self.interface).vTbl).getErrorText.unwrap())((*self.interface).me,(&s.as_cape_string_out() as *const C::ICapeString).cast_mut())
+			((*(*self.interface).vTbl).getErrorText.unwrap())(
+				(*self.interface).me,
+				(&s.as_cape_string_out() as *const C::ICapeString).cast_mut(),
+			)
 		};
 		if result == COBIAERR_NOERROR {
 			Ok(s.as_string())
@@ -95,17 +89,16 @@ impl CapeError {
 	///
 	/// Sometimes an error is casued by another error. If so, the
 	/// error that causes this error is available through this function.
-
 	pub fn get_cause(&self) -> Option<CapeError> {
 		let mut interface: *mut C::ICapeError = std::ptr::null_mut();
 		let result = unsafe {
 			((*(*self.interface).vTbl).getCause.unwrap())(
 				(*self.interface).me,
-				&mut interface as *mut *mut C::ICapeError
+				&mut interface as *mut *mut C::ICapeError,
 			)
 		};
 		if result != COBIAERR_NOERROR || interface.is_null() {
-			None			
+			None
 		} else {
 			Some(CapeError { interface })
 		}
@@ -114,12 +107,14 @@ impl CapeError {
 	/// Get the error source
 	///
 	/// The error source is a descriptive name of the object that
-	/// raised the error. 
-
+	/// raised the error.
 	pub fn get_source(&self) -> Result<String, COBIAError> {
 		let mut s = CapeStringImpl::new();
 		let result = unsafe {
-			((*(*self.interface).vTbl).getSource.unwrap())((*self.interface).me,(&s.as_cape_string_out() as *const C::ICapeString).cast_mut())
+			((*(*self.interface).vTbl).getSource.unwrap())(
+				(*self.interface).me,
+				(&s.as_cape_string_out() as *const C::ICapeString).cast_mut(),
+			)
 		};
 		if result == COBIAERR_NOERROR {
 			Ok(s.as_string())
@@ -132,11 +127,13 @@ impl CapeError {
 	///
 	/// The error scope is the function that was being executed when
 	/// the error was raised.
-
 	pub fn get_scope(&self) -> Result<String, COBIAError> {
 		let mut s = CapeStringImpl::new();
 		let result = unsafe {
-			((*(*self.interface).vTbl).getScope.unwrap())((*self.interface).me,(&s.as_cape_string_out() as *const C::ICapeString).cast_mut())
+			((*(*self.interface).vTbl).getScope.unwrap())(
+				(*self.interface).me,
+				(&s.as_cape_string_out() as *const C::ICapeString).cast_mut(),
+			)
 		};
 		if result == COBIAERR_NOERROR {
 			Ok(s.as_string())
@@ -144,45 +141,37 @@ impl CapeError {
 			Err(COBIAError::Code(result))
 		}
 	}
-	
 }
 
-/// Display 
-
+/// Display
 impl std::fmt::Display for CapeError {
-
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-		let mut err:Option<CapeError> = Some(self.clone());
-		while let Some(e)=err {
+		let mut err: Option<CapeError> = Some(self.clone());
+		while let Some(e) = err {
 			match e.get_scope() {
-				Ok(scope) => {
-					match e.get_source() {
-						Ok(source) => {
-							write!(f, "in {} of {}: ", scope, source)?;
-						},
-						_ => {
-							write!(f, "in {}", scope)?;
-						}
+				Ok(scope) => match e.get_source() {
+					Ok(source) => {
+						write!(f, "in {} of {}: ", scope, source)?;
+					}
+					_ => {
+						write!(f, "in {}", scope)?;
 					}
 				},
 				_ => {
-					match e.get_source() {
-						Ok(source) => {
-							write!(f, "{}: ", source)?;
-						},
-						_ => {}
+					if let Ok(source) = e.get_source() {
+						write!(f, "{}: ", source)?;
 					}
 				}
 			}
 			match e.get_error_text() {
 				Ok(text) => {
 					write!(f, "{}", text)?;
-				},
+				}
 				_ => {
 					write!(f, "Unknown error")?;
 				}
 			}
-			err=e.get_cause();
+			err = e.get_cause();
 			if err.is_some() {
 				write!(f, ", caused by: ")?;
 			}
@@ -195,7 +184,6 @@ impl std::fmt::Display for CapeError {
 ///
 /// ICapeError derives from ICobiaBase, which contains
 /// addReference() and release(). The Drop trait calls release.
-
 impl Drop for CapeError {
 	fn drop(&mut self) {
 		unsafe {
@@ -208,7 +196,6 @@ impl Drop for CapeError {
 ///
 /// ICapeError derives from ICobiaBase, which contains
 /// addReference() and release(). The Clone trait calls addReference.
-
 impl Clone for CapeError {
 	fn clone(&self) -> Self {
 		unsafe {
@@ -219,4 +206,3 @@ impl Clone for CapeError {
 		}
 	}
 }
-

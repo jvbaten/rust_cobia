@@ -26,14 +26,14 @@ pub trait CapeStringConstProvider {
 	/// Note that the caller must ensure that life span of the pointer does not exceed the life
 	/// span of the object and note that the pointer becomes invalid upon assiging a new string
 	/// to the object
-	/// 
+	///
 	fn as_capechar_const(&self) -> *const C::CapeCharacter;
 	/// Convert to const CapeCharacter pointer (null terminated) and length (without null terminator)
 	///
 	/// Note that the caller must ensure that life span of the pointer does not exceed the life
 	/// span of the object and note that the pointer becomes invalid upon assiging a new string
 	/// to the object
-	/// 
+	///
 	fn as_capechar_const_with_length(&self) -> (*const C::CapeCharacter, C::CapeSize);
 }
 
@@ -163,9 +163,8 @@ pub trait CapeValueProviderOut {
 	fn as_cape_value_out(&mut self) -> C::ICapeValue;
 }
 
-
 /// Any object that implements this trait can be converted to an ICapeArrayValue input argument
-/// 
+///
 /// This trait is implemented by any object that can be passed as an ICapeArrayValue
 /// input argument
 pub trait CapeArrayValueProviderIn {
@@ -174,7 +173,7 @@ pub trait CapeArrayValueProviderIn {
 }
 
 /// Any object that implements this trait can be converted to an ICapeArrayValue output argument
-/// 
+///
 /// This trait is implemented by any object that can be passed as an ICapeArrayValue
 /// output argument
 pub trait CapeArrayValueProviderOut {

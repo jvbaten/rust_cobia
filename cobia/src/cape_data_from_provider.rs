@@ -3,25 +3,25 @@ use crate::*;
 /// CapeStringInFromProvider
 ///
 /// When calling a CAPE-OPEN method that takes a CapeString as input,
-/// the caller provides an object that implements `CapeStringProviderIn`, 
+/// the caller provides an object that implements `CapeStringProviderIn`,
 /// for example `CapeStringImpl`.
 ///
 /// The CapeStringInFromProvider returns an `C::ICapeString` interface, which
-/// has a small life span, enough to make sure that the pointer to this 
-/// interface is valid. This is done inside wrapper classes such as 
-/// `capeopen_1_2::CapeIdentification`, 
+/// has a small life span, enough to make sure that the pointer to this
+/// interface is valid. This is done inside wrapper classes such as
+/// `capeopen_1_2::CapeIdentification`,
 ///
 /// When implementing a function that gets called, and takes a CapeString
-/// as input, it received a `&CapeStringIn` typed argument, which is 
+/// as input, it received a `&CapeStringIn` typed argument, which is
 /// constructed from the reference to an `C::ICapeString` interface pointer.
 ///
-/// Typically a function call receives the `C::ICapeString` interface 
-/// from the caller, and from this, the `CapeStringIn` is constructed by 
+/// Typically a function call receives the `C::ICapeString` interface
+/// from the caller, and from this, the `CapeStringIn` is constructed by
 /// the `cape_object_implementation` macro.
 ///
 /// In the rare case that one wants to call an internal CAPE-OPEN function
-/// directly, one needs to provide the class that implements the 
-/// `CapeStringProviderIn` trait, allocate the pointer, point to it, and 
+/// directly, one needs to provide the class that implements the
+/// `CapeStringProviderIn` trait, allocate the pointer, point to it, and
 /// construct the `CapeStringIn` object from a reference to that pointer.
 ///
 /// The `CapeStringInFromProvider` class does all this.
@@ -36,15 +36,13 @@ use crate::*;
 /// let value=StringFromCapeStringIn(&CapeStringInFromProvider::from(&string).as_cape_string_in()); //this is how string is passed as &CapeStringIn argument
 /// assert_eq!(value,"Hello".to_string());
 /// ```
-
 pub struct CapeStringInFromProvider {
 	interface: C::ICapeString,
 	interface_ptr: *mut C::ICapeString,
 }
 
 impl CapeStringInFromProvider {
-
-	pub fn from<T:CapeStringProviderIn>(provider:&T) -> Self {
+	pub fn from<T: CapeStringProviderIn>(provider: &T) -> Self {
 		Self {
 			interface: provider.as_cape_string_in(),
 			interface_ptr: std::ptr::null_mut(),
@@ -52,34 +50,33 @@ impl CapeStringInFromProvider {
 	}
 
 	pub fn as_cape_string_in(&mut self) -> CapeStringIn<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeString;
-		CapeStringIn::new(& self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeString;
+		CapeStringIn::new(&self.interface_ptr)
 	}
-
 }
 
 /// CapeStringOutFromProvider
 ///
 /// When calling a CAPE-OPEN method that takes a CapeString as output,
-/// the caller provides an object that implements `CapeStringProviderOut`, 
+/// the caller provides an object that implements `CapeStringProviderOut`,
 /// for example `CapeStringImpl`.
 ///
 /// The `CapeStringOutFromProvider` returns an `C::ICapeString` interface, which
-/// has a small life span, enough to make sure that the pointer to this 
-/// interface is valid. This is done inside wrapper classes such as 
-/// `capeopen_1_2::CapeIdentification`, 
+/// has a small life span, enough to make sure that the pointer to this
+/// interface is valid. This is done inside wrapper classes such as
+/// `capeopen_1_2::CapeIdentification`,
 ///
 /// When implementing a function that gets called, and takes a CapeString
-/// as output, it received a `&mut CapeStringOut` typed argument, which is 
+/// as output, it received a `&mut CapeStringOut` typed argument, which is
 /// constructed from the reference to an `C::ICapeString` interface pointer.
 ///
-/// Typically a function call receives the C::ICapeString interface 
-/// from the caller, and from this, the `CapeStringOut` is constructed by 
+/// Typically a function call receives the C::ICapeString interface
+/// from the caller, and from this, the `CapeStringOut` is constructed by
 /// the `cape_object_implementation` macro.
 ///
 /// In the rare case that one wants to call an internal CAPE-OPEN function
-/// directly, one needs to provide the class that implements the 
-/// `CapeStringProviderOut` trait, allocate the pointer, point to it, and 
+/// directly, one needs to provide the class that implements the
+/// `CapeStringProviderOut` trait, allocate the pointer, point to it, and
 /// construct the `CapeStringOut` object from a reference to that pointer.
 ///
 /// The `CapeStringOutFromProvider` class does all this.
@@ -94,15 +91,13 @@ impl CapeStringInFromProvider {
 /// SetCapeStringOut(&mut CapeStringOutFromProvider::from(&mut string).as_cape_string_out()); //this is how string is passed as &mut CapeStringOut argument
 /// assert_eq!(string.as_string(),"Hello".to_string());
 /// ```
-
 pub struct CapeStringOutFromProvider {
 	interface: C::ICapeString,
 	interface_ptr: *mut C::ICapeString,
 }
 
 impl CapeStringOutFromProvider {
-
-	pub fn from<T:CapeStringProviderOut>(provider:&mut T) -> Self {
+	pub fn from<T: CapeStringProviderOut>(provider: &mut T) -> Self {
 		Self {
 			interface: provider.as_cape_string_out(),
 			interface_ptr: std::ptr::null_mut(),
@@ -110,10 +105,9 @@ impl CapeStringOutFromProvider {
 	}
 
 	pub fn as_cape_string_out(&mut self) -> CapeStringOut<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeString;
-		CapeStringOut::new(& mut self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeString;
+		CapeStringOut::new(&mut self.interface_ptr)
 	}
-
 }
 
 /// CapeValueInFromProvider
@@ -153,22 +147,21 @@ impl CapeStringOutFromProvider {
 /// let value=ValueFromCapeValueIn(&CapeValueInFromProvider::from(&value).as_cape_value_in()); //this is how value is passed as &CapeValueIn argument
 /// assert_eq!(value,3.14);
 /// ```
-
 pub struct CapeValueInFromProvider {
 	interface: C::ICapeValue,
 	interface_ptr: *mut C::ICapeValue,
 }
 
 impl CapeValueInFromProvider {
-	pub fn from<T:CapeValueProviderIn>(provider:&T) -> Self {
+	pub fn from<T: CapeValueProviderIn>(provider: &T) -> Self {
 		Self {
 			interface: provider.as_cape_value_in(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_value_in(&mut self) -> CapeValueIn<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeValue;
-		CapeValueIn::new(& self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeValue;
+		CapeValueIn::new(&self.interface_ptr)
 	}
 }
 
@@ -208,22 +201,21 @@ impl CapeValueInFromProvider {
 /// SetValueOut(&mut CapeValueOutFromProvider::from(&mut value).as_cape_value_out()); //this is how value is passed as &mut CapeValueOut argument
 /// assert_eq!(value.value(),CapeValueContent::Integer(8));
 /// ```
-
 pub struct CapeValueOutFromProvider {
 	interface: C::ICapeValue,
 	interface_ptr: *mut C::ICapeValue,
 }
 
 impl CapeValueOutFromProvider {
-	pub fn from<T:CapeValueProviderOut>(provider:&mut T) -> Self {
+	pub fn from<T: CapeValueProviderOut>(provider: &mut T) -> Self {
 		Self {
 			interface: provider.as_cape_value_out(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_value_out(&mut self) -> CapeValueOut<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeValue;
-		CapeValueOut::new(& mut self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeValue;
+		CapeValueOut::new(&mut self.interface_ptr)
 	}
 }
 
@@ -263,22 +255,21 @@ impl CapeValueOutFromProvider {
 /// let value=ArrayFromCapeArrayStringIn(&CapeArrayStringInFromProvider::from(&array).as_cape_array_string_in()); //this is how array is passed as &CapeArrayStringIn argument
 /// assert_eq!(value,vec!["Hello".to_string(),"World".to_string()]);
 /// ```
-
 pub struct CapeArrayStringInFromProvider {
 	interface: C::ICapeArrayString,
 	interface_ptr: *mut C::ICapeArrayString,
 }
 
 impl CapeArrayStringInFromProvider {
-	pub fn from<T:CapeArrayStringProviderIn>(provider:&T) -> Self {
+	pub fn from<T: CapeArrayStringProviderIn>(provider: &T) -> Self {
 		Self {
 			interface: provider.as_cape_array_string_in(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_string_in(&mut self) -> CapeArrayStringIn<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayString;
-		CapeArrayStringIn::new(& self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayString;
+		CapeArrayStringIn::new(&self.interface_ptr)
 	}
 }
 
@@ -318,22 +309,21 @@ impl CapeArrayStringInFromProvider {
 /// SetArrayOut(&mut CapeArrayStringOutFromProvider::from(&mut array).as_cape_array_string_out()); //this is how array is passed as &mut CapeArrayStringOut argument
 /// assert_eq!(array.as_string_vec(),vec!["Hello".to_string(),"World".to_string()]);
 /// ```
-
 pub struct CapeArrayStringOutFromProvider {
 	interface: C::ICapeArrayString,
 	interface_ptr: *mut C::ICapeArrayString,
 }
 
 impl CapeArrayStringOutFromProvider {
-	pub fn from<T:CapeArrayStringProviderOut>(provider:&mut T) -> Self {
+	pub fn from<T: CapeArrayStringProviderOut>(provider: &mut T) -> Self {
 		Self {
 			interface: provider.as_cape_array_string_out(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_string_out(&mut self) -> CapeArrayStringOut<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayString;
-		CapeArrayStringOut::new(& mut self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayString;
+		CapeArrayStringOut::new(&mut self.interface_ptr)
 	}
 }
 
@@ -373,22 +363,21 @@ impl CapeArrayStringOutFromProvider {
 /// let value=ArrayFromCapeArrayIntegerIn(&CapeArrayIntegerInFromProvider::from(&array).as_cape_array_integer_in()); //this is how array is passed as &CapeArrayIntegerIn argument
 /// assert_eq!(value,vec![1,2,3]);
 /// ```
-
 pub struct CapeArrayIntegerInFromProvider {
 	interface: C::ICapeArrayInteger,
 	interface_ptr: *mut C::ICapeArrayInteger,
 }
 
 impl CapeArrayIntegerInFromProvider {
-	pub fn from<T:CapeArrayIntegerProviderIn>(provider:&T) -> Self {
+	pub fn from<T: CapeArrayIntegerProviderIn>(provider: &T) -> Self {
 		Self {
 			interface: provider.as_cape_array_integer_in(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_integer_in(&mut self) -> CapeArrayIntegerIn<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayInteger;
-		CapeArrayIntegerIn::new(& self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayInteger;
+		CapeArrayIntegerIn::new(&self.interface_ptr)
 	}
 }
 
@@ -428,22 +417,21 @@ impl CapeArrayIntegerInFromProvider {
 /// SetArrayOut(&mut CapeArrayIntegerOutFromProvider::from(&mut array).as_cape_array_integer_out()); //this is how array is passed as &mut CapeArrayIntegerOut argument
 /// assert_eq!(array.as_vec(),&vec![1,2,3]);
 /// ```
-	
 pub struct CapeArrayIntegerOutFromProvider {
 	interface: C::ICapeArrayInteger,
 	interface_ptr: *mut C::ICapeArrayInteger,
 }
 
 impl CapeArrayIntegerOutFromProvider {
-	pub fn from<T:CapeArrayIntegerProviderOut>(provider:&mut T) -> Self {
+	pub fn from<T: CapeArrayIntegerProviderOut>(provider: &mut T) -> Self {
 		Self {
 			interface: provider.as_cape_array_integer_out(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_integer_out(&mut self) -> CapeArrayIntegerOut<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayInteger;
-		CapeArrayIntegerOut::new(& mut self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayInteger;
+		CapeArrayIntegerOut::new(&mut self.interface_ptr)
 	}
 }
 
@@ -483,22 +471,21 @@ impl CapeArrayIntegerOutFromProvider {
 /// let value=ArrayFromCapeArrayRealIn(&CapeArrayRealInFromProvider::from(&array).as_cape_array_real_in()); //this is how array is passed as &CapeArrayRealIn argument
 /// assert_eq!(value,vec![1.0,2.0,3.0]);
 /// ```
-
 pub struct CapeArrayRealInFromProvider {
 	interface: C::ICapeArrayReal,
 	interface_ptr: *mut C::ICapeArrayReal,
 }
 
 impl CapeArrayRealInFromProvider {
-	pub fn from<T:CapeArrayRealProviderIn>(provider:&T) -> Self {
+	pub fn from<T: CapeArrayRealProviderIn>(provider: &T) -> Self {
 		Self {
 			interface: provider.as_cape_array_real_in(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_real_in(&mut self) -> CapeArrayRealIn<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayReal;
-		CapeArrayRealIn::new(& self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayReal;
+		CapeArrayRealIn::new(&self.interface_ptr)
 	}
 }
 
@@ -538,22 +525,21 @@ impl CapeArrayRealInFromProvider {
 /// SetArrayOut(&mut CapeArrayRealOutFromProvider::from(&mut array).as_cape_array_real_out()); //this is how array is passed as &mut CapeArrayRealOut argument
 /// assert_eq!(array.as_vec(),&vec![1.0,2.0,3.0]);
 /// ```
-
 pub struct CapeArrayRealOutFromProvider {
 	interface: C::ICapeArrayReal,
 	interface_ptr: *mut C::ICapeArrayReal,
 }
 
 impl CapeArrayRealOutFromProvider {
-	pub fn from<T:CapeArrayRealProviderOut>(provider:&mut T) -> Self {
+	pub fn from<T: CapeArrayRealProviderOut>(provider: &mut T) -> Self {
 		Self {
 			interface: provider.as_cape_array_real_out(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_real_out(&mut self) -> CapeArrayRealOut<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayReal;
-		CapeArrayRealOut::new(& mut self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayReal;
+		CapeArrayRealOut::new(&mut self.interface_ptr)
 	}
 }
 
@@ -593,22 +579,21 @@ impl CapeArrayRealOutFromProvider {
 /// let value=ArrayFromCapeArrayBooleanIn(&CapeArrayBooleanInFromProvider::from(&array).as_cape_array_boolean_in()); //this is how array is passed as &CapeArrayBooleanIn argument
 /// assert_eq!(value,vec![true as cobia::CapeBoolean,false as cobia::CapeBoolean,true as cobia::CapeBoolean]);
 /// ```
-
 pub struct CapeArrayBooleanInFromProvider {
 	interface: C::ICapeArrayBoolean,
 	interface_ptr: *mut C::ICapeArrayBoolean,
 }
 
 impl CapeArrayBooleanInFromProvider {
-	pub fn from<T:CapeArrayBooleanProviderIn>(provider:&T) -> Self {
+	pub fn from<T: CapeArrayBooleanProviderIn>(provider: &T) -> Self {
 		Self {
 			interface: provider.as_cape_array_boolean_in(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_boolean_in(&mut self) -> CapeArrayBooleanIn<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayBoolean;
-		CapeArrayBooleanIn::new(& self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayBoolean;
+		CapeArrayBooleanIn::new(&self.interface_ptr)
 	}
 }
 
@@ -648,22 +633,21 @@ impl CapeArrayBooleanInFromProvider {
 /// SetArrayOut(&mut CapeArrayBooleanOutFromProvider::from(&mut array).as_cape_array_boolean_out()); //this is how array is passed as &mut CapeArrayBooleanOut argument
 /// assert_eq!(array.as_vec(),&vec![true as cobia::CapeBoolean,false as cobia::CapeBoolean,true as cobia::CapeBoolean]);
 /// ```
-
 pub struct CapeArrayBooleanOutFromProvider {
 	interface: C::ICapeArrayBoolean,
 	interface_ptr: *mut C::ICapeArrayBoolean,
 }
 
 impl CapeArrayBooleanOutFromProvider {
-	pub fn from<T:CapeArrayBooleanProviderOut>(provider:&mut T) -> Self {
+	pub fn from<T: CapeArrayBooleanProviderOut>(provider: &mut T) -> Self {
 		Self {
 			interface: provider.as_cape_array_boolean_out(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_boolean_out(&mut self) -> CapeArrayBooleanOut<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayBoolean;
-		CapeArrayBooleanOut::new(& mut self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayBoolean;
+		CapeArrayBooleanOut::new(&mut self.interface_ptr)
 	}
 }
 
@@ -703,22 +687,21 @@ impl CapeArrayBooleanOutFromProvider {
 /// let value=ArrayFromCapeArrayByteIn(&CapeArrayByteInFromProvider::from(&array).as_cape_array_byte_in()); //this is how array is passed as &CapeArrayByteIn argument
 /// assert_eq!(value,vec![1,2,3]);
 /// ```
-
 pub struct CapeArrayByteInFromProvider {
 	interface: C::ICapeArrayByte,
 	interface_ptr: *mut C::ICapeArrayByte,
 }
 
 impl CapeArrayByteInFromProvider {
-	pub fn from<T:CapeArrayByteProviderIn>(provider:&T) -> Self {
+	pub fn from<T: CapeArrayByteProviderIn>(provider: &T) -> Self {
 		Self {
 			interface: provider.as_cape_array_byte_in(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_byte_in(&mut self) -> CapeArrayByteIn<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayByte;
-		CapeArrayByteIn::new(& self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayByte;
+		CapeArrayByteIn::new(&self.interface_ptr)
 	}
 }
 
@@ -758,22 +741,21 @@ impl CapeArrayByteInFromProvider {
 /// SetArrayOut(&mut CapeArrayByteOutFromProvider::from(&mut array).as_cape_array_byte_out()); //this is how array is passed as &mut CapeArrayByteOut argument
 /// assert_eq!(array.as_vec(),&vec![1,2,3]);
 /// ```
-
 pub struct CapeArrayByteOutFromProvider {
 	interface: C::ICapeArrayByte,
 	interface_ptr: *mut C::ICapeArrayByte,
 }
 
 impl CapeArrayByteOutFromProvider {
-	pub fn from<T:CapeArrayByteProviderOut>(provider:&mut T) -> Self {
+	pub fn from<T: CapeArrayByteProviderOut>(provider: &mut T) -> Self {
 		Self {
 			interface: provider.as_cape_array_byte_out(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_byte_out(&mut self) -> CapeArrayByteOut<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayByte;
-		CapeArrayByteOut::new(& mut self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayByte;
+		CapeArrayByteOut::new(&mut self.interface_ptr)
 	}
 }
 
@@ -813,22 +795,21 @@ impl CapeArrayByteOutFromProvider {
 /// let value=ArrayFromCapeArrayValueIn(&CapeArrayValueInFromProvider::from(&array).as_cape_array_value_in()); //this is how array is passed as &CapeArrayValueIn argument
 /// assert_eq!(value,vec![CapeValueContent::Integer(1),CapeValueContent::Integer(2),CapeValueContent::Integer(3)]);
 /// ```
-
 pub struct CapeArrayValueInFromProvider {
 	interface: C::ICapeArrayValue,
 	interface_ptr: *mut C::ICapeArrayValue,
 }
 
 impl CapeArrayValueInFromProvider {
-	pub fn from<T:CapeArrayValueProviderIn>(provider:&T) -> Self {
+	pub fn from<T: CapeArrayValueProviderIn>(provider: &T) -> Self {
 		Self {
 			interface: provider.as_cape_array_value_in(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_value_in(&mut self) -> CapeArrayValueIn<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayValue;
-		CapeArrayValueIn::new(& self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayValue;
+		CapeArrayValueIn::new(&self.interface_ptr)
 	}
 }
 
@@ -868,22 +849,21 @@ impl CapeArrayValueInFromProvider {
 /// SetArrayOut(&mut CapeArrayValueOutFromProvider::from(&mut array).as_cape_array_value_out()); //this is how array is passed as &mut CapeArrayValueOut argument
 /// assert_eq!(array.as_value_vec(),vec![CapeValueContent::Integer(1),CapeValueContent::Integer(2),CapeValueContent::Integer(3)]);
 /// ```
-
 pub struct CapeArrayValueOutFromProvider {
 	interface: C::ICapeArrayValue,
 	interface_ptr: *mut C::ICapeArrayValue,
 }
 
 impl CapeArrayValueOutFromProvider {
-	pub fn from<T:CapeArrayValueProviderOut>(provider:&mut T) -> Self {
+	pub fn from<T: CapeArrayValueProviderOut>(provider: &mut T) -> Self {
 		Self {
 			interface: provider.as_cape_array_value_out(),
 			interface_ptr: std::ptr::null_mut(),
 		}
 	}
 	pub fn as_cape_array_value_out(&mut self) -> CapeArrayValueOut<'_> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayValue;
-		CapeArrayValueOut::new(& mut self.interface_ptr)
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayValue;
+		CapeArrayValueOut::new(&mut self.interface_ptr)
 	}
 }
 
@@ -923,24 +903,23 @@ impl CapeArrayValueOutFromProvider {
 /// let value=ArrayFromCapeArrayEnumerationIn(&CapeArrayEnumerationInFromProvider::from(&array).as_cape_array_enumeration_in()); //this is how array is passed as &CapeArrayEnumerationIn argument
 /// assert_eq!(value,vec![CapePMCServiceType::Inproc64,CapePMCServiceType::COM64]);
 /// ```
-
-pub struct CapeArrayEnumerationInFromProvider<Element:Copy+Clone> {
+pub struct CapeArrayEnumerationInFromProvider<Element: Copy + Clone> {
 	interface: C::ICapeArrayEnumeration,
 	interface_ptr: *mut C::ICapeArrayEnumeration,
-	element_type : std::marker::PhantomData<Element>,
+	element_type: std::marker::PhantomData<Element>,
 }
 
-impl<Element:Copy+Clone> CapeArrayEnumerationInFromProvider<Element> {
-	pub fn from<T:CapeArrayEnumerationProviderIn>(provider:&T) -> Self {
+impl<Element: Copy + Clone> CapeArrayEnumerationInFromProvider<Element> {
+	pub fn from<T: CapeArrayEnumerationProviderIn>(provider: &T) -> Self {
 		Self {
 			interface: provider.as_cape_array_enumeration_in(),
 			interface_ptr: std::ptr::null_mut(),
-			element_type:std::default::Default::default(),
+			element_type: std::default::Default::default(),
 		}
 	}
-	pub fn as_cape_array_enumeration_in(&mut self) -> CapeArrayEnumerationIn<'_,Element> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayEnumeration;
-		CapeArrayEnumerationIn::new(& self.interface_ptr)
+	pub fn as_cape_array_enumeration_in(&mut self) -> CapeArrayEnumerationIn<'_, Element> {
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayEnumeration;
+		CapeArrayEnumerationIn::new(&self.interface_ptr)
 	}
 }
 
@@ -980,23 +959,22 @@ impl<Element:Copy+Clone> CapeArrayEnumerationInFromProvider<Element> {
 /// SetArrayOut(&mut CapeArrayEnumerationOutFromProvider::from(&mut array).as_cape_array_enumeration_out()); //this is how array is passed as &mut CapeArrayEnumerationOut argument
 /// assert_eq!(array.as_vec(),&vec![CapePMCServiceType::Inproc64,CapePMCServiceType::COM64]);
 /// ```
-	
-pub struct CapeArrayEnumerationOutFromProvider<Element:Copy+Clone> {
+pub struct CapeArrayEnumerationOutFromProvider<Element: Copy + Clone> {
 	interface: C::ICapeArrayEnumeration,
 	interface_ptr: *mut C::ICapeArrayEnumeration,
-	element_type : std::marker::PhantomData<Element>,
+	element_type: std::marker::PhantomData<Element>,
 }
 
-impl<Element:Copy+Clone> CapeArrayEnumerationOutFromProvider<Element> {
-	pub fn from<T:CapeArrayEnumerationProviderOut>(provider:&mut T) -> Self {
+impl<Element: Copy + Clone> CapeArrayEnumerationOutFromProvider<Element> {
+	pub fn from<T: CapeArrayEnumerationProviderOut>(provider: &mut T) -> Self {
 		Self {
 			interface: provider.as_cape_array_enumeration_out(),
 			interface_ptr: std::ptr::null_mut(),
-			element_type:std::default::Default::default(),
+			element_type: std::default::Default::default(),
 		}
 	}
-	pub fn as_cape_array_enumeration_out(&mut self) -> CapeArrayEnumerationOut<'_,Element> {
-		self.interface_ptr=&mut self.interface as *mut C::ICapeArrayEnumeration;
-		CapeArrayEnumerationOut::new(& mut self.interface_ptr)
+	pub fn as_cape_array_enumeration_out(&mut self) -> CapeArrayEnumerationOut<'_, Element> {
+		self.interface_ptr = &mut self.interface as *mut C::ICapeArrayEnumeration;
+		CapeArrayEnumerationOut::new(&mut self.interface_ptr)
 	}
 }

@@ -193,7 +193,6 @@ pub const ICAPETHERMOCOMPOUNDSLATEUTILITIES_UUID:CapeUUID=CapeUUID::from_slice(&
 /// CapeParamType enumeration
 ///
 /// Enumeration that identifies the type of a parameter or parameter specification.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapeParamType {
@@ -325,7 +324,6 @@ impl fmt::Display for CapeParamType {
 /// CapeDimensionality enumeration
 ///
 /// Index of SI base unit in dimensionality array.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapeDimensionality {
@@ -469,7 +467,6 @@ impl fmt::Display for CapeDimensionality {
 /// CapePersistedDataType enumeration
 ///
 /// Enumeration that identifies the value type of persisted data.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapePersistedDataType {
@@ -631,7 +628,6 @@ impl fmt::Display for CapePersistedDataType {
 /// CapeParamMode enumeration
 ///
 /// Enumeration that identifies the input or output mode of a parameter.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapeParamMode {
@@ -733,7 +729,6 @@ impl fmt::Display for CapeParamMode {
 /// CapeValidationStatus enumeration
 ///
 /// Enumeration that identifies the validation status.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapeValidationStatus {
@@ -837,7 +832,6 @@ bitflags! {
 	/// CapeCalculationCode enumeration
 	///
 	/// Flags to indicate which calculations are performed by CalcAndGetLnPhi\(\).
-
 	#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 	pub struct CapeCalculationCode: u32 {
 		/// No calculations are performed
@@ -859,7 +853,6 @@ bitflags! {
 /// CapePhaseStatus enumeration
 ///
 /// Enumeration that indicates the status of a Phase in a Material Object; meaning only useful in context of phase equilibrium calculation.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapePhaseStatus {
@@ -961,7 +954,6 @@ impl fmt::Display for CapePhaseStatus {
 /// CapeEditResult enumeration
 ///
 /// Result of ICapeUtilities::Edit\(\) operation.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapeEditResult {
@@ -1057,7 +1049,6 @@ impl fmt::Display for CapeEditResult {
 /// CapePortType enumeration
 ///
 /// Enumeration that identifies the type of a Unit Operation Port.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapePortType {
@@ -1165,7 +1156,6 @@ impl fmt::Display for CapePortType {
 /// CapePortDirection enumeration
 ///
 /// Enumeration that identifies the direction of a Unit Operation Port.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapePortDirection {
@@ -1267,7 +1257,6 @@ impl fmt::Display for CapePortDirection {
 /// CapeSolutionStatus enumeration
 ///
 /// Enumeration that identifies the solution status of a flowsheet.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapeSolutionStatus {
@@ -1363,7 +1352,6 @@ impl fmt::Display for CapeSolutionStatus {
 /// CapeStreamType enumeration
 ///
 /// Enumeration that identifies the type of a stream for the monitoring common interface.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapeStreamType {
@@ -1471,7 +1459,6 @@ impl fmt::Display for CapeStreamType {
 /// CapeMonitoringEvent enumeration
 ///
 /// Enumeration that identifies the type of events registered for a Flowsheet Monitoring Component PMC.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapeMonitoringEvent {
@@ -1615,7 +1602,6 @@ impl fmt::Display for CapeMonitoringEvent {
 /// CapeSolutionType enumeration
 ///
 /// Enumeration that identifies the solution type for a phase equilibrium calculation.
-
 #[repr(i32)]
 #[derive(Debug,PartialEq,Eq,Clone,Copy)]
 pub enum CapeSolutionType {
@@ -1720,8 +1706,6 @@ impl fmt::Display for CapeSolutionType {
 /// ICapeIdentification interface
 ///
 /// Interface for component identification, implemented by all CAPE-OPEN objects.
-///
-
 pub trait ICapeIdentification {
 
 	/// Gets the name of the component.
@@ -1766,7 +1750,6 @@ pub trait ICapeIdentification {
 }
 
 /// COBIA interface implementation for ICapeIdentification
-
 pub trait ICapeIdentificationImpl : ICapeIdentification {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeIdentificationImpl;
@@ -1788,10 +1771,10 @@ pub trait ICapeIdentificationImpl : ICapeIdentification {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeIdentification =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeIdentification;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeIdentification_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeIdentification::GetComponentName
@@ -1799,7 +1782,7 @@ pub trait ICapeIdentificationImpl : ICapeIdentification {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_component_name(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_component_name(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if name.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -1821,7 +1804,7 @@ pub trait ICapeIdentificationImpl : ICapeIdentification {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_component_name(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_component_name(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let name=CapeStringIn::new(&name);
@@ -1836,7 +1819,7 @@ pub trait ICapeIdentificationImpl : ICapeIdentification {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_component_description(me: *mut std::ffi::c_void,desc:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_component_description(me: *mut std::ffi::c_void,desc:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if desc.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -1858,7 +1841,7 @@ pub trait ICapeIdentificationImpl : ICapeIdentification {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_component_description(me: *mut std::ffi::c_void,desc:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_component_description(me: *mut std::ffi::c_void,desc:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let desc=CapeStringIn::new(&desc);
@@ -1982,8 +1965,6 @@ impl CapeIdentification {
 /// ICapeCollection interface
 ///
 /// Collection interface, implemented by CAPE-OPEN collection objects.
-///
-
 pub trait ICapeCollection<CollectionItem:CapeSmartPointer> {
 
 	/// Gets an item from the collection by its index.
@@ -2027,7 +2008,6 @@ pub trait ICapeCollection<CollectionItem:CapeSmartPointer> {
 }
 
 /// COBIA interface implementation for ICapeCollection
-
 pub trait ICapeCollectionImpl<CollectionItem:CapeSmartPointer> : ICapeCollection<CollectionItem> {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeCollectionImpl<CollectionItem>;
@@ -2049,10 +2029,10 @@ pub trait ICapeCollectionImpl<CollectionItem:CapeSmartPointer> : ICapeCollection
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeCollection =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeCollection;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeCollection_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeCollection::ItemByIndex
@@ -2060,7 +2040,7 @@ pub trait ICapeCollectionImpl<CollectionItem:CapeSmartPointer> : ICapeCollection
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_item_by_index(me: *mut std::ffi::c_void,index:CapeInteger,item:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_item_by_index(me: *mut std::ffi::c_void,index:CapeInteger,item:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if item.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2083,7 +2063,7 @@ pub trait ICapeCollectionImpl<CollectionItem:CapeSmartPointer> : ICapeCollection
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_item_by_name(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,item:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_item_by_name(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,item:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if item.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2107,7 +2087,7 @@ pub trait ICapeCollectionImpl<CollectionItem:CapeSmartPointer> : ICapeCollection
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_count(me: *mut std::ffi::c_void,item_count:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_count(me: *mut std::ffi::c_void,item_count:*mut CapeInteger) -> crate::C::CapeResult {
 		if item_count.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2176,7 +2156,7 @@ impl<CollectionItem:CapeSmartPointer> CapeCollection<CollectionItem> {
 				if item_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				let item=crate::CapeObject::attach(item_ptr);
+				let item=unsafe{crate::CapeObject::attach(item_ptr)};
 				let item=match CollectionItem::from_object(&item) {
 					Ok(_item) => _item,
 					Err(e) => {return Err(e);}
@@ -2210,7 +2190,7 @@ impl<CollectionItem:CapeSmartPointer> CapeCollection<CollectionItem> {
 				if item_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				let item=crate::CapeObject::attach(item_ptr);
+				let item=unsafe{crate::CapeObject::attach(item_ptr)};
 				let item=match CollectionItem::from_object(&item) {
 					Ok(_item) => _item,
 					Err(e) => {return Err(e);}
@@ -2248,7 +2228,6 @@ impl<CollectionItem:CapeSmartPointer> CapeCollection<CollectionItem> {
 impl<Element:CapeSmartPointer> cobia_collection::CollectionInterface<Element> for CapeCollection<Element> {
 
 	/// Get the number of elements in the collection
-
 	fn size(&self) -> usize {
 		match self.get_count() {
 			Ok(count) => count as usize,
@@ -2264,7 +2243,6 @@ impl<Element:CapeSmartPointer> cobia_collection::CollectionInterface<Element> fo
 	/// or IndexMut trait, as both these traits require returning the 
 	/// item by reference, which is not possible in this context, as 
 	/// the returned object owns the interface pointer.
-
 	fn at(&self,index : usize) -> Result<Element, COBIAError> {
 		self.item_by_index(index as CapeInteger)
 	}
@@ -2273,7 +2251,6 @@ impl<Element:CapeSmartPointer> cobia_collection::CollectionInterface<Element> fo
 	///
 	/// The name is case insentive, but must correspond to one of the items
 	/// in the collection.
-
 	fn get(&self,id : &str) -> Result<Element, COBIAError> {
 		self.item_by_name(&CapeStringImpl::from_string(id))
 	}
@@ -2301,8 +2278,6 @@ impl<'a,Element:CapeSmartPointer> IntoIterator for &'a CapeCollection<Element> {
 /// ICapeParameter interface
 ///
 /// Parameter interface implemented by all CAPE-OPEN Parameter objects.
-///
-
 pub trait ICapeParameter {
 
 	/// Gets the validation status of the parameter.
@@ -2361,7 +2336,6 @@ pub trait ICapeParameter {
 }
 
 /// COBIA interface implementation for ICapeParameter
-
 pub trait ICapeParameterImpl : ICapeParameter {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeParameterImpl;
@@ -2383,10 +2357,10 @@ pub trait ICapeParameterImpl : ICapeParameter {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeParameter =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeParameter;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeParameter_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeParameter::GetValStatus
@@ -2394,7 +2368,7 @@ pub trait ICapeParameterImpl : ICapeParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_val_status(me: *mut std::ffi::c_void,val_status:*mut C::CAPEOPEN_1_2_CapeValidationStatus) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_val_status(me: *mut std::ffi::c_void,val_status:*mut C::CAPEOPEN_1_2_CapeValidationStatus) -> crate::C::CapeResult {
 		if val_status.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2414,7 +2388,7 @@ pub trait ICapeParameterImpl : ICapeParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_mode(me: *mut std::ffi::c_void,mode:*mut C::CAPEOPEN_1_2_CapeParamMode) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_mode(me: *mut std::ffi::c_void,mode:*mut C::CAPEOPEN_1_2_CapeParamMode) -> crate::C::CapeResult {
 		if mode.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2434,7 +2408,7 @@ pub trait ICapeParameterImpl : ICapeParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_type(me: *mut std::ffi::c_void,parameter_type:*mut C::CAPEOPEN_1_2_CapeParamType) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_type(me: *mut std::ffi::c_void,parameter_type:*mut C::CAPEOPEN_1_2_CapeParamType) -> crate::C::CapeResult {
 		if parameter_type.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2454,7 +2428,7 @@ pub trait ICapeParameterImpl : ICapeParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2479,7 +2453,7 @@ pub trait ICapeParameterImpl : ICapeParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_reset(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_reset(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.reset() {
@@ -2646,8 +2620,6 @@ impl CapeParameter {
 /// ICapeRealParameter interface
 ///
 /// Interface implemented by parameters of type CAPE\_PARAMETER\_REAL.
-///
-
 pub trait ICapeRealParameter {
 
 	/// Gets the value of the parameter.
@@ -2731,7 +2703,6 @@ pub trait ICapeRealParameter {
 }
 
 /// COBIA interface implementation for ICapeRealParameter
-
 pub trait ICapeRealParameterImpl : ICapeRealParameter {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeRealParameterImpl;
@@ -2753,10 +2724,10 @@ pub trait ICapeRealParameterImpl : ICapeRealParameter {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeRealParameter =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeRealParameter;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeRealParameter_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeRealParameter::GetValue
@@ -2764,7 +2735,7 @@ pub trait ICapeRealParameterImpl : ICapeRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut CapeReal) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2784,7 +2755,7 @@ pub trait ICapeRealParameterImpl : ICapeRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:CapeReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.set_value(value) {
@@ -2798,7 +2769,7 @@ pub trait ICapeRealParameterImpl : ICapeRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeReal) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2818,7 +2789,7 @@ pub trait ICapeRealParameterImpl : ICapeRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeReal) -> crate::C::CapeResult {
 		if l_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2838,7 +2809,7 @@ pub trait ICapeRealParameterImpl : ICapeRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeReal) -> crate::C::CapeResult {
 		if u_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2858,7 +2829,7 @@ pub trait ICapeRealParameterImpl : ICapeRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_dimensionality(me: *mut std::ffi::c_void,dimensionality:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_dimensionality(me: *mut std::ffi::c_void,dimensionality:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if dimensionality.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -2880,7 +2851,7 @@ pub trait ICapeRealParameterImpl : ICapeRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3093,8 +3064,6 @@ impl CapeRealParameter {
 /// ICapeIntegerParameter interface
 ///
 /// Interface implemented by parameters of type CAPE\_PARAMETER\_INTEGER.
-///
-
 pub trait ICapeIntegerParameter {
 
 	/// Gets the value of the parameter.
@@ -3168,7 +3137,6 @@ pub trait ICapeIntegerParameter {
 }
 
 /// COBIA interface implementation for ICapeIntegerParameter
-
 pub trait ICapeIntegerParameterImpl : ICapeIntegerParameter {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeIntegerParameterImpl;
@@ -3190,10 +3158,10 @@ pub trait ICapeIntegerParameterImpl : ICapeIntegerParameter {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeIntegerParameter =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeIntegerParameter;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeIntegerParameter_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeIntegerParameter::GetValue
@@ -3201,7 +3169,7 @@ pub trait ICapeIntegerParameterImpl : ICapeIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut CapeInteger) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3221,7 +3189,7 @@ pub trait ICapeIntegerParameterImpl : ICapeIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:CapeInteger) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.set_value(value) {
@@ -3235,7 +3203,7 @@ pub trait ICapeIntegerParameterImpl : ICapeIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeInteger) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3255,7 +3223,7 @@ pub trait ICapeIntegerParameterImpl : ICapeIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeInteger) -> crate::C::CapeResult {
 		if l_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3275,7 +3243,7 @@ pub trait ICapeIntegerParameterImpl : ICapeIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeInteger) -> crate::C::CapeResult {
 		if u_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3295,7 +3263,7 @@ pub trait ICapeIntegerParameterImpl : ICapeIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3488,8 +3456,6 @@ impl CapeIntegerParameter {
 /// ICapeStringParameter interface
 ///
 /// Interface implemented by parameters of type CAPE\_PARAMETER\_STRING.
-///
-
 pub trait ICapeStringParameter {
 
 	/// Gets the value of the parameter.
@@ -3560,7 +3526,6 @@ pub trait ICapeStringParameter {
 }
 
 /// COBIA interface implementation for ICapeStringParameter
-
 pub trait ICapeStringParameterImpl : ICapeStringParameter {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeStringParameterImpl;
@@ -3582,10 +3547,10 @@ pub trait ICapeStringParameterImpl : ICapeStringParameter {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeStringParameter =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeStringParameter;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeStringParameter_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeStringParameter::GetValue
@@ -3593,7 +3558,7 @@ pub trait ICapeStringParameterImpl : ICapeStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3615,7 +3580,7 @@ pub trait ICapeStringParameterImpl : ICapeStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value=CapeStringIn::new(&value);
@@ -3630,7 +3595,7 @@ pub trait ICapeStringParameterImpl : ICapeStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3652,7 +3617,7 @@ pub trait ICapeStringParameterImpl : ICapeStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_option_list(me: *mut std::ffi::c_void,option_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_option_list(me: *mut std::ffi::c_void,option_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if option_names.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3674,7 +3639,7 @@ pub trait ICapeStringParameterImpl : ICapeStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_restricted_to_list(me: *mut std::ffi::c_void,restricted:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_restricted_to_list(me: *mut std::ffi::c_void,restricted:*mut CapeBoolean) -> crate::C::CapeResult {
 		if restricted.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3694,7 +3659,7 @@ pub trait ICapeStringParameterImpl : ICapeStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3879,8 +3844,6 @@ impl CapeStringParameter {
 /// ICapeBooleanParameter interface
 ///
 /// Interface implemented by parameters of type CAPE\_PARAMETER\_BOOLEAN.
-///
-
 pub trait ICapeBooleanParameter {
 
 	/// Gets the value of the parameter.
@@ -3932,7 +3895,6 @@ pub trait ICapeBooleanParameter {
 }
 
 /// COBIA interface implementation for ICapeBooleanParameter
-
 pub trait ICapeBooleanParameterImpl : ICapeBooleanParameter {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeBooleanParameterImpl;
@@ -3954,10 +3916,10 @@ pub trait ICapeBooleanParameterImpl : ICapeBooleanParameter {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeBooleanParameter =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeBooleanParameter;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeBooleanParameter_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeBooleanParameter::GetValue
@@ -3965,7 +3927,7 @@ pub trait ICapeBooleanParameterImpl : ICapeBooleanParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut CapeBoolean) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -3985,7 +3947,7 @@ pub trait ICapeBooleanParameterImpl : ICapeBooleanParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:CapeBoolean) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.set_value(value) {
@@ -3999,7 +3961,7 @@ pub trait ICapeBooleanParameterImpl : ICapeBooleanParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeBoolean) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4019,7 +3981,7 @@ pub trait ICapeBooleanParameterImpl : ICapeBooleanParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4166,8 +4128,6 @@ impl CapeBooleanParameter {
 /// ICapeArrayParameter interface
 ///
 /// Interface implemented by all array parameters.
-///
-
 pub trait ICapeArrayParameter {
 
 	/// Gets the number of dimensions of the array parameter.
@@ -4193,7 +4153,6 @@ pub trait ICapeArrayParameter {
 }
 
 /// COBIA interface implementation for ICapeArrayParameter
-
 pub trait ICapeArrayParameterImpl : ICapeArrayParameter {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeArrayParameterImpl;
@@ -4215,10 +4174,10 @@ pub trait ICapeArrayParameterImpl : ICapeArrayParameter {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeArrayParameter =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeArrayParameter;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeArrayParameter_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeArrayParameter::GetNumDimensions
@@ -4226,7 +4185,7 @@ pub trait ICapeArrayParameterImpl : ICapeArrayParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_num_dimensions(me: *mut std::ffi::c_void,num_dimensions:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_num_dimensions(me: *mut std::ffi::c_void,num_dimensions:*mut CapeInteger) -> crate::C::CapeResult {
 		if num_dimensions.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4246,7 +4205,7 @@ pub trait ICapeArrayParameterImpl : ICapeArrayParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_size(me: *mut std::ffi::c_void,size:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_size(me: *mut std::ffi::c_void,size:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
 		if size.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4340,8 +4299,6 @@ impl CapeArrayParameter {
 /// ICapeArrayRealParameter interface
 ///
 /// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_REAL.
-///
-
 pub trait ICapeArrayRealParameter {
 
 	/// Gets the value of the parameter.
@@ -4465,7 +4422,6 @@ pub trait ICapeArrayRealParameter {
 }
 
 /// COBIA interface implementation for ICapeArrayRealParameter
-
 pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeArrayRealParameterImpl;
@@ -4487,10 +4443,10 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeArrayRealParameter =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeArrayRealParameter;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeArrayRealParameter_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeArrayRealParameter::GetValue
@@ -4498,7 +4454,7 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4520,7 +4476,7 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value=CapeArrayRealIn::new(&value);
@@ -4535,7 +4491,7 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut CapeReal) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4556,7 +4512,7 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let position=CapeArrayIntegerIn::new(&position);
@@ -4571,7 +4527,7 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeReal) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4591,7 +4547,7 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeReal) -> crate::C::CapeResult {
 		if l_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4611,7 +4567,7 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeReal) -> crate::C::CapeResult {
 		if u_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4631,7 +4587,7 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_dimensionality(me: *mut std::ffi::c_void,dimensionality:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_dimensionality(me: *mut std::ffi::c_void,dimensionality:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if dimensionality.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4653,7 +4609,7 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4679,7 +4635,7 @@ pub trait ICapeArrayRealParameterImpl : ICapeArrayRealParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -4965,8 +4921,6 @@ impl CapeArrayRealParameter {
 /// ICapeArrayIntegerParameter interface
 ///
 /// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_INTEGER.
-///
-
 pub trait ICapeArrayIntegerParameter {
 
 	/// Gets the value of the parameter.
@@ -5080,7 +5034,6 @@ pub trait ICapeArrayIntegerParameter {
 }
 
 /// COBIA interface implementation for ICapeArrayIntegerParameter
-
 pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeArrayIntegerParameterImpl;
@@ -5102,10 +5055,10 @@ pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeArrayIntegerParameter =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeArrayIntegerParameter;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeArrayIntegerParameter_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeArrayIntegerParameter::GetValue
@@ -5113,7 +5066,7 @@ pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5135,7 +5088,7 @@ pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value=CapeArrayIntegerIn::new(&value);
@@ -5150,7 +5103,7 @@ pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut CapeInteger) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5171,7 +5124,7 @@ pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeInteger) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let position=CapeArrayIntegerIn::new(&position);
@@ -5186,7 +5139,7 @@ pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeInteger) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5206,7 +5159,7 @@ pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeInteger) -> crate::C::CapeResult {
 		if l_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5226,7 +5179,7 @@ pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeInteger) -> crate::C::CapeResult {
 		if u_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5246,7 +5199,7 @@ pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5272,7 +5225,7 @@ pub trait ICapeArrayIntegerParameterImpl : ICapeArrayIntegerParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5538,8 +5491,6 @@ impl CapeArrayIntegerParameter {
 /// ICapeArrayStringParameter interface
 ///
 /// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_STRING.
-///
-
 pub trait ICapeArrayStringParameter {
 
 	/// Gets the value of the parameter.
@@ -5648,7 +5599,6 @@ pub trait ICapeArrayStringParameter {
 }
 
 /// COBIA interface implementation for ICapeArrayStringParameter
-
 pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeArrayStringParameterImpl;
@@ -5670,10 +5620,10 @@ pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeArrayStringParameter =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeArrayStringParameter;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeArrayStringParameter_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeArrayStringParameter::GetValue
@@ -5681,7 +5631,7 @@ pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5703,7 +5653,7 @@ pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value=CapeArrayStringIn::new(&value);
@@ -5718,7 +5668,7 @@ pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5741,7 +5691,7 @@ pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let position=CapeArrayIntegerIn::new(&position);
@@ -5757,7 +5707,7 @@ pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5779,7 +5729,7 @@ pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_option_list(me: *mut std::ffi::c_void,option_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_option_list(me: *mut std::ffi::c_void,option_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if option_names.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5801,7 +5751,7 @@ pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_restricted_to_list(me: *mut std::ffi::c_void,restricted:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_restricted_to_list(me: *mut std::ffi::c_void,restricted:*mut CapeBoolean) -> crate::C::CapeResult {
 		if restricted.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5821,7 +5771,7 @@ pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut crate::C::ICapeString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut crate::C::ICapeString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -5848,7 +5798,7 @@ pub trait ICapeArrayStringParameterImpl : ICapeArrayStringParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -6103,8 +6053,6 @@ impl CapeArrayStringParameter {
 /// ICapeArrayBooleanParameter interface
 ///
 /// Interface implemented by parameters of type CAPE\_PARAMETER\_ARRAY\_BOOLEAN.
-///
-
 pub trait ICapeArrayBooleanParameter {
 
 	/// Gets the value of the parameter.
@@ -6196,7 +6144,6 @@ pub trait ICapeArrayBooleanParameter {
 }
 
 /// COBIA interface implementation for ICapeArrayBooleanParameter
-
 pub trait ICapeArrayBooleanParameterImpl : ICapeArrayBooleanParameter {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeArrayBooleanParameterImpl;
@@ -6218,10 +6165,10 @@ pub trait ICapeArrayBooleanParameterImpl : ICapeArrayBooleanParameter {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeArrayBooleanParameter =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeArrayBooleanParameter;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeArrayBooleanParameter_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeArrayBooleanParameter::GetValue
@@ -6229,7 +6176,7 @@ pub trait ICapeArrayBooleanParameterImpl : ICapeArrayBooleanParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayBoolean) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -6251,7 +6198,7 @@ pub trait ICapeArrayBooleanParameterImpl : ICapeArrayBooleanParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_value(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayBoolean) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value=CapeArrayBooleanIn::new(&value);
@@ -6266,7 +6213,7 @@ pub trait ICapeArrayBooleanParameterImpl : ICapeArrayBooleanParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut CapeBoolean) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -6287,7 +6234,7 @@ pub trait ICapeArrayBooleanParameterImpl : ICapeArrayBooleanParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_element_value(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeBoolean) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let position=CapeArrayIntegerIn::new(&position);
@@ -6302,7 +6249,7 @@ pub trait ICapeArrayBooleanParameterImpl : ICapeArrayBooleanParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeBoolean) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -6322,7 +6269,7 @@ pub trait ICapeArrayBooleanParameterImpl : ICapeArrayBooleanParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -6348,7 +6295,7 @@ pub trait ICapeArrayBooleanParameterImpl : ICapeArrayBooleanParameter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -6568,8 +6515,6 @@ impl CapeArrayBooleanParameter {
 /// ICapeParameterSpecification interface
 ///
 /// Interface for parameter specifications, implemented by all CAPE-OPEN Parameter Specification objects.
-///
-
 pub trait ICapeParameterSpecification {
 
 	/// Gets the type of the parameter.
@@ -6585,7 +6530,6 @@ pub trait ICapeParameterSpecification {
 }
 
 /// COBIA interface implementation for ICapeParameterSpecification
-
 pub trait ICapeParameterSpecificationImpl : ICapeParameterSpecification {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeParameterSpecificationImpl;
@@ -6607,10 +6551,10 @@ pub trait ICapeParameterSpecificationImpl : ICapeParameterSpecification {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeParameterSpecification =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeParameterSpecification;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeParameterSpecification_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeParameterSpecification::GetType
@@ -6618,7 +6562,7 @@ pub trait ICapeParameterSpecificationImpl : ICapeParameterSpecification {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_type(me: *mut std::ffi::c_void,parameter_type:*mut C::CAPEOPEN_1_2_CapeParamType) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_type(me: *mut std::ffi::c_void,parameter_type:*mut C::CAPEOPEN_1_2_CapeParamType) -> crate::C::CapeResult {
 		if parameter_type.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -6694,8 +6638,6 @@ impl CapeParameterSpecification {
 /// ICapeRealParameterSpecification interface
 ///
 /// Interface for parameter specifications of type CAPE\_PARAMETER\_REAL.
-///
-
 pub trait ICapeRealParameterSpecification {
 
 	/// Gets the default value of the parameter.
@@ -6758,7 +6700,6 @@ pub trait ICapeRealParameterSpecification {
 }
 
 /// COBIA interface implementation for ICapeRealParameterSpecification
-
 pub trait ICapeRealParameterSpecificationImpl : ICapeRealParameterSpecification {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeRealParameterSpecificationImpl;
@@ -6780,10 +6721,10 @@ pub trait ICapeRealParameterSpecificationImpl : ICapeRealParameterSpecification 
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeRealParameterSpecification =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeRealParameterSpecification;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeRealParameterSpecification_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeRealParameterSpecification::GetDefaultValue
@@ -6791,7 +6732,7 @@ pub trait ICapeRealParameterSpecificationImpl : ICapeRealParameterSpecification 
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeReal) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -6811,7 +6752,7 @@ pub trait ICapeRealParameterSpecificationImpl : ICapeRealParameterSpecification 
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeReal) -> crate::C::CapeResult {
 		if l_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -6831,7 +6772,7 @@ pub trait ICapeRealParameterSpecificationImpl : ICapeRealParameterSpecification 
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeReal) -> crate::C::CapeResult {
 		if u_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -6851,7 +6792,7 @@ pub trait ICapeRealParameterSpecificationImpl : ICapeRealParameterSpecification 
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_dimensionality(me: *mut std::ffi::c_void,dimensionality:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_dimensionality(me: *mut std::ffi::c_void,dimensionality:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if dimensionality.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -6873,7 +6814,7 @@ pub trait ICapeRealParameterSpecificationImpl : ICapeRealParameterSpecification 
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7043,8 +6984,6 @@ impl CapeRealParameterSpecification {
 /// ICapeIntegerParameterSpecification interface
 ///
 /// Interface for parameter specifications of type CAPE\_PARAMETER\_INTEGER.
-///
-
 pub trait ICapeIntegerParameterSpecification {
 
 	/// Gets the default value of the parameter.
@@ -7097,7 +7036,6 @@ pub trait ICapeIntegerParameterSpecification {
 }
 
 /// COBIA interface implementation for ICapeIntegerParameterSpecification
-
 pub trait ICapeIntegerParameterSpecificationImpl : ICapeIntegerParameterSpecification {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeIntegerParameterSpecificationImpl;
@@ -7119,10 +7057,10 @@ pub trait ICapeIntegerParameterSpecificationImpl : ICapeIntegerParameterSpecific
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeIntegerParameterSpecification =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeIntegerParameterSpecification;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeIntegerParameterSpecification_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeIntegerParameterSpecification::GetDefaultValue
@@ -7130,7 +7068,7 @@ pub trait ICapeIntegerParameterSpecificationImpl : ICapeIntegerParameterSpecific
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeInteger) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7150,7 +7088,7 @@ pub trait ICapeIntegerParameterSpecificationImpl : ICapeIntegerParameterSpecific
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeInteger) -> crate::C::CapeResult {
 		if l_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7170,7 +7108,7 @@ pub trait ICapeIntegerParameterSpecificationImpl : ICapeIntegerParameterSpecific
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeInteger) -> crate::C::CapeResult {
 		if u_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7190,7 +7128,7 @@ pub trait ICapeIntegerParameterSpecificationImpl : ICapeIntegerParameterSpecific
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7340,8 +7278,6 @@ impl CapeIntegerParameterSpecification {
 /// ICapeStringParameterSpecification interface
 ///
 /// Interface for parameter specifications of type CAPE\_PARAMETER\_STRING.
-///
-
 pub trait ICapeStringParameterSpecification {
 
 	/// Gets the default value of the parameter.
@@ -7392,7 +7328,6 @@ pub trait ICapeStringParameterSpecification {
 }
 
 /// COBIA interface implementation for ICapeStringParameterSpecification
-
 pub trait ICapeStringParameterSpecificationImpl : ICapeStringParameterSpecification {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeStringParameterSpecificationImpl;
@@ -7414,10 +7349,10 @@ pub trait ICapeStringParameterSpecificationImpl : ICapeStringParameterSpecificat
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeStringParameterSpecification =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeStringParameterSpecification;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeStringParameterSpecification_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeStringParameterSpecification::GetDefaultValue
@@ -7425,7 +7360,7 @@ pub trait ICapeStringParameterSpecificationImpl : ICapeStringParameterSpecificat
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7447,7 +7382,7 @@ pub trait ICapeStringParameterSpecificationImpl : ICapeStringParameterSpecificat
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_option_list(me: *mut std::ffi::c_void,option_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_option_list(me: *mut std::ffi::c_void,option_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if option_names.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7469,7 +7404,7 @@ pub trait ICapeStringParameterSpecificationImpl : ICapeStringParameterSpecificat
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_restricted_to_list(me: *mut std::ffi::c_void,restricted:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_restricted_to_list(me: *mut std::ffi::c_void,restricted:*mut CapeBoolean) -> crate::C::CapeResult {
 		if restricted.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7489,7 +7424,7 @@ pub trait ICapeStringParameterSpecificationImpl : ICapeStringParameterSpecificat
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7634,8 +7569,6 @@ impl CapeStringParameterSpecification {
 /// ICapeBooleanParameterSpecification interface
 ///
 /// Interface for parameter specifications of type CAPE\_PARAMETER\_BOOLEAN.
-///
-
 pub trait ICapeBooleanParameterSpecification {
 
 	/// Gets the default value of the parameter.
@@ -7666,7 +7599,6 @@ pub trait ICapeBooleanParameterSpecification {
 }
 
 /// COBIA interface implementation for ICapeBooleanParameterSpecification
-
 pub trait ICapeBooleanParameterSpecificationImpl : ICapeBooleanParameterSpecification {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeBooleanParameterSpecificationImpl;
@@ -7688,10 +7620,10 @@ pub trait ICapeBooleanParameterSpecificationImpl : ICapeBooleanParameterSpecific
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeBooleanParameterSpecification =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeBooleanParameterSpecification;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeBooleanParameterSpecification_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeBooleanParameterSpecification::GetDefaultValue
@@ -7699,7 +7631,7 @@ pub trait ICapeBooleanParameterSpecificationImpl : ICapeBooleanParameterSpecific
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeBoolean) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7719,7 +7651,7 @@ pub trait ICapeBooleanParameterSpecificationImpl : ICapeBooleanParameterSpecific
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:CapeBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7823,8 +7755,6 @@ impl CapeBooleanParameterSpecification {
 /// ICapeArrayParameterSpecification interface
 ///
 /// Interface for all array parameter specifications.
-///
-
 pub trait ICapeArrayParameterSpecification {
 
 	/// Gets the number of dimensions of the array parameter.
@@ -7850,7 +7780,6 @@ pub trait ICapeArrayParameterSpecification {
 }
 
 /// COBIA interface implementation for ICapeArrayParameterSpecification
-
 pub trait ICapeArrayParameterSpecificationImpl : ICapeArrayParameterSpecification {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeArrayParameterSpecificationImpl;
@@ -7872,10 +7801,10 @@ pub trait ICapeArrayParameterSpecificationImpl : ICapeArrayParameterSpecificatio
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeArrayParameterSpecification =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeArrayParameterSpecification;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeArrayParameterSpecification_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeArrayParameterSpecification::GetNumDimensions
@@ -7883,7 +7812,7 @@ pub trait ICapeArrayParameterSpecificationImpl : ICapeArrayParameterSpecificatio
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_num_dimensions(me: *mut std::ffi::c_void,num_dimensions:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_num_dimensions(me: *mut std::ffi::c_void,num_dimensions:*mut CapeInteger) -> crate::C::CapeResult {
 		if num_dimensions.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7903,7 +7832,7 @@ pub trait ICapeArrayParameterSpecificationImpl : ICapeArrayParameterSpecificatio
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_size(me: *mut std::ffi::c_void,size:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_size(me: *mut std::ffi::c_void,size:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
 		if size.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -7997,8 +7926,6 @@ impl CapeArrayParameterSpecification {
 /// ICapeArrayRealParameterSpecification interface
 ///
 /// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_REAL.
-///
-
 pub trait ICapeArrayRealParameterSpecification {
 
 	/// Gets the default value of the parameter elements.
@@ -8077,7 +8004,6 @@ pub trait ICapeArrayRealParameterSpecification {
 }
 
 /// COBIA interface implementation for ICapeArrayRealParameterSpecification
-
 pub trait ICapeArrayRealParameterSpecificationImpl : ICapeArrayRealParameterSpecification {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeArrayRealParameterSpecificationImpl;
@@ -8099,10 +8025,10 @@ pub trait ICapeArrayRealParameterSpecificationImpl : ICapeArrayRealParameterSpec
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeArrayRealParameterSpecification =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeArrayRealParameterSpecification;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeArrayRealParameterSpecification_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeArrayRealParameterSpecification::GetDefaultValue
@@ -8110,7 +8036,7 @@ pub trait ICapeArrayRealParameterSpecificationImpl : ICapeArrayRealParameterSpec
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeReal) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8130,7 +8056,7 @@ pub trait ICapeArrayRealParameterSpecificationImpl : ICapeArrayRealParameterSpec
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeReal) -> crate::C::CapeResult {
 		if l_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8150,7 +8076,7 @@ pub trait ICapeArrayRealParameterSpecificationImpl : ICapeArrayRealParameterSpec
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeReal) -> crate::C::CapeResult {
 		if u_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8170,7 +8096,7 @@ pub trait ICapeArrayRealParameterSpecificationImpl : ICapeArrayRealParameterSpec
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_dimensionality(me: *mut std::ffi::c_void,dimensionality:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_dimensionality(me: *mut std::ffi::c_void,dimensionality:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if dimensionality.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8192,7 +8118,7 @@ pub trait ICapeArrayRealParameterSpecificationImpl : ICapeArrayRealParameterSpec
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8218,7 +8144,7 @@ pub trait ICapeArrayRealParameterSpecificationImpl : ICapeArrayRealParameterSpec
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayReal,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8417,8 +8343,6 @@ impl CapeArrayRealParameterSpecification {
 /// ICapeArrayIntegerParameterSpecification interface
 ///
 /// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_INTEGER.
-///
-
 pub trait ICapeArrayIntegerParameterSpecification {
 
 	/// Gets the default value of the parameter elements.
@@ -8487,7 +8411,6 @@ pub trait ICapeArrayIntegerParameterSpecification {
 }
 
 /// COBIA interface implementation for ICapeArrayIntegerParameterSpecification
-
 pub trait ICapeArrayIntegerParameterSpecificationImpl : ICapeArrayIntegerParameterSpecification {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeArrayIntegerParameterSpecificationImpl;
@@ -8509,10 +8432,10 @@ pub trait ICapeArrayIntegerParameterSpecificationImpl : ICapeArrayIntegerParamet
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeArrayIntegerParameterSpecification =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeArrayIntegerParameterSpecification;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeArrayIntegerParameterSpecification_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeArrayIntegerParameterSpecification::GetDefaultValue
@@ -8520,7 +8443,7 @@ pub trait ICapeArrayIntegerParameterSpecificationImpl : ICapeArrayIntegerParamet
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeInteger) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8540,7 +8463,7 @@ pub trait ICapeArrayIntegerParameterSpecificationImpl : ICapeArrayIntegerParamet
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_lower_bound(me: *mut std::ffi::c_void,l_bound:*mut CapeInteger) -> crate::C::CapeResult {
 		if l_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8560,7 +8483,7 @@ pub trait ICapeArrayIntegerParameterSpecificationImpl : ICapeArrayIntegerParamet
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_upper_bound(me: *mut std::ffi::c_void,u_bound:*mut CapeInteger) -> crate::C::CapeResult {
 		if u_bound.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8580,7 +8503,7 @@ pub trait ICapeArrayIntegerParameterSpecificationImpl : ICapeArrayIntegerParamet
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8606,7 +8529,7 @@ pub trait ICapeArrayIntegerParameterSpecificationImpl : ICapeArrayIntegerParamet
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayInteger,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8785,8 +8708,6 @@ impl CapeArrayIntegerParameterSpecification {
 /// ICapeArrayStringParameterSpecification interface
 ///
 /// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_STRING.
-///
-
 pub trait ICapeArrayStringParameterSpecification {
 
 	/// Gets the default value of the parameter elements.
@@ -8853,7 +8774,6 @@ pub trait ICapeArrayStringParameterSpecification {
 }
 
 /// COBIA interface implementation for ICapeArrayStringParameterSpecification
-
 pub trait ICapeArrayStringParameterSpecificationImpl : ICapeArrayStringParameterSpecification {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeArrayStringParameterSpecificationImpl;
@@ -8875,10 +8795,10 @@ pub trait ICapeArrayStringParameterSpecificationImpl : ICapeArrayStringParameter
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeArrayStringParameterSpecification =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeArrayStringParameterSpecification;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeArrayStringParameterSpecification_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeArrayStringParameterSpecification::GetDefaultValue
@@ -8886,7 +8806,7 @@ pub trait ICapeArrayStringParameterSpecificationImpl : ICapeArrayStringParameter
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8908,7 +8828,7 @@ pub trait ICapeArrayStringParameterSpecificationImpl : ICapeArrayStringParameter
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_option_list(me: *mut std::ffi::c_void,option_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_option_list(me: *mut std::ffi::c_void,option_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if option_names.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8930,7 +8850,7 @@ pub trait ICapeArrayStringParameterSpecificationImpl : ICapeArrayStringParameter
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_restricted_to_list(me: *mut std::ffi::c_void,restricted:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_restricted_to_list(me: *mut std::ffi::c_void,restricted:*mut CapeBoolean) -> crate::C::CapeResult {
 		if restricted.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8950,7 +8870,7 @@ pub trait ICapeArrayStringParameterSpecificationImpl : ICapeArrayStringParameter
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut crate::C::ICapeString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:*mut crate::C::ICapeString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -8977,7 +8897,7 @@ pub trait ICapeArrayStringParameterSpecificationImpl : ICapeArrayStringParameter
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayString,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -9150,8 +9070,6 @@ impl CapeArrayStringParameterSpecification {
 /// ICapeArrayBooleanParameterSpecification interface
 ///
 /// Interface for parameter specifications of type CAPE\_PARAMETER\_ARRAY\_BOOLEAN.
-///
-
 pub trait ICapeArrayBooleanParameterSpecification {
 
 	/// Gets the default value of the parameter.
@@ -9198,7 +9116,6 @@ pub trait ICapeArrayBooleanParameterSpecification {
 }
 
 /// COBIA interface implementation for ICapeArrayBooleanParameterSpecification
-
 pub trait ICapeArrayBooleanParameterSpecificationImpl : ICapeArrayBooleanParameterSpecification {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeArrayBooleanParameterSpecificationImpl;
@@ -9220,10 +9137,10 @@ pub trait ICapeArrayBooleanParameterSpecificationImpl : ICapeArrayBooleanParamet
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeArrayBooleanParameterSpecification =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeArrayBooleanParameterSpecification;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeArrayBooleanParameterSpecification_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeArrayBooleanParameterSpecification::GetDefaultValue
@@ -9231,7 +9148,7 @@ pub trait ICapeArrayBooleanParameterSpecificationImpl : ICapeArrayBooleanParamet
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_default_value(me: *mut std::ffi::c_void,default_value:*mut CapeBoolean) -> crate::C::CapeResult {
 		if default_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -9251,7 +9168,7 @@ pub trait ICapeArrayBooleanParameterSpecificationImpl : ICapeArrayBooleanParamet
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate_element(me: *mut std::ffi::c_void,position:*mut crate::C::ICapeArrayInteger,value:CapeBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -9277,7 +9194,7 @@ pub trait ICapeArrayBooleanParameterSpecificationImpl : ICapeArrayBooleanParamet
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,value:*mut crate::C::ICapeArrayBoolean,message:*mut crate::C::ICapeString,is_ok:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_ok.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -9410,8 +9327,6 @@ impl CapeArrayBooleanParameterSpecification {
 /// ICapeUtilities interface
 ///
 /// Interface implemented by all CAPE-OPEN Primary PMC Objects.
-///
-
 pub trait ICapeUtilities {
 
 	/// Gets the collection of parameters of the object.
@@ -9466,7 +9381,6 @@ pub trait ICapeUtilities {
 }
 
 /// COBIA interface implementation for ICapeUtilities
-
 pub trait ICapeUtilitiesImpl : ICapeUtilities {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeUtilitiesImpl;
@@ -9488,10 +9402,10 @@ pub trait ICapeUtilitiesImpl : ICapeUtilities {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeUtilities =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeUtilities;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeUtilities_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeUtilities::GetParameters
@@ -9499,7 +9413,7 @@ pub trait ICapeUtilitiesImpl : ICapeUtilities {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_parameters(me: *mut std::ffi::c_void,parameters:*mut *mut C::CAPEOPEN_1_2_ICapeCollection) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_parameters(me: *mut std::ffi::c_void,parameters:*mut *mut C::CAPEOPEN_1_2_ICapeCollection) -> crate::C::CapeResult {
 		if parameters.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -9522,7 +9436,7 @@ pub trait ICapeUtilitiesImpl : ICapeUtilities {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_simulation_context(me: *mut std::ffi::c_void,context:*mut C::CAPEOPEN_1_2_ICapeSimulationContext) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_simulation_context(me: *mut std::ffi::c_void,context:*mut C::CAPEOPEN_1_2_ICapeSimulationContext) -> crate::C::CapeResult {
 		if context.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -9531,7 +9445,7 @@ pub trait ICapeUtilitiesImpl : ICapeUtilities {
 		if context.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let context=CapeSimulationContext::from_interface_pointer(context);
+		let context=unsafe{CapeSimulationContext::from_interface_pointer(context)};
 		match myself.set_simulation_context(context) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeUtilities::SetSimulationContext")
@@ -9543,7 +9457,7 @@ pub trait ICapeUtilitiesImpl : ICapeUtilities {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_initialize(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_initialize(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.initialize() {
@@ -9557,7 +9471,7 @@ pub trait ICapeUtilitiesImpl : ICapeUtilities {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_terminate(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_terminate(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.terminate() {
@@ -9571,13 +9485,13 @@ pub trait ICapeUtilitiesImpl : ICapeUtilities {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_edit(me: *mut std::ffi::c_void,parent:crate::C::CapeWindowId,result:*mut C::CAPEOPEN_1_2_CapeEditResult) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_edit(me: *mut std::ffi::c_void,parent:crate::C::CapeWindowId,result:*mut C::CAPEOPEN_1_2_CapeEditResult) -> crate::C::CapeResult {
 		if result.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
-		match myself.edit(crate::CapeWindowIdFromRaw(parent)) {
+		match myself.edit(crate::CapeWindowId::FromRaw(parent)) {
 			Ok(_result) => {
 				unsafe{*result=_result as C::CAPEOPEN_1_2_CapeEditResult;}
 				COBIAERR_NOERROR
@@ -9637,7 +9551,7 @@ impl CapeUtilities {
 				if parameters_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(CapeCollection::<CapeParameter>::attach(parameters_ptr))
+				Ok(unsafe{CapeCollection::<CapeParameter>::attach(parameters_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -9710,8 +9624,9 @@ impl CapeUtilities {
 	/// * `result` - Indicates whether the edit operation affected the configuration or status of the PMC object
 	pub fn edit(&self,parent:CapeWindowId) -> Result<CapeEditResult,COBIAError> {
 		let mut result:C::CAPEOPEN_1_2_CapeEditResult=0;
+		let parent=parent.AsRaw();
 		let result_code = unsafe {
-			((*(*self.interface).vTbl).Edit.unwrap())((*self.interface).me,crate::CapeWindowIdToRaw(parent),&mut result as *mut C::CAPEOPEN_1_2_CapeEditResult)
+			((*(*self.interface).vTbl).Edit.unwrap())((*self.interface).me,parent.as_native(),&mut result as *mut C::CAPEOPEN_1_2_CapeEditResult)
 		};
 		match result_code {
 			COBIAERR_NOERROR => {
@@ -9732,13 +9647,10 @@ impl CapeUtilities {
 /// ICapeSimulationContext interface
 ///
 /// Interface provided by the PME to PMC objects.
-///
-
 pub trait ICapeSimulationContext {
 }
 
 /// COBIA interface implementation for ICapeSimulationContext
-
 pub trait ICapeSimulationContextImpl : ICapeSimulationContext {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeSimulationContextImpl;
@@ -9760,10 +9672,10 @@ pub trait ICapeSimulationContextImpl : ICapeSimulationContext {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeSimulationContext =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeSimulationContext;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeSimulationContext_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// VTable for ICapeSimulationContext interface
@@ -9800,8 +9712,6 @@ impl CapeSimulationContext {
 /// ICapeDiagnostic interface
 ///
 /// Interface provided by the PME, implemented by the Simulation Context, that provides diagnostics services.
-///
-
 pub trait ICapeDiagnostic {
 
 	/// Displays a pop-up message to the user.
@@ -9826,7 +9736,6 @@ pub trait ICapeDiagnostic {
 }
 
 /// COBIA interface implementation for ICapeDiagnostic
-
 pub trait ICapeDiagnosticImpl : ICapeDiagnostic {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeDiagnosticImpl;
@@ -9848,10 +9757,10 @@ pub trait ICapeDiagnosticImpl : ICapeDiagnostic {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeDiagnostic =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeDiagnostic;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeDiagnostic_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeDiagnostic::PopUpMessage
@@ -9859,7 +9768,7 @@ pub trait ICapeDiagnosticImpl : ICapeDiagnostic {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_pop_up_message(me: *mut std::ffi::c_void,message:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_pop_up_message(me: *mut std::ffi::c_void,message:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let message=CapeStringIn::new(&message);
@@ -9874,7 +9783,7 @@ pub trait ICapeDiagnosticImpl : ICapeDiagnostic {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_log_message(me: *mut std::ffi::c_void,message:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_log_message(me: *mut std::ffi::c_void,message:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let message=CapeStringIn::new(&message);
@@ -9958,8 +9867,6 @@ impl CapeDiagnostic {
 /// ICapeMaterialManager interface
 ///
 /// Interface provided by the PME, implemented by the Simulation Context, that allows access to available Material Object configurations.
-///
-
 pub trait ICapeMaterialManager {
 
 	/// Gets the list of available Material Object configurations.
@@ -9988,7 +9895,6 @@ pub trait ICapeMaterialManager {
 }
 
 /// COBIA interface implementation for ICapeMaterialManager
-
 pub trait ICapeMaterialManagerImpl : ICapeMaterialManager {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeMaterialManagerImpl;
@@ -10010,10 +9916,10 @@ pub trait ICapeMaterialManagerImpl : ICapeMaterialManager {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeMaterialManager =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeMaterialManager;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeMaterialManager_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeMaterialManager::GetMaterialList
@@ -10021,7 +9927,7 @@ pub trait ICapeMaterialManagerImpl : ICapeMaterialManager {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_material_list(me: *mut std::ffi::c_void,material_name_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_material_list(me: *mut std::ffi::c_void,material_name_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if material_name_list.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10043,7 +9949,7 @@ pub trait ICapeMaterialManagerImpl : ICapeMaterialManager {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_create_material(me: *mut std::ffi::c_void,material_name:*mut crate::C::ICapeString,material:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_create_material(me: *mut std::ffi::c_void,material_name:*mut crate::C::ICapeString,material:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if material.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10132,7 +10038,7 @@ impl CapeMaterialManager {
 				if material_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(crate::CapeObject::attach(material_ptr))
+				Ok(unsafe{crate::CapeObject::attach(material_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -10146,8 +10052,6 @@ impl CapeMaterialManager {
 /// ICapeCOSEUtilities interface
 ///
 /// Interface provided by the PME, implemented by the Simulation Context, that provides access to utility functions.
-///
-
 pub trait ICapeCOSEUtilities {
 
 	/// Gets the list of named values defined in the PME environment.
@@ -10173,7 +10077,6 @@ pub trait ICapeCOSEUtilities {
 }
 
 /// COBIA interface implementation for ICapeCOSEUtilities
-
 pub trait ICapeCOSEUtilitiesImpl : ICapeCOSEUtilities {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeCOSEUtilitiesImpl;
@@ -10195,10 +10098,10 @@ pub trait ICapeCOSEUtilitiesImpl : ICapeCOSEUtilities {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeCOSEUtilities =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeCOSEUtilities;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeCOSEUtilities_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeCOSEUtilities::GetNamedValueList
@@ -10206,7 +10109,7 @@ pub trait ICapeCOSEUtilitiesImpl : ICapeCOSEUtilities {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_named_value_list(me: *mut std::ffi::c_void,named_values:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_named_value_list(me: *mut std::ffi::c_void,named_values:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if named_values.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10228,7 +10131,7 @@ pub trait ICapeCOSEUtilitiesImpl : ICapeCOSEUtilities {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_named_value(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,named_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_named_value(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,named_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
 		if named_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10321,8 +10224,6 @@ impl CapeCOSEUtilities {
 /// ICapeThermoMaterial interface
 ///
 /// Interface implemented by CAPE-OPEN Material Objects.
-///
-
 pub trait ICapeThermoMaterial {
 
 	/// Remove all stored Physical Property values.
@@ -10479,7 +10380,6 @@ pub trait ICapeThermoMaterial {
 }
 
 /// COBIA interface implementation for ICapeThermoMaterial
-
 pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoMaterialImpl;
@@ -10501,10 +10401,10 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoMaterial =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoMaterial;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoMaterial_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoMaterial::ClearAllProps
@@ -10512,7 +10412,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_clear_all_props(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_clear_all_props(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.clear_all_props() {
@@ -10526,7 +10426,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_copy_from_material(me: *mut std::ffi::c_void,source:*mut C::CAPEOPEN_1_2_ICapeThermoMaterial) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_copy_from_material(me: *mut std::ffi::c_void,source:*mut C::CAPEOPEN_1_2_ICapeThermoMaterial) -> crate::C::CapeResult {
 		if source.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10535,7 +10435,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 		if source.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let source=CapeThermoMaterial::from_interface_pointer(source);
+		let source=unsafe{CapeThermoMaterial::from_interface_pointer(source)};
 		match myself.copy_from_material(source) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeThermoMaterial::CopyFromMaterial")
@@ -10547,7 +10447,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_create_material(me: *mut std::ffi::c_void,material_object:*mut *mut C::CAPEOPEN_1_2_ICapeThermoMaterial) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_create_material(me: *mut std::ffi::c_void,material_object:*mut *mut C::CAPEOPEN_1_2_ICapeThermoMaterial) -> crate::C::CapeResult {
 		if material_object.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10570,7 +10470,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_overall_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,results:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_overall_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,results:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if results.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10594,7 +10494,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_overall_t_p_fraction(me: *mut std::ffi::c_void,temperature:*mut CapeReal,pressure:*mut CapeReal,composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_overall_t_p_fraction(me: *mut std::ffi::c_void,temperature:*mut CapeReal,pressure:*mut CapeReal,composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if temperature.is_null()||pressure.is_null()||composition.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10622,7 +10522,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_present_phases(me: *mut std::ffi::c_void,phase_labels:*mut crate::C::ICapeArrayString,phase_status:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_present_phases(me: *mut std::ffi::c_void,phase_labels:*mut crate::C::ICapeArrayString,phase_status:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
 		if phase_labels.is_null()||phase_status.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10646,7 +10546,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_single_phase_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_label:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,results:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_single_phase_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_label:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,results:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if results.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10671,7 +10571,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_t_p_fraction(me: *mut std::ffi::c_void,phase_label:*mut crate::C::ICapeString,temperature:*mut CapeReal,pressure:*mut CapeReal,composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_t_p_fraction(me: *mut std::ffi::c_void,phase_label:*mut crate::C::ICapeString,temperature:*mut CapeReal,pressure:*mut CapeReal,composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if temperature.is_null()||pressure.is_null()||composition.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10700,7 +10600,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_two_phase_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString,basis:*mut crate::C::ICapeString,results:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_two_phase_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString,basis:*mut crate::C::ICapeString,results:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if results.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -10725,7 +10625,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_overall_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_overall_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let property=CapeStringIn::new(&property);
@@ -10742,7 +10642,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_present_phases(me: *mut std::ffi::c_void,phase_labels:*mut crate::C::ICapeArrayString,phase_status:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_present_phases(me: *mut std::ffi::c_void,phase_labels:*mut crate::C::ICapeArrayString,phase_status:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let phase_labels=CapeArrayStringIn::new(&phase_labels);
@@ -10758,7 +10658,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_single_phase_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_label:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_single_phase_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_label:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let property=CapeStringIn::new(&property);
@@ -10776,7 +10676,7 @@ pub trait ICapeThermoMaterialImpl : ICapeThermoMaterial {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_two_phase_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString,basis:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_two_phase_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString,basis:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let property=CapeStringIn::new(&property);
@@ -10884,7 +10784,7 @@ impl CapeThermoMaterial {
 				if material_object_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(CapeThermoMaterial::attach(material_object_ptr))
+				Ok(unsafe{CapeThermoMaterial::attach(material_object_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -11111,8 +11011,6 @@ impl CapeThermoMaterial {
 /// ICapeThermoMaterialContext interface
 ///
 /// Interface implemented by CAPE-OPEN Objects that operate on a Material Object.
-///
-
 pub trait ICapeThermoMaterialContext {
 
 	/// Sets the Material Object to be used.
@@ -11135,7 +11033,6 @@ pub trait ICapeThermoMaterialContext {
 }
 
 /// COBIA interface implementation for ICapeThermoMaterialContext
-
 pub trait ICapeThermoMaterialContextImpl : ICapeThermoMaterialContext {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoMaterialContextImpl;
@@ -11157,10 +11054,10 @@ pub trait ICapeThermoMaterialContextImpl : ICapeThermoMaterialContext {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoMaterialContext =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoMaterialContext;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoMaterialContext_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoMaterialContext::SetMaterial
@@ -11168,7 +11065,7 @@ pub trait ICapeThermoMaterialContextImpl : ICapeThermoMaterialContext {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_material(me: *mut std::ffi::c_void,material:*mut C::CAPEOPEN_1_2_ICapeThermoMaterial) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_material(me: *mut std::ffi::c_void,material:*mut C::CAPEOPEN_1_2_ICapeThermoMaterial) -> crate::C::CapeResult {
 		if material.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -11177,7 +11074,7 @@ pub trait ICapeThermoMaterialContextImpl : ICapeThermoMaterialContext {
 		if material.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let material=CapeThermoMaterial::from_interface_pointer(material);
+		let material=unsafe{CapeThermoMaterial::from_interface_pointer(material)};
 		match myself.set_material(material) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeThermoMaterialContext::SetMaterial")
@@ -11189,7 +11086,7 @@ pub trait ICapeThermoMaterialContextImpl : ICapeThermoMaterialContext {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_unset_material(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_unset_material(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.unset_material() {
@@ -11270,8 +11167,6 @@ impl CapeThermoMaterialContext {
 /// ICapeThermoCompounds interface
 ///
 /// Interface implemented by any CAPE-OPEN object that exposes Compounds.
-///
-
 pub trait ICapeThermoCompounds {
 
 	/// Gets constant property values for the specified Compounds.
@@ -11373,7 +11268,6 @@ pub trait ICapeThermoCompounds {
 }
 
 /// COBIA interface implementation for ICapeThermoCompounds
-
 pub trait ICapeThermoCompoundsImpl : ICapeThermoCompounds {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoCompoundsImpl;
@@ -11395,10 +11289,10 @@ pub trait ICapeThermoCompoundsImpl : ICapeThermoCompounds {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoCompounds =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoCompounds;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoCompounds_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoCompounds::GetCompoundConstant
@@ -11406,7 +11300,7 @@ pub trait ICapeThermoCompoundsImpl : ICapeThermoCompounds {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_compound_constant(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,comp_ids:*mut crate::C::ICapeArrayString,contains_missing_values:*mut CapeBoolean,prop_vals:*mut crate::C::ICapeArrayValue) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_compound_constant(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,comp_ids:*mut crate::C::ICapeArrayString,contains_missing_values:*mut CapeBoolean,prop_vals:*mut crate::C::ICapeArrayValue) -> crate::C::CapeResult {
 		if contains_missing_values.is_null()||prop_vals.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -11434,7 +11328,7 @@ pub trait ICapeThermoCompoundsImpl : ICapeThermoCompounds {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_compound_list(me: *mut std::ffi::c_void,comp_ids:*mut crate::C::ICapeArrayString,formulae:*mut crate::C::ICapeArrayString,names:*mut crate::C::ICapeArrayString,boil_temps:*mut crate::C::ICapeArrayReal,molwts:*mut crate::C::ICapeArrayReal,casnos:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_compound_list(me: *mut std::ffi::c_void,comp_ids:*mut crate::C::ICapeArrayString,formulae:*mut crate::C::ICapeArrayString,names:*mut crate::C::ICapeArrayString,boil_temps:*mut crate::C::ICapeArrayReal,molwts:*mut crate::C::ICapeArrayReal,casnos:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if comp_ids.is_null()||formulae.is_null()||names.is_null()||boil_temps.is_null()||molwts.is_null()||casnos.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -11466,7 +11360,7 @@ pub trait ICapeThermoCompoundsImpl : ICapeThermoCompounds {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_const_prop_list(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_const_prop_list(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if props.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -11488,7 +11382,7 @@ pub trait ICapeThermoCompoundsImpl : ICapeThermoCompounds {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_num_compounds(me: *mut std::ffi::c_void,num:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_num_compounds(me: *mut std::ffi::c_void,num:*mut CapeInteger) -> crate::C::CapeResult {
 		if num.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -11508,7 +11402,7 @@ pub trait ICapeThermoCompoundsImpl : ICapeThermoCompounds {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_p_dependent_property(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,pressure:CapeReal,comp_ids:*mut crate::C::ICapeArrayString,contains_missing_values:*mut CapeBoolean,prop_vals:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_p_dependent_property(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,pressure:CapeReal,comp_ids:*mut crate::C::ICapeArrayString,contains_missing_values:*mut CapeBoolean,prop_vals:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if contains_missing_values.is_null()||prop_vals.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -11536,7 +11430,7 @@ pub trait ICapeThermoCompoundsImpl : ICapeThermoCompounds {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_p_dependent_prop_list(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_p_dependent_prop_list(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if props.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -11558,7 +11452,7 @@ pub trait ICapeThermoCompoundsImpl : ICapeThermoCompounds {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_t_dependent_property(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,temperature:CapeReal,comp_ids:*mut crate::C::ICapeArrayString,contains_missing_values:*mut CapeBoolean,prop_vals:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_t_dependent_property(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,temperature:CapeReal,comp_ids:*mut crate::C::ICapeArrayString,contains_missing_values:*mut CapeBoolean,prop_vals:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if contains_missing_values.is_null()||prop_vals.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -11586,7 +11480,7 @@ pub trait ICapeThermoCompoundsImpl : ICapeThermoCompounds {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_t_dependent_prop_list(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_t_dependent_prop_list(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if props.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -11816,8 +11710,6 @@ impl CapeThermoCompounds {
 /// ICapeThermoPhases interface
 ///
 /// Interface implemented by any CAPE-OPEN object that exposes Phases.
-///
-
 pub trait ICapeThermoPhases {
 
 	/// Gets the number of supported Phases.
@@ -11857,7 +11749,6 @@ pub trait ICapeThermoPhases {
 }
 
 /// COBIA interface implementation for ICapeThermoPhases
-
 pub trait ICapeThermoPhasesImpl : ICapeThermoPhases {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoPhasesImpl;
@@ -11879,10 +11770,10 @@ pub trait ICapeThermoPhasesImpl : ICapeThermoPhases {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoPhases =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoPhases;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoPhases_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoPhases::GetNumPhases
@@ -11890,7 +11781,7 @@ pub trait ICapeThermoPhasesImpl : ICapeThermoPhases {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_num_phases(me: *mut std::ffi::c_void,num:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_num_phases(me: *mut std::ffi::c_void,num:*mut CapeInteger) -> crate::C::CapeResult {
 		if num.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -11910,7 +11801,7 @@ pub trait ICapeThermoPhasesImpl : ICapeThermoPhases {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_phase_info(me: *mut std::ffi::c_void,phase_label:*mut crate::C::ICapeString,phase_attribute:*mut crate::C::ICapeString,value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_phase_info(me: *mut std::ffi::c_void,phase_label:*mut crate::C::ICapeString,phase_attribute:*mut crate::C::ICapeString,value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -11934,7 +11825,7 @@ pub trait ICapeThermoPhasesImpl : ICapeThermoPhases {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_phase_list(me: *mut std::ffi::c_void,phase_labels:*mut crate::C::ICapeArrayString,state_of_aggregation:*mut crate::C::ICapeArrayString,key_compound_id:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_phase_list(me: *mut std::ffi::c_void,phase_labels:*mut crate::C::ICapeArrayString,state_of_aggregation:*mut crate::C::ICapeArrayString,key_compound_id:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if phase_labels.is_null()||state_of_aggregation.is_null()||key_compound_id.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -12056,8 +11947,6 @@ impl CapeThermoPhases {
 /// ICapeThermoPropertyRoutine interface
 ///
 /// Interface implemented by any CAPE-OPEN component that calculates Physical Properties.
-///
-
 pub trait ICapeThermoPropertyRoutine {
 
 	/// Calculates log fugacity coefficients and/or their derivatives of a Phase.
@@ -12152,7 +12041,6 @@ pub trait ICapeThermoPropertyRoutine {
 }
 
 /// COBIA interface implementation for ICapeThermoPropertyRoutine
-
 pub trait ICapeThermoPropertyRoutineImpl : ICapeThermoPropertyRoutine {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoPropertyRoutineImpl;
@@ -12174,10 +12062,10 @@ pub trait ICapeThermoPropertyRoutineImpl : ICapeThermoPropertyRoutine {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoPropertyRoutine =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoPropertyRoutine;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoPropertyRoutine_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoPropertyRoutine::CalcAndGetLnPhi
@@ -12185,7 +12073,7 @@ pub trait ICapeThermoPropertyRoutineImpl : ICapeThermoPropertyRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_calc_and_get_ln_phi(me: *mut std::ffi::c_void,phase_label:*mut crate::C::ICapeString,temperature:CapeReal,pressure:CapeReal,mole_fraction:*mut crate::C::ICapeArrayReal,f_flags:CapeInteger,ln_phi:*mut crate::C::ICapeArrayReal,ln_phi_dt:*mut crate::C::ICapeArrayReal,ln_phi_dp:*mut crate::C::ICapeArrayReal,ln_phi_dn:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_calc_and_get_ln_phi(me: *mut std::ffi::c_void,phase_label:*mut crate::C::ICapeString,temperature:CapeReal,pressure:CapeReal,mole_fraction:*mut crate::C::ICapeArrayReal,f_flags:CapeInteger,ln_phi:*mut crate::C::ICapeArrayReal,ln_phi_dt:*mut crate::C::ICapeArrayReal,ln_phi_dp:*mut crate::C::ICapeArrayReal,ln_phi_dn:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if ln_phi.is_null()||ln_phi_dt.is_null()||ln_phi_dp.is_null()||ln_phi_dn.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -12215,7 +12103,7 @@ pub trait ICapeThermoPropertyRoutineImpl : ICapeThermoPropertyRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_calc_single_phase_prop(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,phase_label:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_calc_single_phase_prop(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,phase_label:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let props=CapeArrayStringIn::new(&props);
@@ -12231,7 +12119,7 @@ pub trait ICapeThermoPropertyRoutineImpl : ICapeThermoPropertyRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_calc_two_phase_prop(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,phase_labels:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_calc_two_phase_prop(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,phase_labels:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let props=CapeArrayStringIn::new(&props);
@@ -12247,7 +12135,7 @@ pub trait ICapeThermoPropertyRoutineImpl : ICapeThermoPropertyRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_check_single_phase_prop_spec(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_label:*mut crate::C::ICapeString,valid:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_check_single_phase_prop_spec(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_label:*mut crate::C::ICapeString,valid:*mut CapeBoolean) -> crate::C::CapeResult {
 		if valid.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -12269,7 +12157,7 @@ pub trait ICapeThermoPropertyRoutineImpl : ICapeThermoPropertyRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_check_two_phase_prop_spec(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString,valid:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_check_two_phase_prop_spec(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString,valid:*mut CapeBoolean) -> crate::C::CapeResult {
 		if valid.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -12291,7 +12179,7 @@ pub trait ICapeThermoPropertyRoutineImpl : ICapeThermoPropertyRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_single_phase_prop_list(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_single_phase_prop_list(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if props.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -12313,7 +12201,7 @@ pub trait ICapeThermoPropertyRoutineImpl : ICapeThermoPropertyRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_two_phase_prop_list(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_two_phase_prop_list(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if props.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -12528,8 +12416,6 @@ impl CapeThermoPropertyRoutine {
 /// ICapeThermoEquilibriumRoutine interface
 ///
 /// Interface implemented by any CAPE-OPEN component that calculates Thermodynamic Phase Equilibrium.
-///
-
 pub trait ICapeThermoEquilibriumRoutine {
 
 	/// Calculates phase equilibrium.
@@ -12562,7 +12448,6 @@ pub trait ICapeThermoEquilibriumRoutine {
 }
 
 /// COBIA interface implementation for ICapeThermoEquilibriumRoutine
-
 pub trait ICapeThermoEquilibriumRoutineImpl : ICapeThermoEquilibriumRoutine {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoEquilibriumRoutineImpl;
@@ -12584,10 +12469,10 @@ pub trait ICapeThermoEquilibriumRoutineImpl : ICapeThermoEquilibriumRoutine {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoEquilibriumRoutine =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoEquilibriumRoutine;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoEquilibriumRoutine_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoEquilibriumRoutine::CalcEquilibrium
@@ -12595,7 +12480,7 @@ pub trait ICapeThermoEquilibriumRoutineImpl : ICapeThermoEquilibriumRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_calc_equilibrium(me: *mut std::ffi::c_void,specification1:*mut crate::C::ICapeArrayString,specification2:*mut crate::C::ICapeArrayString,solution_type:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_calc_equilibrium(me: *mut std::ffi::c_void,specification1:*mut crate::C::ICapeArrayString,specification2:*mut crate::C::ICapeArrayString,solution_type:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let specification1=CapeArrayStringIn::new(&specification1);
@@ -12612,7 +12497,7 @@ pub trait ICapeThermoEquilibriumRoutineImpl : ICapeThermoEquilibriumRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_check_equilibrium_spec(me: *mut std::ffi::c_void,specification1:*mut crate::C::ICapeArrayString,specification2:*mut crate::C::ICapeArrayString,solution_type:*mut crate::C::ICapeString,is_supported:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_check_equilibrium_spec(me: *mut std::ffi::c_void,specification1:*mut crate::C::ICapeArrayString,specification2:*mut crate::C::ICapeArrayString,solution_type:*mut crate::C::ICapeString,is_supported:*mut CapeBoolean) -> crate::C::CapeResult {
 		if is_supported.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -12714,8 +12599,6 @@ impl CapeThermoEquilibriumRoutine {
 /// ICapeThermoUniversalConstant interface
 ///
 /// Interface implemented by CAPE-OPEN Components that provide universal constants.
-///
-
 pub trait ICapeThermoUniversalConstant {
 
 	/// Gets the value of a universal constant.
@@ -12741,7 +12624,6 @@ pub trait ICapeThermoUniversalConstant {
 }
 
 /// COBIA interface implementation for ICapeThermoUniversalConstant
-
 pub trait ICapeThermoUniversalConstantImpl : ICapeThermoUniversalConstant {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoUniversalConstantImpl;
@@ -12763,10 +12645,10 @@ pub trait ICapeThermoUniversalConstantImpl : ICapeThermoUniversalConstant {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoUniversalConstant =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoUniversalConstant;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoUniversalConstant_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoUniversalConstant::GetUniversalConstant
@@ -12774,7 +12656,7 @@ pub trait ICapeThermoUniversalConstantImpl : ICapeThermoUniversalConstant {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_universal_constant(me: *mut std::ffi::c_void,constant_id:*mut crate::C::ICapeString,constant_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_universal_constant(me: *mut std::ffi::c_void,constant_id:*mut crate::C::ICapeString,constant_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
 		if constant_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -12797,7 +12679,7 @@ pub trait ICapeThermoUniversalConstantImpl : ICapeThermoUniversalConstant {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_universal_constant_list(me: *mut std::ffi::c_void,constant_id_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_universal_constant_list(me: *mut std::ffi::c_void,constant_id_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if constant_id_list.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -12889,8 +12771,6 @@ impl CapeThermoUniversalConstant {
 /// ICapeThermoPropertyPackageManager interface
 ///
 /// Principal interface implemented by CAPE-OPEN Thermodynamic Property Package Managers PMCs.
-///
-
 pub trait ICapeThermoPropertyPackageManager {
 
 	/// Gets the list of available Property Package templates.
@@ -12919,7 +12799,6 @@ pub trait ICapeThermoPropertyPackageManager {
 }
 
 /// COBIA interface implementation for ICapeThermoPropertyPackageManager
-
 pub trait ICapeThermoPropertyPackageManagerImpl : ICapeThermoPropertyPackageManager {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoPropertyPackageManagerImpl;
@@ -12941,10 +12820,10 @@ pub trait ICapeThermoPropertyPackageManagerImpl : ICapeThermoPropertyPackageMana
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoPropertyPackageManager =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoPropertyPackageManager;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoPropertyPackageManager_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoPropertyPackageManager::GetPropertyPackageList
@@ -12952,7 +12831,7 @@ pub trait ICapeThermoPropertyPackageManagerImpl : ICapeThermoPropertyPackageMana
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_property_package_list(me: *mut std::ffi::c_void,package_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_property_package_list(me: *mut std::ffi::c_void,package_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if package_names.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -12974,7 +12853,7 @@ pub trait ICapeThermoPropertyPackageManagerImpl : ICapeThermoPropertyPackageMana
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_property_package(me: *mut std::ffi::c_void,package_name:*mut crate::C::ICapeString,package:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_property_package(me: *mut std::ffi::c_void,package_name:*mut crate::C::ICapeString,package:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if package.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -13063,7 +12942,7 @@ impl CapeThermoPropertyPackageManager {
 				if package_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(crate::CapeObject::attach(package_ptr))
+				Ok(unsafe{crate::CapeObject::attach(package_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -13077,8 +12956,6 @@ impl CapeThermoPropertyPackageManager {
 /// ICapeUnit interface
 ///
 /// Principal interface implemented by CAPE-OPEN Unit Operation PMCs.
-///
-
 pub trait ICapeUnit {
 
 	/// Gets the collection of ports of the Unit Operation.
@@ -13126,7 +13003,6 @@ pub trait ICapeUnit {
 }
 
 /// COBIA interface implementation for ICapeUnit
-
 pub trait ICapeUnitImpl : ICapeUnit {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeUnitImpl;
@@ -13148,10 +13024,10 @@ pub trait ICapeUnitImpl : ICapeUnit {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeUnit =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeUnit;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeUnit_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeUnit::ports
@@ -13159,7 +13035,7 @@ pub trait ICapeUnitImpl : ICapeUnit {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_ports(me: *mut std::ffi::c_void,ports:*mut *mut C::CAPEOPEN_1_2_ICapeCollection) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_ports(me: *mut std::ffi::c_void,ports:*mut *mut C::CAPEOPEN_1_2_ICapeCollection) -> crate::C::CapeResult {
 		if ports.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -13182,7 +13058,7 @@ pub trait ICapeUnitImpl : ICapeUnit {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_val_status(me: *mut std::ffi::c_void,val_status:*mut C::CAPEOPEN_1_2_CapeValidationStatus) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_val_status(me: *mut std::ffi::c_void,val_status:*mut C::CAPEOPEN_1_2_CapeValidationStatus) -> crate::C::CapeResult {
 		if val_status.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -13202,7 +13078,7 @@ pub trait ICapeUnitImpl : ICapeUnit {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_calculate(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_calculate(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.calculate() {
@@ -13216,7 +13092,7 @@ pub trait ICapeUnitImpl : ICapeUnit {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,message:*mut crate::C::ICapeString,is_valid:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,message:*mut crate::C::ICapeString,is_valid:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_valid.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -13286,7 +13162,7 @@ impl CapeUnit {
 				if ports_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(CapeCollection::<CapeUnitPort>::attach(ports_ptr))
+				Ok(unsafe{CapeCollection::<CapeUnitPort>::attach(ports_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -13367,8 +13243,6 @@ impl CapeUnit {
 /// ICapeUnitPort interface
 ///
 /// Principal interface implemented by ports of CAPE-OPEN Unit Operation PMCs.
-///
-
 pub trait ICapeUnitPort {
 
 	/// Gets the type of the port.
@@ -13424,7 +13298,6 @@ pub trait ICapeUnitPort {
 }
 
 /// COBIA interface implementation for ICapeUnitPort
-
 pub trait ICapeUnitPortImpl : ICapeUnitPort {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeUnitPortImpl;
@@ -13446,10 +13319,10 @@ pub trait ICapeUnitPortImpl : ICapeUnitPort {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeUnitPort =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeUnitPort;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeUnitPort_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeUnitPort::GetPortType
@@ -13457,7 +13330,7 @@ pub trait ICapeUnitPortImpl : ICapeUnitPort {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_port_type(me: *mut std::ffi::c_void,port_type:*mut C::CAPEOPEN_1_2_CapePortType) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_port_type(me: *mut std::ffi::c_void,port_type:*mut C::CAPEOPEN_1_2_CapePortType) -> crate::C::CapeResult {
 		if port_type.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -13477,7 +13350,7 @@ pub trait ICapeUnitPortImpl : ICapeUnitPort {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_direction(me: *mut std::ffi::c_void,port_direction:*mut C::CAPEOPEN_1_2_CapePortDirection) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_direction(me: *mut std::ffi::c_void,port_direction:*mut C::CAPEOPEN_1_2_CapePortDirection) -> crate::C::CapeResult {
 		if port_direction.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -13497,7 +13370,7 @@ pub trait ICapeUnitPortImpl : ICapeUnitPort {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_connected_object(me: *mut std::ffi::c_void,connected_object:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_connected_object(me: *mut std::ffi::c_void,connected_object:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if connected_object.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -13520,7 +13393,7 @@ pub trait ICapeUnitPortImpl : ICapeUnitPort {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_connect(me: *mut std::ffi::c_void,object_to_connect:*mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_connect(me: *mut std::ffi::c_void,object_to_connect:*mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if object_to_connect.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -13529,7 +13402,7 @@ pub trait ICapeUnitPortImpl : ICapeUnitPort {
 		if object_to_connect.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let object_to_connect=crate::CapeObject::from_interface_pointer(object_to_connect);
+		let object_to_connect=unsafe{crate::CapeObject::from_interface_pointer(object_to_connect)};
 		match myself.connect(object_to_connect) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeUnitPort::Connect")
@@ -13541,7 +13414,7 @@ pub trait ICapeUnitPortImpl : ICapeUnitPort {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_disconnect(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_disconnect(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.disconnect() {
@@ -13653,7 +13526,7 @@ impl CapeUnitPort {
 				if connected_object_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(crate::CapeObject::attach(connected_object_ptr))
+				Ok(unsafe{crate::CapeObject::attach(connected_object_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -13703,8 +13576,6 @@ impl CapeUnitPort {
 /// ICapePersistWriter interface
 ///
 /// Interface for storing data to a persistence node.
-///
-
 pub trait ICapePersistWriter {
 
 	/// Adds a CapeReal value to the node.
@@ -13866,7 +13737,6 @@ pub trait ICapePersistWriter {
 }
 
 /// COBIA interface implementation for ICapePersistWriter
-
 pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapePersistWriterImpl;
@@ -13888,10 +13758,10 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapePersistWriter =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapePersistWriter;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapePersistWriter_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapePersistWriter::AddReal
@@ -13899,7 +13769,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_real(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_real(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:CapeReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -13914,7 +13784,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_integer(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_integer(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:CapeInteger) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -13929,7 +13799,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_boolean(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_boolean(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:CapeBoolean) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -13944,7 +13814,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_string(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_string(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -13960,7 +13830,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_enumeration(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:crate::C::CapeEnumeration) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_enumeration(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:crate::C::CapeEnumeration) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -13975,7 +13845,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_value(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_value(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -13991,7 +13861,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_array_real(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_array_real(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -14007,7 +13877,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_array_integer(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_array_integer(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -14023,7 +13893,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_array_boolean(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_array_boolean(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayBoolean) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -14039,7 +13909,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_array_string(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_array_string(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -14055,7 +13925,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_array_enumeration(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_array_enumeration(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -14071,7 +13941,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_array_value(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayValue) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_array_value(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayValue) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -14087,7 +13957,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_array_byte(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayByte) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_array_byte(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayByte) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let value_name=CapeStringIn::new(&value_name);
@@ -14103,7 +13973,7 @@ pub trait ICapePersistWriterImpl : ICapePersistWriter {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_add_node(me: *mut std::ffi::c_void,node_name:*mut crate::C::ICapeString,value:*mut *mut C::CAPEOPEN_1_2_ICapePersistWriter) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_add_node(me: *mut std::ffi::c_void,node_name:*mut crate::C::ICapeString,value:*mut *mut C::CAPEOPEN_1_2_ICapePersistWriter) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14445,7 +14315,7 @@ impl CapePersistWriter {
 				if value_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(CapePersistWriter::attach(value_ptr))
+				Ok(unsafe{CapePersistWriter::attach(value_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -14459,8 +14329,6 @@ impl CapePersistWriter {
 /// ICapePersistReader interface
 ///
 /// Interface for reading previously stored data from a persistence node.
-///
-
 pub trait ICapePersistReader {
 
 	/// Gets the list of value names stored in the node.
@@ -14668,7 +14536,6 @@ pub trait ICapePersistReader {
 }
 
 /// COBIA interface implementation for ICapePersistReader
-
 pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapePersistReaderImpl;
@@ -14690,10 +14557,10 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapePersistReader =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapePersistReader;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapePersistReader_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapePersistReader::GetValueNames
@@ -14701,7 +14568,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_value_names(me: *mut std::ffi::c_void,value_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_value_names(me: *mut std::ffi::c_void,value_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if value_names.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14723,7 +14590,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_value_type(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value_type:*mut C::CAPEOPEN_1_2_CapePersistedDataType) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_value_type(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value_type:*mut C::CAPEOPEN_1_2_CapePersistedDataType) -> crate::C::CapeResult {
 		if value_type.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14744,7 +14611,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_real(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_real(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut CapeReal) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14765,7 +14632,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_integer(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_integer(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut CapeInteger) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14786,7 +14653,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_boolean(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_boolean(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut CapeBoolean) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14807,7 +14674,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_string(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_string(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14830,7 +14697,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_enumeration(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::CapeEnumeration) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_enumeration(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::CapeEnumeration) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14851,7 +14718,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_value(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14874,7 +14741,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_array_real(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_array_real(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14897,7 +14764,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_array_integer(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_array_integer(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayInteger) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14920,7 +14787,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_array_boolean(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_array_boolean(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayBoolean) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14943,7 +14810,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_array_string(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_array_string(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14966,7 +14833,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_array_enumeration(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_array_enumeration(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -14989,7 +14856,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_array_value(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayValue) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_array_value(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayValue) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15012,7 +14879,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_array_byte(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayByte) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_array_byte(me: *mut std::ffi::c_void,value_name:*mut crate::C::ICapeString,value:*mut crate::C::ICapeArrayByte) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15035,7 +14902,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_node_names(me: *mut std::ffi::c_void,node_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_node_names(me: *mut std::ffi::c_void,node_names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if node_names.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15057,7 +14924,7 @@ pub trait ICapePersistReaderImpl : ICapePersistReader {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_node(me: *mut std::ffi::c_void,node_name:*mut crate::C::ICapeString,value:*mut *mut C::CAPEOPEN_1_2_ICapePersistReader) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_node(me: *mut std::ffi::c_void,node_name:*mut crate::C::ICapeString,value:*mut *mut C::CAPEOPEN_1_2_ICapePersistReader) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15489,7 +15356,7 @@ impl CapePersistReader {
 				if value_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(CapePersistReader::attach(value_ptr))
+				Ok(unsafe{CapePersistReader::attach(value_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -15503,8 +15370,6 @@ impl CapePersistReader {
 /// ICapePersist interface
 ///
 /// Interface implemented by CAPE-OPEN Primary PMC Objects that support persistence.
-///
-
 pub trait ICapePersist {
 
 	/// Saves the object's data to the provided writer.
@@ -15545,7 +15410,6 @@ pub trait ICapePersist {
 }
 
 /// COBIA interface implementation for ICapePersist
-
 pub trait ICapePersistImpl : ICapePersist {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapePersistImpl;
@@ -15567,10 +15431,10 @@ pub trait ICapePersistImpl : ICapePersist {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapePersist =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapePersist;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapePersist_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapePersist::Save
@@ -15578,7 +15442,7 @@ pub trait ICapePersistImpl : ICapePersist {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_save(me: *mut std::ffi::c_void,writer:*mut C::CAPEOPEN_1_2_ICapePersistWriter,clear_dirty:CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_save(me: *mut std::ffi::c_void,writer:*mut C::CAPEOPEN_1_2_ICapePersistWriter,clear_dirty:CapeBoolean) -> crate::C::CapeResult {
 		if writer.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15587,7 +15451,7 @@ pub trait ICapePersistImpl : ICapePersist {
 		if writer.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let writer=CapePersistWriter::from_interface_pointer(writer);
+		let writer=unsafe{CapePersistWriter::from_interface_pointer(writer)};
 		match myself.save(writer,clear_dirty) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapePersist::Save")
@@ -15599,7 +15463,7 @@ pub trait ICapePersistImpl : ICapePersist {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_load(me: *mut std::ffi::c_void,reader:*mut C::CAPEOPEN_1_2_ICapePersistReader) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_load(me: *mut std::ffi::c_void,reader:*mut C::CAPEOPEN_1_2_ICapePersistReader) -> crate::C::CapeResult {
 		if reader.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15608,7 +15472,7 @@ pub trait ICapePersistImpl : ICapePersist {
 		if reader.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let reader=CapePersistReader::from_interface_pointer(reader);
+		let reader=unsafe{CapePersistReader::from_interface_pointer(reader)};
 		match myself.load(reader) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapePersist::Load")
@@ -15620,7 +15484,7 @@ pub trait ICapePersistImpl : ICapePersist {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_is_dirty(me: *mut std::ffi::c_void,dirty:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_is_dirty(me: *mut std::ffi::c_void,dirty:*mut CapeBoolean) -> crate::C::CapeResult {
 		if dirty.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15737,8 +15601,6 @@ impl CapePersist {
 /// ICapeReport interface
 ///
 /// Interface implemented by CAPE-OPEN Objects that support report generation.
-///
-
 pub trait ICapeReport {
 
 	/// Gets the list of available report names.
@@ -15818,7 +15680,6 @@ pub trait ICapeReport {
 }
 
 /// COBIA interface implementation for ICapeReport
-
 pub trait ICapeReportImpl : ICapeReport {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeReportImpl;
@@ -15840,10 +15701,10 @@ pub trait ICapeReportImpl : ICapeReport {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeReport =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeReport;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeReport_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeReport::GetReportNames
@@ -15851,7 +15712,7 @@ pub trait ICapeReportImpl : ICapeReport {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_report_names(me: *mut std::ffi::c_void,names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_report_names(me: *mut std::ffi::c_void,names:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if names.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15873,7 +15734,7 @@ pub trait ICapeReportImpl : ICapeReport {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_report_types(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,types:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_report_types(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,types:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if types.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15896,7 +15757,7 @@ pub trait ICapeReportImpl : ICapeReport {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_report_locales(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,_type:*mut crate::C::ICapeString,locales:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_report_locales(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,_type:*mut crate::C::ICapeString,locales:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if locales.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15920,7 +15781,7 @@ pub trait ICapeReportImpl : ICapeReport {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_check_report_spec(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,_type:*mut crate::C::ICapeString,locale:*mut crate::C::ICapeString,report_available:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_check_report_spec(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,_type:*mut crate::C::ICapeString,locale:*mut crate::C::ICapeString,report_available:*mut CapeBoolean) -> crate::C::CapeResult {
 		if report_available.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15943,7 +15804,7 @@ pub trait ICapeReportImpl : ICapeReport {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_generate_report(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,_type:*mut crate::C::ICapeString,locale:*mut crate::C::ICapeString,report_content:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_generate_report(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,_type:*mut crate::C::ICapeString,locale:*mut crate::C::ICapeString,report_content:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if report_content.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -15968,7 +15829,7 @@ pub trait ICapeReportImpl : ICapeReport {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_generate_report_file(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,_type:*mut crate::C::ICapeString,locale:*mut crate::C::ICapeString,file_name:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_generate_report_file(me: *mut std::ffi::c_void,name:*mut crate::C::ICapeString,_type:*mut crate::C::ICapeString,locale:*mut crate::C::ICapeString,file_name:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let name=CapeStringIn::new(&name);
@@ -16152,8 +16013,6 @@ impl CapeReport {
 /// ICapeFlowsheetMonitoringComponent interface
 ///
 /// Principal interface implemented CAPE-OPEN Flowsheet Monitoring Component PMCs.
-///
-
 pub trait ICapeFlowsheetMonitoringComponent {
 
 	/// Monitors the flowsheet.
@@ -16190,7 +16049,6 @@ pub trait ICapeFlowsheetMonitoringComponent {
 }
 
 /// COBIA interface implementation for ICapeFlowsheetMonitoringComponent
-
 pub trait ICapeFlowsheetMonitoringComponentImpl : ICapeFlowsheetMonitoringComponent {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeFlowsheetMonitoringComponentImpl;
@@ -16212,10 +16070,10 @@ pub trait ICapeFlowsheetMonitoringComponentImpl : ICapeFlowsheetMonitoringCompon
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeFlowsheetMonitoringComponent =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeFlowsheetMonitoringComponent;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeFlowsheetMonitoringComponent_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeFlowsheetMonitoringComponent::Monitor
@@ -16223,7 +16081,7 @@ pub trait ICapeFlowsheetMonitoringComponentImpl : ICapeFlowsheetMonitoringCompon
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_monitor(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_monitor(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.monitor() {
@@ -16237,7 +16095,7 @@ pub trait ICapeFlowsheetMonitoringComponentImpl : ICapeFlowsheetMonitoringCompon
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate(me: *mut std::ffi::c_void,message:*mut crate::C::ICapeString,is_valid:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate(me: *mut std::ffi::c_void,message:*mut crate::C::ICapeString,is_valid:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_valid.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16262,7 +16120,7 @@ pub trait ICapeFlowsheetMonitoringComponentImpl : ICapeFlowsheetMonitoringCompon
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_val_status(me: *mut std::ffi::c_void,validation_status:*mut C::CAPEOPEN_1_2_CapeValidationStatus) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_val_status(me: *mut std::ffi::c_void,validation_status:*mut C::CAPEOPEN_1_2_CapeValidationStatus) -> crate::C::CapeResult {
 		if validation_status.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16381,8 +16239,6 @@ impl CapeFlowsheetMonitoringComponent {
 /// ICapeStream interface
 ///
 /// Interface implemented by CAPE-OPEN Streams returned by the ICapeFlowsheetMonitoring interface.
-///
-
 pub trait ICapeStream {
 
 	/// Gets the Stream type.
@@ -16431,7 +16287,6 @@ pub trait ICapeStream {
 }
 
 /// COBIA interface implementation for ICapeStream
-
 pub trait ICapeStreamImpl : ICapeStream {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeStreamImpl;
@@ -16453,10 +16308,10 @@ pub trait ICapeStreamImpl : ICapeStream {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeStream =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeStream;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeStream_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeStream::StreamType
@@ -16464,7 +16319,7 @@ pub trait ICapeStreamImpl : ICapeStream {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_stream_type(me: *mut std::ffi::c_void,stream_type:*mut C::CAPEOPEN_1_2_CapeStreamType) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_stream_type(me: *mut std::ffi::c_void,stream_type:*mut C::CAPEOPEN_1_2_CapeStreamType) -> crate::C::CapeResult {
 		if stream_type.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16484,7 +16339,7 @@ pub trait ICapeStreamImpl : ICapeStream {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_stream_object(me: *mut std::ffi::c_void,stream_object:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_stream_object(me: *mut std::ffi::c_void,stream_object:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if stream_object.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16507,7 +16362,7 @@ pub trait ICapeStreamImpl : ICapeStream {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_upstream_port_connection(me: *mut std::ffi::c_void,upstream_port:*mut crate::C::ICapeString,upstream_unit:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_upstream_port_connection(me: *mut std::ffi::c_void,upstream_port:*mut crate::C::ICapeString,upstream_unit:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if upstream_port.is_null()||upstream_unit.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16531,7 +16386,7 @@ pub trait ICapeStreamImpl : ICapeStream {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_downstream_port_connection(me: *mut std::ffi::c_void,downstream_port:*mut crate::C::ICapeString,downstream_unit:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_downstream_port_connection(me: *mut std::ffi::c_void,downstream_port:*mut crate::C::ICapeString,downstream_unit:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if downstream_port.is_null()||downstream_unit.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16626,7 +16481,7 @@ impl CapeStream {
 				if stream_object_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(crate::CapeObject::attach(stream_object_ptr))
+				Ok(unsafe{crate::CapeObject::attach(stream_object_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -16680,8 +16535,6 @@ impl CapeStream {
 /// ICapeFlowsheetMonitoringEventSink interface
 ///
 /// Event sink interface implemented by CAPE-OPEN Flowsheet Monitoring Components that implement event handling.
-///
-
 pub trait ICapeFlowsheetMonitoringEventSink {
 
 	/// Notifies that a Unit Operation has been added to the flowsheet.
@@ -16808,7 +16661,6 @@ pub trait ICapeFlowsheetMonitoringEventSink {
 }
 
 /// COBIA interface implementation for ICapeFlowsheetMonitoringEventSink
-
 pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventSink {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeFlowsheetMonitoringEventSinkImpl;
@@ -16830,10 +16682,10 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeFlowsheetMonitoringEventSink =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeFlowsheetMonitoringEventSink;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeFlowsheetMonitoringEventSink_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeFlowsheetMonitoringEventSink::UnitOperationAdded
@@ -16841,7 +16693,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_unit_operation_added(me: *mut std::ffi::c_void,unit:*mut C::CAPEOPEN_1_2_ICapeUnit) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_unit_operation_added(me: *mut std::ffi::c_void,unit:*mut C::CAPEOPEN_1_2_ICapeUnit) -> crate::C::CapeResult {
 		if unit.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16850,7 +16702,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 		if unit.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let unit=CapeUnit::from_interface_pointer(unit);
+		let unit=unsafe{CapeUnit::from_interface_pointer(unit)};
 		match myself.unit_operation_added(unit) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeFlowsheetMonitoringEventSink::UnitOperationAdded")
@@ -16862,7 +16714,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_unit_operation_removed(me: *mut std::ffi::c_void,unit:*mut C::CAPEOPEN_1_2_ICapeUnit) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_unit_operation_removed(me: *mut std::ffi::c_void,unit:*mut C::CAPEOPEN_1_2_ICapeUnit) -> crate::C::CapeResult {
 		if unit.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16871,7 +16723,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 		if unit.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let unit=CapeUnit::from_interface_pointer(unit);
+		let unit=unsafe{CapeUnit::from_interface_pointer(unit)};
 		match myself.unit_operation_removed(unit) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeFlowsheetMonitoringEventSink::UnitOperationRemoved")
@@ -16883,7 +16735,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_unit_operation_renamed(me: *mut std::ffi::c_void,unit:*mut C::CAPEOPEN_1_2_ICapeUnit,old_name:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_unit_operation_renamed(me: *mut std::ffi::c_void,unit:*mut C::CAPEOPEN_1_2_ICapeUnit,old_name:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if unit.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16892,7 +16744,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 		if unit.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let unit=CapeUnit::from_interface_pointer(unit);
+		let unit=unsafe{CapeUnit::from_interface_pointer(unit)};
 		let old_name=CapeStringIn::new(&old_name);
 		match myself.unit_operation_renamed(unit,&old_name) {
 			Ok(_) => COBIAERR_NOERROR,
@@ -16905,7 +16757,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_stream_added(me: *mut std::ffi::c_void,stream:*mut C::CAPEOPEN_1_2_ICapeStream,_type:C::CAPEOPEN_1_2_CapeStreamType) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_stream_added(me: *mut std::ffi::c_void,stream:*mut C::CAPEOPEN_1_2_ICapeStream,_type:C::CAPEOPEN_1_2_CapeStreamType) -> crate::C::CapeResult {
 		if stream.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16914,7 +16766,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 		if stream.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let stream=CapeStream::from_interface_pointer(stream);
+		let stream=unsafe{CapeStream::from_interface_pointer(stream)};
 		let _type=match CapeStreamType::from(_type) {
 			Some(__type) => __type,
 			None => {return myself.set_last_error(COBIAError::Message("Invalid enumeration value".to_string()),"ICapeFlowsheetMonitoringEventSink::StreamAdded");}
@@ -16930,7 +16782,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_stream_removed(me: *mut std::ffi::c_void,stream:*mut C::CAPEOPEN_1_2_ICapeStream,_type:C::CAPEOPEN_1_2_CapeStreamType) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_stream_removed(me: *mut std::ffi::c_void,stream:*mut C::CAPEOPEN_1_2_ICapeStream,_type:C::CAPEOPEN_1_2_CapeStreamType) -> crate::C::CapeResult {
 		if stream.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16939,7 +16791,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 		if stream.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let stream=CapeStream::from_interface_pointer(stream);
+		let stream=unsafe{CapeStream::from_interface_pointer(stream)};
 		let _type=match CapeStreamType::from(_type) {
 			Some(__type) => __type,
 			None => {return myself.set_last_error(COBIAError::Message("Invalid enumeration value".to_string()),"ICapeFlowsheetMonitoringEventSink::StreamRemoved");}
@@ -16955,7 +16807,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_stream_renamed(me: *mut std::ffi::c_void,stream:*mut C::CAPEOPEN_1_2_ICapeStream,_type:C::CAPEOPEN_1_2_CapeStreamType,old_name:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_stream_renamed(me: *mut std::ffi::c_void,stream:*mut C::CAPEOPEN_1_2_ICapeStream,_type:C::CAPEOPEN_1_2_CapeStreamType,old_name:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if stream.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16964,7 +16816,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 		if stream.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let stream=CapeStream::from_interface_pointer(stream);
+		let stream=unsafe{CapeStream::from_interface_pointer(stream)};
 		let _type=match CapeStreamType::from(_type) {
 			Some(__type) => __type,
 			None => {return myself.set_last_error(COBIAError::Message("Invalid enumeration value".to_string()),"ICapeFlowsheetMonitoringEventSink::StreamRenamed");}
@@ -16981,7 +16833,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_connection_changed(me: *mut std::ffi::c_void,stream:*mut C::CAPEOPEN_1_2_ICapeStream,_type:C::CAPEOPEN_1_2_CapeStreamType,port:*mut C::CAPEOPEN_1_2_ICapeUnitPort,unit:*mut C::CAPEOPEN_1_2_ICapeUnit) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_connection_changed(me: *mut std::ffi::c_void,stream:*mut C::CAPEOPEN_1_2_ICapeStream,_type:C::CAPEOPEN_1_2_CapeStreamType,port:*mut C::CAPEOPEN_1_2_ICapeUnitPort,unit:*mut C::CAPEOPEN_1_2_ICapeUnit) -> crate::C::CapeResult {
 		if stream.is_null()||port.is_null()||unit.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -16990,13 +16842,13 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 		if stream.is_null()||port.is_null()||unit.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let stream=CapeStream::from_interface_pointer(stream);
+		let stream=unsafe{CapeStream::from_interface_pointer(stream)};
 		let _type=match CapeStreamType::from(_type) {
 			Some(__type) => __type,
 			None => {return myself.set_last_error(COBIAError::Message("Invalid enumeration value".to_string()),"ICapeFlowsheetMonitoringEventSink::ConnectionChanged");}
 		};
-		let port=CapeUnitPort::from_interface_pointer(port);
-		let unit=CapeUnit::from_interface_pointer(unit);
+		let port=unsafe{CapeUnitPort::from_interface_pointer(port)};
+		let unit=unsafe{CapeUnit::from_interface_pointer(unit)};
 		match myself.connection_changed(stream,_type,port,unit) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeFlowsheetMonitoringEventSink::ConnectionChanged")
@@ -17008,7 +16860,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_flowsheet_solution_status_changed(me: *mut std::ffi::c_void,solution_status:C::CAPEOPEN_1_2_CapeSolutionStatus) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_flowsheet_solution_status_changed(me: *mut std::ffi::c_void,solution_status:C::CAPEOPEN_1_2_CapeSolutionStatus) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let solution_status=match CapeSolutionStatus::from(solution_status) {
@@ -17026,7 +16878,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_flowsheet_validation_state_changed(me: *mut std::ffi::c_void,validation_status:C::CAPEOPEN_1_2_CapeValidationStatus) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_flowsheet_validation_state_changed(me: *mut std::ffi::c_void,validation_status:C::CAPEOPEN_1_2_CapeValidationStatus) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let validation_status=match CapeValidationStatus::from(validation_status) {
@@ -17044,7 +16896,7 @@ pub trait ICapeFlowsheetMonitoringEventSinkImpl : ICapeFlowsheetMonitoringEventS
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_next_time_step(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_next_time_step(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.next_time_step() {
@@ -17309,8 +17161,6 @@ impl CapeFlowsheetMonitoringEventSink {
 /// ICapeFlowsheetMonitoring interface
 ///
 /// Interface implemented by the Simulation Context to provide services to Flowsheet Monitoring Component PMCs.
-///
-
 pub trait ICapeFlowsheetMonitoring {
 
 	/// Gets the collection of streams of the requested type.
@@ -17386,7 +17236,6 @@ pub trait ICapeFlowsheetMonitoring {
 }
 
 /// COBIA interface implementation for ICapeFlowsheetMonitoring
-
 pub trait ICapeFlowsheetMonitoringImpl : ICapeFlowsheetMonitoring {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeFlowsheetMonitoringImpl;
@@ -17408,10 +17257,10 @@ pub trait ICapeFlowsheetMonitoringImpl : ICapeFlowsheetMonitoring {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeFlowsheetMonitoring =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeFlowsheetMonitoring;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeFlowsheetMonitoring_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeFlowsheetMonitoring::GetStreamCollection
@@ -17419,7 +17268,7 @@ pub trait ICapeFlowsheetMonitoringImpl : ICapeFlowsheetMonitoring {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_stream_collection(me: *mut std::ffi::c_void,_type:C::CAPEOPEN_1_2_CapeStreamType,stream_collection:*mut *mut C::CAPEOPEN_1_2_ICapeCollection) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_stream_collection(me: *mut std::ffi::c_void,_type:C::CAPEOPEN_1_2_CapeStreamType,stream_collection:*mut *mut C::CAPEOPEN_1_2_ICapeCollection) -> crate::C::CapeResult {
 		if stream_collection.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -17446,7 +17295,7 @@ pub trait ICapeFlowsheetMonitoringImpl : ICapeFlowsheetMonitoring {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_unit_operation_collection(me: *mut std::ffi::c_void,unit_operation_collection:*mut *mut C::CAPEOPEN_1_2_ICapeCollection) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_unit_operation_collection(me: *mut std::ffi::c_void,unit_operation_collection:*mut *mut C::CAPEOPEN_1_2_ICapeCollection) -> crate::C::CapeResult {
 		if unit_operation_collection.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -17469,7 +17318,7 @@ pub trait ICapeFlowsheetMonitoringImpl : ICapeFlowsheetMonitoring {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_solution_status(me: *mut std::ffi::c_void,solution_status:*mut C::CAPEOPEN_1_2_CapeSolutionStatus) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_solution_status(me: *mut std::ffi::c_void,solution_status:*mut C::CAPEOPEN_1_2_CapeSolutionStatus) -> crate::C::CapeResult {
 		if solution_status.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -17489,7 +17338,7 @@ pub trait ICapeFlowsheetMonitoringImpl : ICapeFlowsheetMonitoring {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_val_status(me: *mut std::ffi::c_void,validation_status:*mut C::CAPEOPEN_1_2_CapeValidationStatus) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_val_status(me: *mut std::ffi::c_void,validation_status:*mut C::CAPEOPEN_1_2_CapeValidationStatus) -> crate::C::CapeResult {
 		if validation_status.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -17509,7 +17358,7 @@ pub trait ICapeFlowsheetMonitoringImpl : ICapeFlowsheetMonitoring {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_register_for_events(me: *mut std::ffi::c_void,component:*mut crate::C::ICapeInterface,events:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_register_for_events(me: *mut std::ffi::c_void,component:*mut crate::C::ICapeInterface,events:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
 		if component.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -17518,7 +17367,7 @@ pub trait ICapeFlowsheetMonitoringImpl : ICapeFlowsheetMonitoring {
 		if component.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let component=crate::CapeObject::from_interface_pointer(component);
+		let component=unsafe{crate::CapeObject::from_interface_pointer(component)};
 		let events=CapeArrayEnumerationIn::<CapeMonitoringEvent>::new(&events);
 		match myself.register_for_events(component,&events) {
 			Ok(_) => COBIAERR_NOERROR,
@@ -17531,7 +17380,7 @@ pub trait ICapeFlowsheetMonitoringImpl : ICapeFlowsheetMonitoring {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_supported_events(me: *mut std::ffi::c_void,supported_events:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_supported_events(me: *mut std::ffi::c_void,supported_events:*mut crate::C::ICapeArrayEnumeration) -> crate::C::CapeResult {
 		if supported_events.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -17603,7 +17452,7 @@ impl CapeFlowsheetMonitoring {
 				if stream_collection_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(CapeCollection::<CapeStream>::attach(stream_collection_ptr))
+				Ok(unsafe{CapeCollection::<CapeStream>::attach(stream_collection_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -17629,7 +17478,7 @@ impl CapeFlowsheetMonitoring {
 				if unit_operation_collection_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(CapeCollection::<CapeUnit>::attach(unit_operation_collection_ptr))
+				Ok(unsafe{CapeCollection::<CapeUnit>::attach(unit_operation_collection_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -17737,8 +17586,6 @@ impl CapeFlowsheetMonitoring {
 /// ICapeThermoMaterialCustomData interface
 ///
 /// Interface for accessing custom data containers associated with Material Objects.
-///
-
 pub trait ICapeThermoMaterialCustomData {
 
 	/// Gets the custom data container associated with the a Material Object.
@@ -17755,7 +17602,6 @@ pub trait ICapeThermoMaterialCustomData {
 }
 
 /// COBIA interface implementation for ICapeThermoMaterialCustomData
-
 pub trait ICapeThermoMaterialCustomDataImpl : ICapeThermoMaterialCustomData {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoMaterialCustomDataImpl;
@@ -17777,10 +17623,10 @@ pub trait ICapeThermoMaterialCustomDataImpl : ICapeThermoMaterialCustomData {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoMaterialCustomData =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoMaterialCustomData;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoMaterialCustomData_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoMaterialCustomData::GetCustomDataContainer
@@ -17788,7 +17634,7 @@ pub trait ICapeThermoMaterialCustomDataImpl : ICapeThermoMaterialCustomData {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_custom_data_container(me: *mut std::ffi::c_void,source:*mut crate::C::ICapeInterface,custom_data_container:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_custom_data_container(me: *mut std::ffi::c_void,source:*mut crate::C::ICapeInterface,custom_data_container:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if source.is_null()||custom_data_container.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -17797,7 +17643,7 @@ pub trait ICapeThermoMaterialCustomDataImpl : ICapeThermoMaterialCustomData {
 		if source.is_null()||custom_data_container.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let source=crate::CapeObject::from_interface_pointer(source);
+		let source=unsafe{crate::CapeObject::from_interface_pointer(source)};
 		match myself.get_custom_data_container(source) {
 			Ok(_custom_data_container) => {
 				unsafe{*custom_data_container=_custom_data_container.detach();}
@@ -17855,7 +17701,7 @@ impl CapeThermoMaterialCustomData {
 				if custom_data_container_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(crate::CapeObject::attach(custom_data_container_ptr))
+				Ok(unsafe{crate::CapeObject::attach(custom_data_container_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -17869,8 +17715,6 @@ impl CapeThermoMaterialCustomData {
 /// ICapeCustomDataSource interface
 ///
 /// Interface implemented by Primary PMC Objects that store custom data on Material Objects.
-///
-
 pub trait ICapeCustomDataSource {
 
 	/// Creates a new instance of its custom data container.
@@ -17909,7 +17753,6 @@ pub trait ICapeCustomDataSource {
 }
 
 /// COBIA interface implementation for ICapeCustomDataSource
-
 pub trait ICapeCustomDataSourceImpl : ICapeCustomDataSource {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeCustomDataSourceImpl;
@@ -17931,10 +17774,10 @@ pub trait ICapeCustomDataSourceImpl : ICapeCustomDataSource {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeCustomDataSource =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeCustomDataSource;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeCustomDataSource_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeCustomDataSource::CreateCustomDataContainer
@@ -17942,7 +17785,7 @@ pub trait ICapeCustomDataSourceImpl : ICapeCustomDataSource {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_create_custom_data_container(me: *mut std::ffi::c_void,custom_data_container:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_create_custom_data_container(me: *mut std::ffi::c_void,custom_data_container:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if custom_data_container.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -17965,7 +17808,7 @@ pub trait ICapeCustomDataSourceImpl : ICapeCustomDataSource {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_copy_custom_data(me: *mut std::ffi::c_void,source:*mut crate::C::ICapeInterface,target:*mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_copy_custom_data(me: *mut std::ffi::c_void,source:*mut crate::C::ICapeInterface,target:*mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if source.is_null()||target.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -17974,8 +17817,8 @@ pub trait ICapeCustomDataSourceImpl : ICapeCustomDataSource {
 		if source.is_null()||target.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let source=crate::CapeObject::from_interface_pointer(source);
-		let target=crate::CapeObject::from_interface_pointer(target);
+		let source=unsafe{crate::CapeObject::from_interface_pointer(source)};
+		let target=unsafe{crate::CapeObject::from_interface_pointer(target)};
 		match myself.copy_custom_data(source,target) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeCustomDataSource::CopyCustomData")
@@ -17987,7 +17830,7 @@ pub trait ICapeCustomDataSourceImpl : ICapeCustomDataSource {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_thermodynamic_configuration_changed(me: *mut std::ffi::c_void,container:*mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_thermodynamic_configuration_changed(me: *mut std::ffi::c_void,container:*mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if container.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -17996,7 +17839,7 @@ pub trait ICapeCustomDataSourceImpl : ICapeCustomDataSource {
 		if container.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let container=crate::CapeObject::from_interface_pointer(container);
+		let container=unsafe{crate::CapeObject::from_interface_pointer(container)};
 		match myself.thermodynamic_configuration_changed(container) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeCustomDataSource::ThermodynamicConfigurationChanged")
@@ -18052,7 +17895,7 @@ impl CapeCustomDataSource {
 				if custom_data_container_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(crate::CapeObject::attach(custom_data_container_ptr))
+				Ok(unsafe{crate::CapeObject::attach(custom_data_container_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -18107,8 +17950,6 @@ impl CapeCustomDataSource {
 /// ICapeThermoPetroleumFractions interface
 ///
 /// Interface implemented by CAPE-OPEN Material Objects that support Petroleum Fractions.
-///
-
 pub trait ICapeThermoPetroleumFractions {
 
 	/// Sets the values of a petroleum property for all Petroleum Fractions.
@@ -18204,7 +18045,6 @@ pub trait ICapeThermoPetroleumFractions {
 }
 
 /// COBIA interface implementation for ICapeThermoPetroleumFractions
-
 pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoPetroleumFractionsImpl;
@@ -18226,10 +18066,10 @@ pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoPetroleumFractions =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoPetroleumFractions;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoPetroleumFractions_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoPetroleumFractions::SetPetroCompoundProp
@@ -18237,7 +18077,7 @@ pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_petro_compound_prop(me: *mut std::ffi::c_void,property_id:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_petro_compound_prop(me: *mut std::ffi::c_void,property_id:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let property_id=CapeStringIn::new(&property_id);
@@ -18254,7 +18094,7 @@ pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_petro_bulk_prop(me: *mut std::ffi::c_void,property_id:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,value:CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_petro_bulk_prop(me: *mut std::ffi::c_void,property_id:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,value:CapeReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let property_id=CapeStringIn::new(&property_id);
@@ -18270,7 +18110,7 @@ pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_petro_compound_prop(me: *mut std::ffi::c_void,property_id:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_petro_compound_prop(me: *mut std::ffi::c_void,property_id:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if values.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -18294,7 +18134,7 @@ pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_petro_bulk_prop(me: *mut std::ffi::c_void,property_id:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,value:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_petro_bulk_prop(me: *mut std::ffi::c_void,property_id:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,value:*mut CapeReal) -> crate::C::CapeResult {
 		if value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -18316,7 +18156,7 @@ pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_petro_prop_list(me: *mut std::ffi::c_void,property_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_petro_prop_list(me: *mut std::ffi::c_void,property_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if property_ids.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -18338,7 +18178,7 @@ pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_petro_prop_attribute(me: *mut std::ffi::c_void,property_id:*mut crate::C::ICapeString,attribute_name:*mut crate::C::ICapeString,attribute_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_petro_prop_attribute(me: *mut std::ffi::c_void,property_id:*mut crate::C::ICapeString,attribute_name:*mut crate::C::ICapeString,attribute_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
 		if attribute_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -18362,7 +18202,7 @@ pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_copy_petro_properties(me: *mut std::ffi::c_void,source:*mut C::CAPEOPEN_1_2_ICapeThermoMaterial) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_copy_petro_properties(me: *mut std::ffi::c_void,source:*mut C::CAPEOPEN_1_2_ICapeThermoMaterial) -> crate::C::CapeResult {
 		if source.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -18371,7 +18211,7 @@ pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 		if source.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
-		let source=CapeThermoMaterial::from_interface_pointer(source);
+		let source=unsafe{CapeThermoMaterial::from_interface_pointer(source)};
 		match myself.copy_petro_properties(source) {
 			Ok(_) => COBIAERR_NOERROR,
 			Err(e) => myself.set_last_error(e,"ICapeThermoPetroleumFractions::CopyPetroProperties")
@@ -18383,7 +18223,7 @@ pub trait ICapeThermoPetroleumFractionsImpl : ICapeThermoPetroleumFractions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_update_petro_properties(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_update_petro_properties(me: *mut std::ffi::c_void) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		match myself.update_petro_properties() {
@@ -18599,8 +18439,6 @@ impl CapeThermoPetroleumFractions {
 /// ICapeManager interface
 ///
 /// A Manager object creates and manages a set of Primary PMC Objects belonging all to the same category of Primary PMCs.
-///
-
 pub trait ICapeManager {
 
 	/// Returns True if the Manager supports creation of new Primary PMC Objects.
@@ -18673,7 +18511,6 @@ pub trait ICapeManager {
 }
 
 /// COBIA interface implementation for ICapeManager
-
 pub trait ICapeManagerImpl : ICapeManager {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeManagerImpl;
@@ -18695,10 +18532,10 @@ pub trait ICapeManagerImpl : ICapeManager {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeManager =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeManager;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeManager_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeManager::GetSupportsCreateNew
@@ -18706,7 +18543,7 @@ pub trait ICapeManagerImpl : ICapeManager {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_supports_create_new(me: *mut std::ffi::c_void,supports_create_new:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_supports_create_new(me: *mut std::ffi::c_void,supports_create_new:*mut CapeBoolean) -> crate::C::CapeResult {
 		if supports_create_new.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -18726,7 +18563,7 @@ pub trait ICapeManagerImpl : ICapeManager {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_last_create_new_was_canceled_by_user(me: *mut std::ffi::c_void,user_cancel:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_last_create_new_was_canceled_by_user(me: *mut std::ffi::c_void,user_cancel:*mut CapeBoolean) -> crate::C::CapeResult {
 		if user_cancel.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -18746,7 +18583,7 @@ pub trait ICapeManagerImpl : ICapeManager {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_create_for_load(me: *mut std::ffi::c_void,object:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_create_for_load(me: *mut std::ffi::c_void,object:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if object.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -18769,7 +18606,7 @@ pub trait ICapeManagerImpl : ICapeManager {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_create_new(me: *mut std::ffi::c_void,object:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_create_new(me: *mut std::ffi::c_void,object:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if object.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -18792,7 +18629,7 @@ pub trait ICapeManagerImpl : ICapeManager {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_template_list(me: *mut std::ffi::c_void,template_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_template_list(me: *mut std::ffi::c_void,template_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if template_list.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -18814,7 +18651,7 @@ pub trait ICapeManagerImpl : ICapeManager {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_create_from_template(me: *mut std::ffi::c_void,template_name:*mut crate::C::ICapeString,object:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_create_from_template(me: *mut std::ffi::c_void,template_name:*mut crate::C::ICapeString,object:*mut *mut crate::C::ICapeInterface) -> crate::C::CapeResult {
 		if object.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -18929,7 +18766,7 @@ impl CapeManager {
 				if object_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(crate::CapeObject::attach(object_ptr))
+				Ok(unsafe{crate::CapeObject::attach(object_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -18955,7 +18792,7 @@ impl CapeManager {
 				if object_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(crate::CapeObject::attach(object_ptr))
+				Ok(unsafe{crate::CapeObject::attach(object_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -19003,7 +18840,7 @@ impl CapeManager {
 				if object_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(crate::CapeObject::attach(object_ptr))
+				Ok(unsafe{crate::CapeObject::attach(object_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -19017,8 +18854,6 @@ impl CapeManager {
 /// ICapeThermoReactionSet interface
 ///
 /// Interface that gives a Client of a Chemical Reaction Server access to the list of Chemical Reactions, implemented by a Reaction Set object and any Chemical Reaction Server.
-///
-
 pub trait ICapeThermoReactionSet {
 
 	/// Gets the number of Chemical Reactions.
@@ -19044,7 +18879,6 @@ pub trait ICapeThermoReactionSet {
 }
 
 /// COBIA interface implementation for ICapeThermoReactionSet
-
 pub trait ICapeThermoReactionSetImpl : ICapeThermoReactionSet {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoReactionSetImpl;
@@ -19066,10 +18900,10 @@ pub trait ICapeThermoReactionSetImpl : ICapeThermoReactionSet {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoReactionSet =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoReactionSet_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoReactionSet::GetNumberOfReactions
@@ -19077,7 +18911,7 @@ pub trait ICapeThermoReactionSetImpl : ICapeThermoReactionSet {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_number_of_reactions(me: *mut std::ffi::c_void,number_of_reactions:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_number_of_reactions(me: *mut std::ffi::c_void,number_of_reactions:*mut CapeInteger) -> crate::C::CapeResult {
 		if number_of_reactions.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19097,7 +18931,7 @@ pub trait ICapeThermoReactionSetImpl : ICapeThermoReactionSet {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_ids(me: *mut std::ffi::c_void,reaction_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_reaction_ids(me: *mut std::ffi::c_void,reaction_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if reaction_ids.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19191,8 +19025,6 @@ impl CapeThermoReactionSet {
 /// ICapeThermoReactions interface
 ///
 /// Interface that gives access to the description of a Chemical Reaction, implemented by any Chemical Reaction Server.
-///
-
 pub trait ICapeThermoReactions {
 
 	/// Gets the attribute identifiers for the specified Chemical Reaction.
@@ -19300,7 +19132,6 @@ pub trait ICapeThermoReactions {
 }
 
 /// COBIA interface implementation for ICapeThermoReactions
-
 pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoReactionsImpl;
@@ -19322,10 +19153,10 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoReactions =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoReactions;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoReactions_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoReactions::GetReactionAttributeList
@@ -19333,7 +19164,7 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_attribute_list(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,attribute_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_reaction_attribute_list(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,attribute_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if attribute_list.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19356,7 +19187,7 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_attribute(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,reac_attribute:*mut crate::C::ICapeString,attribute_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_reaction_attribute(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,reac_attribute:*mut crate::C::ICapeString,attribute_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
 		if attribute_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19380,7 +19211,7 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_compound_count(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,compound_count:*mut CapeInteger) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_reaction_compound_count(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,compound_count:*mut CapeInteger) -> crate::C::CapeResult {
 		if compound_count.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19401,7 +19232,7 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_compound_ids(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,comp_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_reaction_compound_ids(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,comp_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if comp_ids.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19424,7 +19255,7 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_stoichiometric_coefficients(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,stoichiometric_coefficients:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_reaction_stoichiometric_coefficients(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,stoichiometric_coefficients:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if stoichiometric_coefficients.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19447,7 +19278,7 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_compound_phases(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_reaction_compound_phases(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if phase_labels.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19470,7 +19301,7 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_is_reaction_list_valid(me: *mut std::ffi::c_void,reac_ids:*mut crate::C::ICapeArrayString,message:*mut crate::C::ICapeString,is_valid:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_is_reaction_list_valid(me: *mut std::ffi::c_void,reac_ids:*mut crate::C::ICapeArrayString,message:*mut crate::C::ICapeString,is_valid:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_valid.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19496,7 +19327,7 @@ pub trait ICapeThermoReactionsImpl : ICapeThermoReactions {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reduced_reaction_set(me: *mut std::ffi::c_void,present_comp_ids:*mut crate::C::ICapeArrayString,reac_ids:*mut crate::C::ICapeArrayString,is_equilibrium:*mut crate::C::ICapeArrayBoolean,consider_all_reactions:CapeBoolean,over_reduced:*mut CapeBoolean,reduced_reaction_set:*mut *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_reduced_reaction_set(me: *mut std::ffi::c_void,present_comp_ids:*mut crate::C::ICapeArrayString,reac_ids:*mut crate::C::ICapeArrayString,is_equilibrium:*mut crate::C::ICapeArrayBoolean,consider_all_reactions:CapeBoolean,over_reduced:*mut CapeBoolean,reduced_reaction_set:*mut *mut C::CAPEOPEN_1_2_ICapeThermoReactionSet) -> crate::C::CapeResult {
 		if over_reduced.is_null()||reduced_reaction_set.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19732,7 +19563,7 @@ impl CapeThermoReactions {
 				if reduced_reaction_set_ptr.is_null() {
 					return Err(COBIAError::Code(COBIAERR_NULLPOINTER));
 				}
-				Ok(CapeThermoReactionSet::attach(reduced_reaction_set_ptr))
+				Ok(unsafe{CapeThermoReactionSet::attach(reduced_reaction_set_ptr)})
 			},
 			_ => Err(COBIAError::from_object(result_code,self))
 		}
@@ -19746,8 +19577,6 @@ impl CapeThermoReactions {
 /// ICapeThermoReactionRoutine interface
 ///
 /// Interface that provides the Client with the capability to request calculation of Reaction Properties, implemented by any Chemical Reaction Server.
-///
-
 pub trait ICapeThermoReactionRoutine {
 
 	/// Gets the identifiers of the Reaction Properties that are available for the specified Chemical Reaction.
@@ -19802,7 +19631,6 @@ pub trait ICapeThermoReactionRoutine {
 }
 
 /// COBIA interface implementation for ICapeThermoReactionRoutine
-
 pub trait ICapeThermoReactionRoutineImpl : ICapeThermoReactionRoutine {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoReactionRoutineImpl;
@@ -19824,10 +19652,10 @@ pub trait ICapeThermoReactionRoutineImpl : ICapeThermoReactionRoutine {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoReactionRoutine =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoReactionRoutine;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoReactionRoutine_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoReactionRoutine::GetReactionPropList
@@ -19835,7 +19663,7 @@ pub trait ICapeThermoReactionRoutineImpl : ICapeThermoReactionRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_prop_list(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,reaction_prop_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_reaction_prop_list(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,reaction_prop_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if reaction_prop_ids.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19858,7 +19686,7 @@ pub trait ICapeThermoReactionRoutineImpl : ICapeThermoReactionRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_check_reaction_property_availability(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,property:*mut crate::C::ICapeString,message:*mut crate::C::ICapeString,is_available:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_check_reaction_property_availability(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,property:*mut crate::C::ICapeString,message:*mut crate::C::ICapeString,is_available:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_available.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -19885,7 +19713,7 @@ pub trait ICapeThermoReactionRoutineImpl : ICapeThermoReactionRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_calc_reaction_prop(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,reac_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_calc_reaction_prop(me: *mut std::ffi::c_void,props:*mut crate::C::ICapeArrayString,reac_ids:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let props=CapeArrayStringIn::new(&props);
@@ -19901,7 +19729,7 @@ pub trait ICapeThermoReactionRoutineImpl : ICapeThermoReactionRoutine {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_rate_basis(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,qualifier:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_reaction_rate_basis(me: *mut std::ffi::c_void,reac_id:*mut crate::C::ICapeString,basis:*mut crate::C::ICapeString,qualifier:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if basis.is_null()||qualifier.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20047,8 +19875,6 @@ impl CapeThermoReactionRoutine {
 /// ICapeThermoReactionProperties interface
 ///
 /// Interface that allows for storing and retrieving Reaction Properties, implemented by the Material Object.
-///
-
 pub trait ICapeThermoReactionProperties {
 
 	/// Gets Reaction Property values for a specified Chemical Reaction.
@@ -20077,7 +19903,6 @@ pub trait ICapeThermoReactionProperties {
 }
 
 /// COBIA interface implementation for ICapeThermoReactionProperties
-
 pub trait ICapeThermoReactionPropertiesImpl : ICapeThermoReactionProperties {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoReactionPropertiesImpl;
@@ -20099,10 +19924,10 @@ pub trait ICapeThermoReactionPropertiesImpl : ICapeThermoReactionProperties {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoReactionProperties =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoReactionProperties;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoReactionProperties_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoReactionProperties::GetReactionProp
@@ -20110,7 +19935,7 @@ pub trait ICapeThermoReactionPropertiesImpl : ICapeThermoReactionProperties {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_reaction_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,reac_id:*mut crate::C::ICapeString,results:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_reaction_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,reac_id:*mut crate::C::ICapeString,results:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if results.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20134,7 +19959,7 @@ pub trait ICapeThermoReactionPropertiesImpl : ICapeThermoReactionProperties {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_reaction_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,reac_id:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_reaction_prop(me: *mut std::ffi::c_void,property:*mut crate::C::ICapeString,reac_id:*mut crate::C::ICapeString,values:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let property=CapeStringIn::new(&property);
@@ -20224,8 +20049,6 @@ impl CapeThermoReactionProperties {
 /// ICapeThermoEquilibriumRoutineEx interface
 ///
 /// Interface that extends ICapeThermoEquilibriumRoutine with Reactive Phase Equilibrium, implemented by any CAPE-OPEN component that calculates Thermodynamic and Reactive Phase Equilibrium.
-///
-
 pub trait ICapeThermoEquilibriumRoutineEx {
 
 	/// Calculates the amounts and compositions of Phases at the combined Reactive and Phase Equilibrium.
@@ -20270,7 +20093,6 @@ pub trait ICapeThermoEquilibriumRoutineEx {
 }
 
 /// COBIA interface implementation for ICapeThermoEquilibriumRoutineEx
-
 pub trait ICapeThermoEquilibriumRoutineExImpl : ICapeThermoEquilibriumRoutineEx {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoEquilibriumRoutineExImpl;
@@ -20292,10 +20114,10 @@ pub trait ICapeThermoEquilibriumRoutineExImpl : ICapeThermoEquilibriumRoutineEx 
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoEquilibriumRoutineEx =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoEquilibriumRoutineEx;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoEquilibriumRoutineEx_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoEquilibriumRoutineEx::CalcEquilibriumEx
@@ -20303,7 +20125,7 @@ pub trait ICapeThermoEquilibriumRoutineExImpl : ICapeThermoEquilibriumRoutineEx 
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_calc_equilibrium_ex(me: *mut std::ffi::c_void,specification1:*mut crate::C::ICapeArrayString,specification2:*mut crate::C::ICapeArrayString,solution_type:C::CAPEOPEN_1_2_CapeSolutionType,reaction_mole_ratio:*mut CapeReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_calc_equilibrium_ex(me: *mut std::ffi::c_void,specification1:*mut crate::C::ICapeArrayString,specification2:*mut crate::C::ICapeArrayString,solution_type:C::CAPEOPEN_1_2_CapeSolutionType,reaction_mole_ratio:*mut CapeReal) -> crate::C::CapeResult {
 		if reaction_mole_ratio.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20330,7 +20152,7 @@ pub trait ICapeThermoEquilibriumRoutineExImpl : ICapeThermoEquilibriumRoutineEx 
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_is_reactive(me: *mut std::ffi::c_void,is_reactive:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_is_reactive(me: *mut std::ffi::c_void,is_reactive:*mut CapeBoolean) -> crate::C::CapeResult {
 		if is_reactive.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20350,7 +20172,7 @@ pub trait ICapeThermoEquilibriumRoutineExImpl : ICapeThermoEquilibriumRoutineEx 
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_check_equilibrium_spec(me: *mut std::ffi::c_void,specification1:*mut crate::C::ICapeArrayString,specification2:*mut crate::C::ICapeArrayString,solution_type:C::CAPEOPEN_1_2_CapeSolutionType,is_supported:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_check_equilibrium_spec(me: *mut std::ffi::c_void,specification1:*mut crate::C::ICapeArrayString,specification2:*mut crate::C::ICapeArrayString,solution_type:C::CAPEOPEN_1_2_CapeSolutionType,is_supported:*mut CapeBoolean) -> crate::C::CapeResult {
 		if is_supported.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20479,8 +20301,6 @@ impl CapeThermoEquilibriumRoutineEx {
 /// ICapeThermoCompoundSlates interface
 ///
 /// Interface implemented by Compounds Servers that provide multiple Compound slates, such as a Property Package or Material Object.
-///
-
 pub trait ICapeThermoCompoundSlates {
 
 	/// Gets the Compound Slate on which the Compounds Server operates.
@@ -20527,7 +20347,6 @@ pub trait ICapeThermoCompoundSlates {
 }
 
 /// COBIA interface implementation for ICapeThermoCompoundSlates
-
 pub trait ICapeThermoCompoundSlatesImpl : ICapeThermoCompoundSlates {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoCompoundSlatesImpl;
@@ -20549,10 +20368,10 @@ pub trait ICapeThermoCompoundSlatesImpl : ICapeThermoCompoundSlates {
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoCompoundSlates =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoCompoundSlates;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoCompoundSlates_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoCompoundSlates::GetActiveCompoundSlate
@@ -20560,7 +20379,7 @@ pub trait ICapeThermoCompoundSlatesImpl : ICapeThermoCompoundSlates {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_active_compound_slate(me: *mut std::ffi::c_void,active_compound_slate:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_active_compound_slate(me: *mut std::ffi::c_void,active_compound_slate:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		if active_compound_slate.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20582,7 +20401,7 @@ pub trait ICapeThermoCompoundSlatesImpl : ICapeThermoCompoundSlates {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_set_active_compound_slate(me: *mut std::ffi::c_void,active_compound_slate:*mut crate::C::ICapeString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_set_active_compound_slate(me: *mut std::ffi::c_void,active_compound_slate:*mut crate::C::ICapeString) -> crate::C::CapeResult {
 		let p = me as *mut Self::T;
 		let myself=unsafe { &mut *p };
 		let active_compound_slate=CapeStringIn::new(&active_compound_slate);
@@ -20597,7 +20416,7 @@ pub trait ICapeThermoCompoundSlatesImpl : ICapeThermoCompoundSlates {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_compound_slate_list(me: *mut std::ffi::c_void,compound_slate_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_compound_slate_list(me: *mut std::ffi::c_void,compound_slate_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if compound_slate_list.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20619,7 +20438,7 @@ pub trait ICapeThermoCompoundSlatesImpl : ICapeThermoCompoundSlates {
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_get_compound_slate_info(me: *mut std::ffi::c_void,compound_slate:*mut crate::C::ICapeString,compound_slate_attribute:*mut crate::C::ICapeString,compound_slate_attribute_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_get_compound_slate_info(me: *mut std::ffi::c_void,compound_slate:*mut crate::C::ICapeString,compound_slate_attribute:*mut crate::C::ICapeString,compound_slate_attribute_value:*mut crate::C::ICapeValue) -> crate::C::CapeResult {
 		if compound_slate_attribute_value.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20754,8 +20573,6 @@ impl CapeThermoCompoundSlates {
 /// ICapeThermoCompoundSlateUtilities interface
 ///
 /// Interface that provides services to the PME and is implemented by external Compound Severs that support multiple Compound Slates, i.e. a Property Package.
-///
-
 pub trait ICapeThermoCompoundSlateUtilities {
 
 	/// Returns a list of Compounds which is the translation of a subset of Compounds of the source Compound Slate to the equivalent set of Compounds in the target Compound Slate.
@@ -20819,7 +20636,6 @@ pub trait ICapeThermoCompoundSlateUtilities {
 }
 
 /// COBIA interface implementation for ICapeThermoCompoundSlateUtilities
-
 pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilities {
 	/// Placeholder type for the object that implements this trait, typically created by the `cape_object_implementation` macro
 	type T: ICapeInterfaceImpl+ICapeThermoCompoundSlateUtilitiesImpl;
@@ -20841,10 +20657,10 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 		let iface: *mut crate::C::CAPEOPEN_1_2_ICapeThermoCompoundSlateUtilities =
 			u.as_interface_pointer() as *mut C::CAPEOPEN_1_2_ICapeThermoCompoundSlateUtilities;
 		unsafe { (*iface).me = u.get_self() as *const Timpl as *mut std::ffi::c_void };
-		u.add_interface(
+		unsafe {u.add_interface(
 			std::ptr::addr_of!(C::CAPEOPEN_1_2_ICapeThermoCompoundSlateUtilities_UUID),
 			iface as *mut crate::C::ICapeInterface,
-		);
+		)};
 	}
 	
 	/// Interface function pointer for ICapeThermoCompoundSlateUtilities::TranslateCompoundList
@@ -20852,7 +20668,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_translate_compound_list(me: *mut std::ffi::c_void,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,source_compound_list:*mut crate::C::ICapeArrayString,target_compound_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_translate_compound_list(me: *mut std::ffi::c_void,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,source_compound_list:*mut crate::C::ICapeArrayString,target_compound_list:*mut crate::C::ICapeArrayString) -> crate::C::CapeResult {
 		if target_compound_list.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20877,7 +20693,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_validate_compound_list(me: *mut std::ffi::c_void,compound_slate:*mut crate::C::ICapeString,compound_list:*mut crate::C::ICapeArrayString,message:*mut crate::C::ICapeString,is_valid:*mut CapeBoolean) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_validate_compound_list(me: *mut std::ffi::c_void,compound_slate:*mut crate::C::ICapeString,compound_list:*mut crate::C::ICapeArrayString,message:*mut crate::C::ICapeString,is_valid:*mut CapeBoolean) -> crate::C::CapeResult {
 		if message.is_null()||is_valid.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20904,7 +20720,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_convert_fraction_single_phase(me: *mut std::ffi::c_void,phase_label:*mut crate::C::ICapeString,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,target_basis:*mut crate::C::ICapeString,target_composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_convert_fraction_single_phase(me: *mut std::ffi::c_void,phase_label:*mut crate::C::ICapeString,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,target_basis:*mut crate::C::ICapeString,target_composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if target_basis.is_null()||target_composition.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}
@@ -20931,7 +20747,7 @@ pub trait ICapeThermoCompoundSlateUtilitiesImpl : ICapeThermoCompoundSlateUtilit
 	/// # Safety
 	///
 	/// This is an extern "C" function called from native code. Do not call directly.
-	extern "C" fn raw_convert_fraction_overall(me: *mut std::ffi::c_void,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString,target_basis:*mut crate::C::ICapeString,target_composition:*mut crate::C::ICapeArrayReal,target_phase_fraction:*mut crate::C::ICapeArrayReal,target_phase_composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
+	unsafe extern "C" fn raw_convert_fraction_overall(me: *mut std::ffi::c_void,source_compound_slate:*mut crate::C::ICapeString,target_compound_slate:*mut crate::C::ICapeString,phase_labels:*mut crate::C::ICapeArrayString,target_basis:*mut crate::C::ICapeString,target_composition:*mut crate::C::ICapeArrayReal,target_phase_fraction:*mut crate::C::ICapeArrayReal,target_phase_composition:*mut crate::C::ICapeArrayReal) -> crate::C::CapeResult {
 		if target_basis.is_null()||target_composition.is_null()||target_phase_fraction.is_null()||target_phase_composition.is_null() {
 			return COBIAERR_NULLPOINTER;
 		}

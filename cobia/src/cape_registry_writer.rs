@@ -4,7 +4,7 @@ use std::path::Path;
 
 /// Opens the COBIA registry for writing
 ///
-/// This struct is used to write to the COBIA registry. To 
+/// This struct is used to write to the COBIA registry. To
 /// write values in the registry one obtains a sub-key
 /// using create_key, which is created if it does not already
 /// exist.
@@ -23,20 +23,18 @@ use std::path::Path;
 /// let writer = CapeRegistryWriter::new(false).unwrap();
 /// cobia::cape_open_cleanup();
 /// ```
-
 pub struct CapeRegistryWriter {
 	interface: *mut C::ICapeRegistryWriter,
 }
 
 impl CapeRegistryWriter {
-
 	/// Opens the COBIA registry for writing
 	///
 	/// This function opens the COBIA registry for writing. If all_users is true
 	/// the registry is opened for all users, otherwise it is opened for the current
 	/// user.
 	///
-	/// Opening the registry for writing to the all-users hive typically requires 
+	/// Opening the registry for writing to the all-users hive typically requires
 	/// administrative privileges.
 	///
 	/// # Arguments
@@ -55,7 +53,6 @@ impl CapeRegistryWriter {
 	/// let writer = CapeRegistryWriter::new(false).unwrap();
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn new(all_users: bool) -> Result<CapeRegistryWriter, COBIAError> {
 		let mut writer: *mut C::ICapeRegistryWriter = std::ptr::null_mut();
 		let result = unsafe {
@@ -92,7 +89,6 @@ impl CapeRegistryWriter {
 	/// //not call commit().
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn create_key(&self, key_name: &str) -> Result<CapeRegistryKeyWriter<'_>, COBIAError> {
 		let mut key: *mut C::ICapeRegistryKeyWriter = std::ptr::null_mut();
 		let result = unsafe {
@@ -105,7 +101,10 @@ impl CapeRegistryWriter {
 			)
 		};
 		if result == COBIAERR_NOERROR {
-			Ok(CapeRegistryKeyWriter { interface: key, writer:self })
+			Ok(CapeRegistryKeyWriter {
+				interface: key,
+				writer: self,
+			})
 		} else {
 			Err(COBIAError::Code(result))
 		}
@@ -135,7 +134,6 @@ impl CapeRegistryWriter {
 	/// let key=writer.get_key("/types").unwrap();
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn get_key(&self, key_name: &str) -> Result<CapeRegistryKey, COBIAError> {
 		let mut key: *mut C::ICapeRegistryKey = std::ptr::null_mut();
 		let result = unsafe {
@@ -180,7 +178,7 @@ impl CapeRegistryWriter {
 	/// writer.commit().unwrap();
 	/// cobia::cape_open_cleanup();
 	/// ```
-	/// 
+	///
 	/// This will succeed, as the key does not exist:
 	///
 	/// ```
@@ -190,7 +188,6 @@ impl CapeRegistryWriter {
 	/// writer.delete_key("/key_that_does_not_exist").unwrap();
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn delete_key(&self, key_name: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).deleteKey.unwrap())(
@@ -233,7 +230,6 @@ impl CapeRegistryWriter {
 	/// writer.commit().unwrap();
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn delete_value(&self, key_name: &str, value_name: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).deleteValue.unwrap())(
@@ -260,7 +256,6 @@ impl CapeRegistryWriter {
 	/// This function is not typically called directly; it is used
 	/// in the self-registation entry point, which is typically
 	/// generated using the pmc_entry_points! macro.
-
 	pub fn get_pmc_registrar(&self) -> Result<CapeRegistrar, COBIAError> {
 		let mut registrar: *mut C::ICapePMCRegistrar = std::ptr::null_mut();
 		let result = unsafe {
@@ -280,13 +275,12 @@ impl CapeRegistryWriter {
 
 	/// Unregister a PMC by uuid.
 	///
-	/// This function unregisters a PMC by uuid. 
+	/// This function unregisters a PMC by uuid.
 	/// Changes to do not take effect until commit() is called.
 	///
 	/// This function is not typically called directly; it is used
 	/// in the self-unregistation entry point, which is typically
 	/// generated using the pmc_entry_points! macro.
-
 	pub fn unregister_pmc(&self, uuid: &CapeUUID) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).unregisterPMC.unwrap())(
@@ -303,13 +297,12 @@ impl CapeRegistryWriter {
 
 	/// Unregister a service for a PMC by uuid.
 	///
-	/// This function unregisters service for a PMC by uuid. 
+	/// This function unregisters service for a PMC by uuid.
 	/// Changes to do not take effect until commit() is called.
 	///
 	/// This function is not typically called directly; it is used
 	/// in the self-unregistation entry point, which is typically
 	/// generated using the pmc_entry_points! macro.
-
 	pub fn unregister_pmc_service(
 		&self,
 		uuid: &CapeUUID,
@@ -352,7 +345,6 @@ impl CapeRegistryWriter {
 	/// writer.delete_key("/cobia_rust_commit").unwrap();
 	/// writer.commit().unwrap();
 	/// cobia::cape_open_cleanup();
-
 	pub fn commit(&self) -> Result<(), COBIAError> {
 		let result = unsafe { ((*(*self.interface).vTbl).commit.unwrap())((*self.interface).me) };
 		if result == COBIAERR_NOERROR {
@@ -364,7 +356,7 @@ impl CapeRegistryWriter {
 
 	/// Revert changes to the registry
 	///
-	/// This function ignores all changes made to the registry 
+	/// This function ignores all changes made to the registry
 	/// since the last commit without committing them.
 	///
 	/// # Example
@@ -380,7 +372,6 @@ impl CapeRegistryWriter {
 	/// writer.create_key("/rust_cobia_test_key").unwrap().
 	/// set_string_value("test_value", "1-2-3-test").unwrap();
 	/// cobia::cape_open_cleanup();
-
 	pub fn revert(&self) -> Result<(), COBIAError> {
 		let result = unsafe { ((*(*self.interface).vTbl).revert.unwrap())((*self.interface).me) };
 		if result == COBIAERR_NOERROR {
@@ -392,14 +383,13 @@ impl CapeRegistryWriter {
 
 	/// Register types from IDL
 	///
-	/// This function registers types from IDL files. This function is not 
+	/// This function registers types from IDL files. This function is not
 	/// typically called. It is called for example by the cobiaRegister
 	/// registration tool.
 	///
 	/// # Arguments
 	///
 	/// * `idl_files` - A vector of strings containing the paths to the IDL files.
-
 	pub fn register_types_from_idl<T: AsRef<str>>(
 		&self,
 		idl_files: &[T],
@@ -407,7 +397,9 @@ impl CapeRegistryWriter {
 		let result = unsafe {
 			((*(*self.interface).vTbl).registerTypesFromIDL.unwrap())(
 				(*self.interface).me,
-				(&CapeArrayStringVec::from_slice(idl_files).as_cape_array_string_in() as *const C::ICapeArrayString).cast_mut()
+				(&CapeArrayStringVec::from_slice(idl_files).as_cape_array_string_in()
+					as *const C::ICapeArrayString)
+					.cast_mut(),
 			)
 		};
 		if result == COBIAERR_NOERROR {
@@ -419,17 +411,15 @@ impl CapeRegistryWriter {
 
 	/// Register types from IDL
 	///
-	/// This function registers types from IDL files. This function is not 
+	/// This function registers types from IDL files. This function is not
 	/// typically called. It is called for example by the cobiaRegister
 	/// registration tool.
 	///
 	/// # Arguments
 	///
 	/// * `idl_files` - A vector of Paths to the IDL files.
-
 	pub fn register_types_from_idl_paths(&self, idl_files: &[&Path]) -> Result<(), COBIAError> {
-		let mut paths_as_string = Vec::<String>::new();
-		paths_as_string.reserve(idl_files.len());
+		let mut paths_as_string = Vec::<String>::with_capacity(idl_files.len());
 		for p in idl_files {
 			paths_as_string.push(p.to_str().unwrap().to_string());
 		}
@@ -439,14 +429,13 @@ impl CapeRegistryWriter {
 	///Unregister types from IDL
 	///
 	/// This function unregisters types from IDL files by library ID.
-	/// This function is not 
+	/// This function is not
 	/// typically called. It is called for example by the cobiaRegister
 	/// registration tool.
-	/// 
+	///
 	/// # Arguments
 	///
 	/// * `library_id` - The library ID of the types to unregister.
-
 	pub fn unregister_types(&self, library_id: &CapeUUID) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).unregisterTypes.unwrap())(
@@ -472,7 +461,6 @@ impl CapeRegistryWriter {
 	/// * `library_id` - The library ID of the proxy interface provider.
 	/// * `service_type` - The service type of the proxy interface provider.
 	/// * `location` - The location of the proxy interface provider, typically a path to a shared library.
-
 	pub fn register_proxy_interface_provider(
 		&self,
 		library_id: &CapeUUID,
@@ -508,7 +496,6 @@ impl CapeRegistryWriter {
 	///
 	/// * `library_id` - The library ID of the proxy interface provider.
 	/// * `service_type` - The service type of the proxy interface provider.
-
 	pub fn unregister_proxy_interface_provider(
 		&self,
 		library_id: &CapeUUID,
@@ -535,7 +522,6 @@ impl CapeRegistryWriter {
 ///
 /// ICapeRegistryWriter derives from ICobiaBase, which contains
 /// addReference() and release(). The Drop trait calls release.
-
 impl Drop for CapeRegistryWriter {
 	fn drop(&mut self) {
 		unsafe {
@@ -548,7 +534,6 @@ impl Drop for CapeRegistryWriter {
 ///
 /// ICapeRegistryWriter derives from ICobiaBase, which contains
 /// addReference() and release(). The Clone trait calls addReference.
-
 impl Clone for CapeRegistryWriter {
 	fn clone(&self) -> Self {
 		unsafe {

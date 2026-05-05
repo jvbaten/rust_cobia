@@ -1,7 +1,7 @@
 use bitflags::bitflags;
 use std::fmt;
 
-///
+///CapeRegistryValueType enumeration
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum CapeRegistryValueType {
@@ -98,7 +98,7 @@ impl fmt::Display for CapeRegistryValueType {
 	}
 }
 
-///
+///CapeValueType enumeration
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum CapeValueType {
@@ -200,7 +200,7 @@ impl fmt::Display for CapeValueType {
 	}
 }
 
-///
+///CapePMCServiceType enumeration
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum CapePMCServiceType {

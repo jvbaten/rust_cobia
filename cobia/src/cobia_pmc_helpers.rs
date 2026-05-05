@@ -18,7 +18,6 @@ use crate::*;
 /// # Example
 ///
 /// See the example in the lib.rs file in the pmc module
-
 pub struct PMCInfo {
 	pub create_instance: fn(*mut *mut C::ICapeInterface) -> CapeResult,
 	pub registration_details: fn(&CapeRegistrar) -> Result<(), COBIAError>,
@@ -32,7 +31,6 @@ pub struct PMCInfo {
 /// # Example
 ///
 /// See the example in the unit_operation.rs file in the pmc module
-
 pub trait PMCRegisterationInfo {
 	fn registration_details(registrar: &CapeRegistrar) -> Result<(), COBIAError>;
 	fn get_uuid() -> CapeUUID;
@@ -42,7 +40,6 @@ pub trait PMCRegisterationInfo {
 /// typically implemented by the cape_object_implementation! macro
 /// and only for objects created with the cape_object_implementation! macro,
 /// which do not take any arguments for construction.
-
 pub trait CapeCreateInstance {
 	fn create_instance(instance: *mut *mut C::ICapeInterface) -> CapeResult;
 }
@@ -52,7 +49,6 @@ pub trait CapeCreateInstance {
 /// # Example:
 ///
 /// See PMCInfo documentation
-
 pub const fn pmc_info<T: PMCRegisterationInfo + CapeCreateInstance>() -> PMCInfo {
 	PMCInfo {
 		create_instance: T::create_instance,
@@ -65,7 +61,6 @@ pub const fn pmc_info<T: PMCRegisterationInfo + CapeCreateInstance>() -> PMCInfo
 ///
 /// This entry point is called by the the capeRegisterObjects entry point
 /// that is generated from the pmc_entry_points! macro to register a PMC
-
 pub fn register_pmc(pmc_info: &PMCInfo, writer: &CapeRegistryWriter) -> Result<(), COBIAError> {
 	let registrar = writer.get_pmc_registrar()?;
 	(pmc_info.registration_details)(&registrar)?;
@@ -86,7 +81,6 @@ pub fn register_pmc(pmc_info: &PMCInfo, writer: &CapeRegistryWriter) -> Result<(
 ///
 /// This entry point is called by the the capeUnregisterObjects entry point
 /// that is generated from the pmc_entry_points! macro to register a PMC
-
 pub fn unregister_pmc(pmc_info: &PMCInfo, writer: &CapeRegistryWriter) -> Result<(), COBIAError> {
 	writer.unregister_pmc_service(&(pmc_info.get_uuid)(), inproc_service_type())?;
 	Ok(())
@@ -106,7 +100,6 @@ pub fn unregister_pmc(pmc_info: &PMCInfo, writer: &CapeRegistryWriter) -> Result
 /// # Example
 ///
 /// See the example in the lib.rs file in the pmc module
-
 #[macro_export]
 macro_rules! pmc_entry_points {
 	( $pmc_defs:expr, $register_for_all_users:expr ) => {
@@ -118,7 +111,6 @@ macro_rules! pmc_entry_points {
 		///
 		/// # Returns
 		/// * A `Result` indicating success or failure of the registration.
-
 		fn register_types() -> Result<(), cobia::COBIAError> {
 			//register the cobia pmc
 			cobia::cape_open_initialize()?;
@@ -146,7 +138,6 @@ macro_rules! pmc_entry_points {
 		///
 		/// # Returns
 		/// * A `CapeResult` indicating success or failure of the registration.
-
 		#[unsafe(no_mangle)]
 		pub extern "C" fn capeRegisterObjects() -> cobia::CapeResult {
 			match register_types() {
@@ -162,7 +153,6 @@ macro_rules! pmc_entry_points {
 		///
 		/// # Returns
 		/// * A `Result` indicating success or failure of the unregistration.
-
 		fn unregister_types() -> Result<(), cobia::COBIAError> {
 			//unregister the cobia pmc
 			cobia::cape_open_initialize()?;
@@ -190,7 +180,6 @@ macro_rules! pmc_entry_points {
 		///
 		/// # Returns
 		/// * A `CapeResult` indicating success or failure of the unregistration.
-
 		#[unsafe(no_mangle)]
 		pub extern "C" fn capeUnregisterObjects() -> cobia::CapeResult {
 			match unregister_types() {
@@ -209,9 +198,12 @@ macro_rules! pmc_entry_points {
 		///
 		/// # Returns
 		/// * A `CapeResult` indicating success or failure of the object creation.
-
+		///
+		/// # Safety
+		/// This function is unsafe because it dereferences raw pointers. The caller must ensure that
+		/// the pointers are valid and properly aligned.
 		#[unsafe(no_mangle)]
-		pub extern "C" fn capeCreateObject(
+		pub unsafe extern "C" fn capeCreateObject(
 			uuid: *const cobia::CapeUUID,
 			ptr: *mut *mut cobia::C::ICapeInterface,
 		) -> cobia::CapeResult {

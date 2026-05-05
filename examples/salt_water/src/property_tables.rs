@@ -1,16 +1,16 @@
-use strum::IntoEnumIterator;
-use strum_macros::{EnumCount,EnumIter};
+use cobia::{CapeOpenMap, CapeStringConstProvider};
 use std::sync::LazyLock;
-use cobia::{CapeOpenMap,CapeStringConstProvider};
+use strum::IntoEnumIterator;
+use strum_macros::{EnumCount, EnumIter};
 
 /// Singleton table of supported properties with lookup function
 pub(crate) struct PropertyTables {
-    /// Lookup table for single phase properties by identifier, case insensive.
-	single_phase_property_map : CapeOpenMap<SinglePhaseProperty>,
+	/// Lookup table for single phase properties by identifier, case insensive.
+	single_phase_property_map: CapeOpenMap<SinglePhaseProperty>,
 }
 
 /// Enumeration containing all supported single phase properties
-#[derive(EnumIter,EnumCount)]
+#[derive(EnumIter, EnumCount, Clone)]
 pub(crate) enum SinglePhaseProperty {
 	/// Viscosity, Pa*s
 	Viscosity,
@@ -75,9 +75,8 @@ pub(crate) enum SinglePhaseProperty {
 }
 
 impl SinglePhaseProperty {
-
 	/// Returns the name of the property as a string.
-	/// 
+	///
 	/// # Returns
 	/// A string slice representing the name of the property.
 	pub(crate) fn name(&self) -> &str {
@@ -88,26 +87,30 @@ impl SinglePhaseProperty {
 			SinglePhaseProperty::ViscositydMoles => "viscosity.Dmoles",
 			SinglePhaseProperty::ViscositydMolFraction => "viscosity.Dmolfraction",
 			SinglePhaseProperty::ThermalConductivity => "thermalConductivity",
-			SinglePhaseProperty::ThermalConductivitydTemperature => "thermalConductivity.Dtemperature",
+			SinglePhaseProperty::ThermalConductivitydTemperature => {
+				"thermalConductivity.Dtemperature"
+			}
 			SinglePhaseProperty::ThermalConductivitydPressure => "thermalConductivity.Dpressure",
 			SinglePhaseProperty::ThermalConductivitydMoles => "thermalConductivity.Dmoles",
-			SinglePhaseProperty::ThermalConductivitydMolFraction => "thermalConductivity.Dmolfraction",
+			SinglePhaseProperty::ThermalConductivitydMolFraction => {
+				"thermalConductivity.Dmolfraction"
+			}
 			SinglePhaseProperty::Enthalpy => "enthalpy",
 			SinglePhaseProperty::EnthalpydTemperature => "enthalpy.Dtemperature",
 			SinglePhaseProperty::EnthalpydPressure => "enthalpy.Dpressure",
 			SinglePhaseProperty::EnthalpydMoles => "enthalpy.Dmoles",
 			SinglePhaseProperty::EnthalpydMolFraction => "enthalpy.Dmolfraction",
-			SinglePhaseProperty::Entropy=> "entropy",
+			SinglePhaseProperty::Entropy => "entropy",
 			SinglePhaseProperty::EntropydTemperature => "entropy.Dtemperature",
 			SinglePhaseProperty::EntropydPressure => "entropy.Dpressure",
 			SinglePhaseProperty::EntropydMoles => "entropy.Dmoles",
 			SinglePhaseProperty::EntropydMolFraction => "entropy.Dmolfraction",
-			SinglePhaseProperty::Density=> "density",
+			SinglePhaseProperty::Density => "density",
 			SinglePhaseProperty::DensitydTemperature => "density.Dtemperature",
 			SinglePhaseProperty::DensitydPressure => "density.Dpressure",
 			SinglePhaseProperty::DensitydMoles => "density.Dmoles",
 			SinglePhaseProperty::DensitydMolFraction => "density.Dmolfraction",
-			SinglePhaseProperty::Volume=> "volume",
+			SinglePhaseProperty::Volume => "volume",
 			SinglePhaseProperty::VolumedTemperature => "volume.Dtemperature",
 			SinglePhaseProperty::VolumedPressure => "volume.Dpressure",
 			SinglePhaseProperty::VolumedMoles => "volume.Dmoles",
@@ -117,7 +120,6 @@ impl SinglePhaseProperty {
 }
 
 impl PropertyTables {
-
 	/// Construction of the singleton instance of the property tables.
 	///
 	/// Builds the property table.
@@ -125,10 +127,9 @@ impl PropertyTables {
 	/// # Returns
 	/// A new instance of `PropertyTables`.
 	fn new() -> PropertyTables {
-
 		let mut single_phase_property_map = CapeOpenMap::new();
 		for prop in SinglePhaseProperty::iter() {
-			single_phase_property_map.insert(&prop.name().to_string(),prop);
+			single_phase_property_map.insert(prop.clone().name(), prop);
 		}
 		PropertyTables {
 			single_phase_property_map,
@@ -142,12 +143,17 @@ impl PropertyTables {
 	///
 	/// # Returns
 	/// * `Option<&SinglePhaseProperty>` - A reference to the property if found, otherwise `None`.
-	pub fn get_single_phase_property<'a,'b,S:CapeStringConstProvider>(&'a self,prop_name:&'b S) -> Option<&'a SinglePhaseProperty> where 'b:'a {
+	pub fn get_single_phase_property<'a, 'b, S: CapeStringConstProvider>(
+		&'a self,
+		prop_name: &'b S,
+	) -> Option<&'a SinglePhaseProperty>
+	where
+		'b: 'a,
+	{
 		self.single_phase_property_map.get(prop_name)
 	}
-
 }
 
 /// Global shared instance of the property tables, constructed on first use.
-pub(crate) static PROPERTYTABLES: LazyLock<PropertyTables> = LazyLock::new(|
-|{PropertyTables::new()});
+pub(crate) static PROPERTYTABLES: LazyLock<PropertyTables> =
+	LazyLock::new(PropertyTables::new);

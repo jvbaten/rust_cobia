@@ -4,23 +4,21 @@ use crate::*;
 /// A writable COBIA registry key
 ///
 /// This struct is used to write to a COBIA registry key. It is obtained
-/// from a `CapeRegistryWriter` and can be used to 
+/// from a `CapeRegistryWriter` and can be used to
 /// create subkeys and write values. It is valid only for the life
 /// span of the CapeRegistryWriter.
 ///
 /// Values are not written to the registry until CapeRegistryWriter::commit() is
 /// called.
 ///
-/// The registry writer is typically used only locally and is not 
+/// The registry writer is typically used only locally and is not
 /// marked Send or Sync.
-
 pub struct CapeRegistryKeyWriter<'a> {
 	pub(crate) interface: *mut C::ICapeRegistryKeyWriter,
-	pub(crate) writer: &'a CapeRegistryWriter //cannot use the key after the writer is deleted....
+	pub(crate) writer: &'a CapeRegistryWriter, //cannot use the key after the writer is deleted....
 }
 
 impl<'a> CapeRegistryKeyWriter<'a> {
-
 	/// Create a subkey
 	///
 	/// Create a subkey with the given name. The subkey is returned as a
@@ -61,8 +59,11 @@ impl<'a> CapeRegistryKeyWriter<'a> {
 	/// assert!(reader.is_err());
 	/// cobia::cape_open_cleanup();
 	/// ```
-
-	pub fn create_sub_key(&self, writer: &'a CapeRegistryWriter, key_name: &str) -> Result<CapeRegistryKeyWriter<'_>, COBIAError> {
+	pub fn create_sub_key(
+		&self,
+		writer: &'a CapeRegistryWriter,
+		key_name: &str,
+	) -> Result<CapeRegistryKeyWriter<'_>, COBIAError> {
 		let mut key: *mut C::ICapeRegistryKeyWriter = std::ptr::null_mut();
 		let result = unsafe {
 			((*(*self.interface).vTbl).createSubKey.unwrap())(
@@ -74,7 +75,10 @@ impl<'a> CapeRegistryKeyWriter<'a> {
 			)
 		};
 		if result == COBIAERR_NOERROR {
-			Ok(CapeRegistryKeyWriter { interface: key, writer })
+			Ok(CapeRegistryKeyWriter {
+				interface: key,
+				writer,
+			})
 		} else {
 			Err(COBIAError::Code(result))
 		}
@@ -122,7 +126,6 @@ impl<'a> CapeRegistryKeyWriter<'a> {
 	/// assert!(reader.is_err());
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn delete_sub_key(&self, key_name: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).deleteSubKey.unwrap())(
@@ -179,7 +182,6 @@ impl<'a> CapeRegistryKeyWriter<'a> {
 	/// writer.commit().unwrap();
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn delete_value(&self, key_name: Option<&str>, value_name: &str) -> Result<(), COBIAError> {
 		let key_name = {
 			if let Some(key_name) = key_name {
@@ -235,10 +237,13 @@ impl<'a> CapeRegistryKeyWriter<'a> {
 	/// writer.commit().unwrap();
 	/// cobia::cape_open_cleanup();
 	/// ```
-
-	pub fn set_string_value<T1: AsRef<str>,T2: AsRef<str>>(&self, value_name: T1, value: T2) -> Result<(), COBIAError> {
-		let value_name=value_name.as_ref();
-		let value=value.as_ref();
+	pub fn set_string_value<T1: AsRef<str>, T2: AsRef<str>>(
+		&self,
+		value_name: T1,
+		value: T2,
+	) -> Result<(), COBIAError> {
+		let value_name = value_name.as_ref();
+		let value = value.as_ref();
 		let result = unsafe {
 			((*(*self.interface).vTbl).putStringValue.unwrap())(
 				(*self.interface).me,
@@ -281,14 +286,13 @@ impl<'a> CapeRegistryKeyWriter<'a> {
 	/// }
 	/// //read the value back
 	/// assert_eq!(CapeRegistryKey::from_path("/cobia_rust_put_integer_value").unwrap().
-	///		get_integer_value("my_integer_value",None).unwrap(), 14);
+	///    get_integer_value("my_integer_value",None).unwrap(), 14);
 	/// // now delete the entire key
 	/// let writer = CapeRegistryWriter::new(false).unwrap();
 	/// writer.delete_key("/cobia_rust_put_integer_value").unwrap();
 	/// writer.commit().unwrap();
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn put_integer_value(&self, value_name: &str, value: i32) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putIntegerValue.unwrap())(
@@ -331,14 +335,13 @@ impl<'a> CapeRegistryKeyWriter<'a> {
 	/// }
 	/// //read the value back
 	/// assert_eq!(CapeRegistryKey::from_path("/cobia_rust_put_uuid_value").unwrap().
-	///		get_uuid_value("new_uuid",None).unwrap(), test_uuid);
+	///    get_uuid_value("new_uuid",None).unwrap(), test_uuid);
 	/// // now delete the entire key
 	/// let writer = CapeRegistryWriter::new(false).unwrap();
 	/// writer.delete_key("/cobia_rust_put_uuid_value").unwrap();
 	/// writer.commit().unwrap();
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn put_uuid_value(&self, value_name: &str, value: &CapeUUID) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putUUIDValue.unwrap())(
@@ -362,7 +365,7 @@ impl<'a> CapeRegistryKeyWriter<'a> {
 	/// registry until CapeRegistryWriter::commit() is called.
 	///
 	/// Empty values are typically used to denote an option that is either
-	/// set (value present) or not set (value not present). 
+	/// set (value present) or not set (value not present).
 	///
 	/// # Arguments
 	///
@@ -383,14 +386,13 @@ impl<'a> CapeRegistryKeyWriter<'a> {
 	/// }
 	/// //check existence and type
 	/// assert_eq!(CapeRegistryKey::from_path("/cobia_rust_put_empty_value").unwrap().
-	///		get_value_type("test_empty_value",None).unwrap(), cobia::CapeRegistryValueType::Empty);
+	///    get_value_type("test_empty_value",None).unwrap(), cobia::CapeRegistryValueType::Empty);
 	/// // now delete the entire key
 	/// let writer = CapeRegistryWriter::new(false).unwrap();
 	/// writer.delete_key("/cobia_rust_put_empty_value").unwrap();
 	/// writer.commit().unwrap();
 	/// cobia::cape_open_cleanup();
 	/// ```
-
 	pub fn put_empty_value(&self, value_name: &str) -> Result<(), COBIAError> {
 		let result = unsafe {
 			((*(*self.interface).vTbl).putEmptyValue.unwrap())(
@@ -424,7 +426,6 @@ impl<'a> CapeRegistryKeyReader for CapeRegistryKeyWriter<'a> {}
 ///
 /// ICapeRegistryKeyWriter derives from ICobiaBase, which contains
 /// addReference() and release(). The Drop trait calls release.
-
 impl<'a> Drop for CapeRegistryKeyWriter<'a> {
 	fn drop(&mut self) {
 		unsafe {
@@ -437,7 +438,6 @@ impl<'a> Drop for CapeRegistryKeyWriter<'a> {
 ///
 /// ICapeRegistryKeyWriter derives from ICobiaBase, which contains
 /// addReference() and release(). The Clone trait calls addReference.
-
 impl<'a> Clone for CapeRegistryKeyWriter<'a> {
 	fn clone(&self) -> Self {
 		unsafe {
@@ -445,7 +445,7 @@ impl<'a> Clone for CapeRegistryKeyWriter<'a> {
 		}
 		CapeRegistryKeyWriter {
 			interface: self.interface,
-			writer: self.writer
+			writer: self.writer,
 		}
 	}
 }
