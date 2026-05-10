@@ -111,13 +111,13 @@ impl CapeWindowId {
 		let window = unsafe { *window_id };
 		match window.type_ {
 			C::eCapeWindowType_CapeWindow_X11 => unsafe {
-				if window.data.X11.display_string.is_null() || window.data.X11.xid == 0 {
+				if window.data.X11.display_string.is_null() || window.data.X11.xid == 0u64 {
 					return CapeWindowId::CapeWindow_None;
 				}
 				let c_str = std::ffi::CStr::from_ptr(window.data.X11.display_string);
 				CapeWindowId::x11(
 					c_str.to_str().unwrap_or_default().to_string(),
-					window.data.X11.xid,
+					window.data.X11.xid as u64,
 				)
 			},
 			C::eCapeWindowType_CapeWindow_Wayland => unsafe {
@@ -157,7 +157,7 @@ impl CapeWindowIdRaw {
 				X11: C::CapeWindowX11 {
 					//dummy
 					display_string: std::ptr::null(),
-					xid: 0,
+					xid: 0u64,
 				},
 			},
 		};
@@ -174,7 +174,7 @@ impl CapeWindowIdRaw {
 						data: C::CapeWindowTypeData {
 							X11: C::CapeWindowX11 {
 								display_string: allocated_string.as_ref().unwrap().as_ptr(),
-								xid: *xid,
+								xid: *xid as u64,
 							},
 						},
 					};
