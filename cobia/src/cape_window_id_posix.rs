@@ -3,6 +3,7 @@ use crate::C;
 /// CapeWindowId represents a window
 ///
 /// X11, Wayland, and COCOA are supported.
+#[derive(Clone)]
 pub enum CapeWindowId {
 	/// No known or unsupported window type
 	CapeWindow_None,
