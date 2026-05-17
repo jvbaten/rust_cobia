@@ -7,7 +7,7 @@ pub enum CapeWindowType {
     None=0,
     X11=1,
     Wayland=2,
-    COCOA=3,
+    AppKit=3,
 }
 
 impl CapeWindowType {
@@ -28,7 +28,7 @@ impl CapeWindowType {
     ///let v2=cobia::CapeWindowType::from(2);
     ///assert_eq!(v2.unwrap(),cobia::CapeWindowType::Wayland);
     ///let v3=cobia::CapeWindowType::from(3);
-    ///assert_eq!(v3.unwrap(),cobia::CapeWindowType::COCOA);
+    ///assert_eq!(v3.unwrap(),cobia::CapeWindowType::AppKit);
     ///let v4=cobia::CapeWindowType::from(-1);
     ///assert_eq!(v4,None);
     ///```
@@ -37,7 +37,7 @@ impl CapeWindowType {
             0 => Some(CapeWindowType::None),
             1 => Some(CapeWindowType::X11),
             2 => Some(CapeWindowType::Wayland),
-            3 => Some(CapeWindowType::COCOA),
+            3 => Some(CapeWindowType::AppKit),
             _ => None,
         }
     }
@@ -47,7 +47,7 @@ impl CapeWindowType {
 			Self::None => "None",
 			Self::X11 => "X11",
 			Self::Wayland => "Wayland",
-			Self::COCOA => "COCOA",
+			Self::AppKit => "AppKit",
         }
     }
     ///get an iterator

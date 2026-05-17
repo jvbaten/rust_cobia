@@ -14,7 +14,7 @@
 //! * Viscosity
 //! * Thermal conductivity
 //!
-//! See the [salt_water_calculator] documentation fo validity ranges.
+//! See the [salt_water_calculator] documentation of validity ranges.
 //!
 //! Phase equilibria routines are provided that calculate the conditions
 //! of the liquid phase, at given temperaure and pressure, temperature and

@@ -2,7 +2,7 @@ use crate::C;
 
 /// CapeWindowId represents a window
 ///
-/// X11, Wayland, and COCOA are supported.
+/// X11, Wayland, and AppKit are supported.
 #[derive(Clone)]
 pub enum CapeWindowId {
 	/// No known or unsupported window type
@@ -21,11 +21,11 @@ pub enum CapeWindowId {
 		/// Procol for display handle
 		protocol: C::WaylandForeignProtocol,
 	},
-	/// COCOA window
+	/// AppKit window
 	///
 	/// Note that this should only be used from the main thread
-	CapeWindow_COCOA {
-		/// COCOA window pointer
+	CapeWindow_AppKit {
+		/// AppKit window pointer
 		window: *mut std::os::raw::c_void,
 	},
 }
@@ -75,17 +75,17 @@ impl CapeWindowId {
 		CapeWindowId::CapeWindow_Wayland { handle, protocol }
 	}
 
-	/// Get a COCOA CapeWindowId
+	/// Get an AppKit CapeWindowId
 	///
 	/// Note that this should only be used from the main thread
 	///
 	/// # Arguments
-	/// * `window` - COCOA window pointer
+	/// * `window` - AppKit window pointer
 	///
 	/// # Return
-	/// COCOA CapeWindow
-	pub fn cocoa(window: *mut std::os::raw::c_void) -> CapeWindowId {
-		CapeWindowId::CapeWindow_COCOA { window }
+	/// AppKit CapeWindow
+	pub fn appkit(window: *mut std::os::raw::c_void) -> CapeWindowId {
+		CapeWindowId::CapeWindow_AppKit { window }
 	}
 
 	/// Convert to raw window id
@@ -131,11 +131,11 @@ impl CapeWindowId {
 					window.data.Wayland.protocol,
 				)
 			},
-			C::eCapeWindowType_CapeWindow_COCOA => unsafe {
-				if window.data.COCOA.window.is_null() {
+			C::eCapeWindowType_CapeWindow_AppKit => unsafe {
+				if window.data.AppKit.window.is_null() {
 					return CapeWindowId::CapeWindow_None;
 				}
-				CapeWindowId::cocoa(window.data.COCOA.window)
+				CapeWindowId::appkit(window.data.AppKit.window)
 			},
 			_ => {
 				CapeWindowId::CapeWindow_None //unknown
@@ -196,12 +196,12 @@ impl CapeWindowIdRaw {
 					};
 				}
 			}
-			CapeWindowId::CapeWindow_COCOA { window } => {
+			CapeWindowId::CapeWindow_AppKit { window } => {
 				if !window.is_null() {
 					raw = C::CapeWindow {
-						type_: C::eCapeWindowType_CapeWindow_COCOA,
+						type_: C::eCapeWindowType_CapeWindow_AppKit,
 						data: C::CapeWindowTypeData {
-							COCOA: C::CapeWindowCOCOA {
+							AppKit: C::CapeWindowAppKit {
 								window: window.clone(),
 							},
 						},
