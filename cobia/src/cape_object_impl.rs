@@ -23,8 +23,8 @@ pub struct CapeObjectData {
 }
 
 impl CapeObjectData {
-	pub fn get_raw_interface(&self) -> C::ICapeInterface {
-		self.interface
+	pub fn get_raw_interface(&self) -> *const C::ICapeInterface {
+		&self.interface
 	}
 }
 
@@ -42,6 +42,8 @@ pub trait ICapeInterfaceImpl: std::fmt::Display {
 	fn get_object_data(&mut self) -> &mut CapeObjectData;
 	/// Returns a pointer to the implementing object.
 	fn get_self(&mut self) -> *mut Self::T;
+	/// Returns the object as interface
+	fn get_raw_interface(&self) -> *const C::ICapeInterface;
 
 	/// the V-table for the ICapeInterface implementation.
 	const CAPEINTERFACE_VTABLE: C::ICapeInterface_VTable = C::ICapeInterface_VTable {

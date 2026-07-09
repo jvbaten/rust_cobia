@@ -542,7 +542,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 					Some(fn_ptr) => {
 						//check against my own function pointer
 						let self_object_data=#cobiainfostruct::new();
-						let my_add_ref=unsafe {(*self_object_data.cape_object_data.get_raw_interface().vTbl).addReference};
+						let my_add_ref=unsafe {(*(*self_object_data.cape_object_data.get_raw_interface()).vTbl).addReference};
 						#[allow(unpredictable_function_pointer_comparisons)]
 						if my_add_ref.unwrap()==fn_ptr {
 							//same object, can borrow
@@ -577,7 +577,7 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 					Some(fn_ptr) => {
 						//check against my own function pointer
 						let self_object_data=#cobiainfostruct::new();
-						let my_add_ref=unsafe {(*self_object_data.cape_object_data.get_raw_interface().vTbl).addReference};
+						let my_add_ref=unsafe {(*(*self_object_data.cape_object_data.get_raw_interface()).vTbl).addReference};
 						#[allow(unpredictable_function_pointer_comparisons)]
 						if my_add_ref.unwrap()==fn_ptr {
 							//same object, can borrow
@@ -592,8 +592,21 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 					_ => None,
 				}
 			}
-
-			
+			/// Get a smart pointer to the object
+			/// 
+			/// This increases the reference count and returns an object from 
+			/// which other interfaces can be queried.
+			///
+			/// # Safety
+			///
+			/// The returned object must obey the COBIA threading rules, which 
+			/// depend on which flags were passed to object creation, in case
+            /// the object was created, or the object is restricted to the calling
+			/// thread in case it is a PME object
+			pub(crate) unsafe fn as_smart_pointer(&self) -> cobia::CapeObject {
+				let cape_interface=self.get_raw_interface();
+				unsafe { cobia::CapeObject::from_interface_pointer(cape_interface as *const _ as *mut _) }
+			}
 		}
 
 		impl Default for #cobiainfostruct {
@@ -618,6 +631,9 @@ pub fn cape_object_implementation(attr: TokenStream, item: TokenStream) -> Token
 			}
 			fn get_self(&mut self) -> *mut #structname {
 				self as *mut #structname
+			}
+			fn get_raw_interface(&self) -> *const C::ICapeInterface {
+				self.cobia_object_data.cape_object_data.get_raw_interface()
 			}
 		}
 
