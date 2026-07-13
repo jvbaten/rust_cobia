@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unit Operation Runner</title>
+    <script type="module" src="/main.js" defer></script>
+  </head>
+  <body id="main">
+    <div id="thermostatus">initializing thermo...</div>
+    <div id="unitstatus">initializing unit...</div>
+    <div id="mainpane">
+      <div id="mainselectors">
+        <div id="streams_button" class="pill mainlink" title="Streams"></div>
+        <div id="parameters_button" class="pill mainlink" title="Parameters"></div>
+        <div id="reports_button" class="pill mainlink" title="Reports"></div>
+        <div id="log_button" class="pill mainlink" title="Log"></div>
+        <div id="info_button" class="pill mainlink" title="About"></div>
+      </div>
+      <div class="maincontent" id="streams"><table id="streamtable"></table></div>
+      <div class="maincontent" id="parameters"><table id="parametertable"></table></div>
+      <div class="maincontent" id="reports">
+        <div id="reports_pane">
+          <select id="reportselect"></select>
+          <div class="reportcontainer" id="reporttext"></div>
+          <div class="reportcontainer" id="reporttablediv">
+            <table id="reporttable"></table>
+          </div>
+          <img class="reportcontainer" id="reportimage"></img>
+          <iframe class="reportcontainer" id="reportiframe"></iframe>
+        </div>
+      </div>
+      <div class="maincontent" id="log"><table id="logtable"></table></div>
+      <div class="maincontent" id="info"><table id="infotable"></table></div>
+    </div>
+    <div id="statusbar">
+        initializing...
+    </div>
+  </body>
+</html>

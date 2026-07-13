@@ -1,0 +1,41 @@
+[package]
+name = "unitoperationrunner"
+version = "0.1.0"
+description = "CAPE-OPEN Unit Operation Runner"
+authors = ["Jasper, AmsterCHEM"]
+edition = "2024"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "unitoperationrunner_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["image-png"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+raw-window-handle = "0.6.2"
+tauri-plugin-dialog = "2"
+arrayvec = "0.7.6"
+bitflags = "2.11.0"
+quick-xml = "0.39.2"
+base64 = "0.22.1"
+uuid = { version = "1.22.0", features = ["v4",] }
+cobia = { path = "../../../cobia"}
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62.2", features = ["Win32", "Win32_UI", "Win32_UI_WindowsAndMessaging"] }
+
+[target.'cfg(unix)'.dependencies]
+x11 = { version = "2.21.0" }
+wayland-sys = "0.31.11"
+wayland-backend = "0.3.15"
+wayland-client = { version="0.31.14", features = ["system"] }
+wayland-protocols = { version = "0.32.12", features = ["client", "unstable"] }
