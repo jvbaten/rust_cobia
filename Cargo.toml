@@ -2,12 +2,9 @@
 resolver = "2"
 members = [
     "cobia",
-    "cobia/cobia_macro",
-    "examples/distillation_shortcut_unit",
-    "examples/salt_water",
-    "examples/utils/html_dialog/html_dialog",
-    "examples/utils/html_dialog/example"
+    "cobia/cobia_macro"
 ]
+exclude = ["examples"]
 
 [profile.release-with-deb-info]
 inherits = "release"
