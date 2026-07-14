@@ -1,0 +1,38 @@
+[package]
+name = "distillation_shortcut_unit"
+version = "0.1.3"
+edition = "2024"
+authors = ["Jasper van Baten, AmsterCHEM"]
+license = "MIT"
+repository = "https://github.com/jvbaten/rust_cobia"
+description = "cobia example: Distillation Short-cut CAPE-OPEN Unit Operation"
+homepage = "https://www.amsterchem.com/cobiarust.html"
+keywords = ["unit-operations", "CAPE OPEN", "shortcut-distillation", "chemical-engineering", "process-simulation"]
+documentation = "https://www.amsterchem.com/rust_cobia_doc/distillation_shortcut_unit/"
+
+
+[lib]
+name = "distillation_shortcut_unit"
+crate-type = ["cdylib"]
+
+[build-dependencies]
+winres = "0.1"
+
+[dependencies]
+chrono = "0.4.41"
+bitflags = "2.11.1"
+ipc-channel = "0.22.0"
+process_path = "0.1.4"
+serde = "1.0.228"
+cobia = { path = "../../../cobia"}
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62.2", features = ["Win32", "Win32_System", "Win32_System_Threading", "Win32_UI", "Win32_UI_WindowsAndMessaging", "Win32_UI_Input", "Win32_UI_Input_KeyboardAndMouse"] }
+
+[package.metadata.winres]
+OriginalFilename = "distillation_shortcut_unit.dll"
+FileDescription = "Distillation Shortcut CAPE-OPEN Unit Operation"
+ProductVersion = "0.1.3.0"
+ProductName = "Distillation Shortcut Unit"
+LegalCopyright = "Copyright © AmsterCHEM 2026"
+

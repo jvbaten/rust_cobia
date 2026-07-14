@@ -1,0 +1,324 @@
+//! # Distillation shortcut unit operation editor
+//!
+//! The editor is implemented using Tauri v2, and runs
+//! out-of-process from the CAPE-OPEN compliant flowsheeting environment,
+//! as Tauri (or rather tao) does not like running in a foreign thread,
+//! which is not something the CAPE-OPEN unit operation has control over.
+//!
+//! In addition when running in-process, tao tends to leave input handling
+//! hooks after the main dialog terminates, and the easiest way to get rid of those is
+//! to terminate the process after editing is done.
+//!
+//! This crate is the client side of the IPC protocol defined in
+//! [`edit_dialog_messages`]: it connects back to the unit ("server") process that
+//! spawned it, forwards [`UpdateMessage`]s from the server to the Tauri frontend as
+//! window events (`update-status`, `update-content`, `update-streams`), and forwards
+//! frontend actions to the server as [`InputMessage`]s via the `request_update` and
+//! `data_entry` Tauri commands.
+
+mod edit_dialog_messages;
+use edit_dialog_messages::*;
+use tauri::{Emitter, Manager, State};
+use std::sync::{Mutex};
+use ipc_channel::ipc::{self,IpcSender,IpcReceiver};
+use raw_window_handle::{HasWindowHandle};
+
+#[cfg(not(target_os = "windows"))]
+use raw_window_handle::{HasDisplayHandle};
+
+/// Tauri-managed state holding the channel back to the server process. Shared with
+/// the frontend's command handlers via [`tauri::State`].
+struct EditData {
+    /// Sender used to forward [`InputMessage`]s to the server process.
+    tx : IpcSender<InputMessage>
+}
+
+impl EditData {
+    /// # Arguments
+    /// * `tx` - The IPC sender connected to the server process.
+    ///
+    /// # Returns
+    /// A new [`EditData`] wrapping `tx`.
+    fn new(tx: IpcSender<InputMessage>) -> Self {
+        Self {
+            tx
+        }
+    }
+}
+
+
+/// Tauri command invoked by the frontend once its UI has loaded, requesting the
+/// server send the dialog's initial state.
+///
+/// # Arguments
+/// * `state` - The managed [`EditData`], used to reach the server's IPC sender.
+///
+/// # Returns
+/// Nothing; sends [`InputMessage::InitialUpdate`] to the server. Send failures
+/// (e.g. the server process having exited) are silently ignored.
+#[tauri::command]
+fn request_update(state: State<'_, Mutex<EditData>>) {
+    let _=state.lock().unwrap().tx.send(InputMessage::InitialUpdate);
+}
+
+/// Tauri command invoked by the frontend whenever the user changes a control's
+/// value in the dialog.
+///
+/// # Arguments
+/// * `state` - The managed [`EditData`], used to reach the server's IPC sender.
+/// * `control_id` - Identifier of the edited control (matches an ID in the dialog's
+///   HTML).
+/// * `value` - The control's new value, as text.
+///
+/// # Returns
+/// Nothing; sends an [`InputMessage::DataEntry`] to the server. Send failures
+/// (e.g. the server process having exited) are silently ignored.
+#[tauri::command]
+fn data_entry(state: State<'_, Mutex<EditData>>, control_id: String, value: String) {
+    let _=state.lock().unwrap().tx.send(InputMessage::DataEntry(DataEntry { control_id, value }));
+}
+
+/// Entry point for the editor's Tauri application, invoked by `main`.
+///
+/// Parses the server's IPC one-shot server name from the command line, connects
+/// to it, and completes the IPC handshake by
+/// creating a fresh channel and sending it to the server via
+/// [`InputMessage::SetChannel`].
+///
+/// Once connected, builds the Tauri application, registers commands, and spawns
+/// a background thread that receives [`UpdateMessage`]s from the server.
+///
+/// # Arguments
+/// None; the server's connection name is read from `std::env::args()`.
+///
+/// # Returns
+/// Never returns normally: `app.run` blocks for the lifetime of the Tauri event
+/// loop, and this process is expected to be terminated (see the module-level docs)
+/// once the dialog closes. Setup failures instead terminate the process via
+/// `std::process::exit(-1)`.
+pub fn show_dialog()  {
+
+    //parse command line
+    let mut server_name = None;
+    let mut msg = None;
+    let mut first = true;
+    for arg in std::env::args() {
+        if first {
+            first=false;
+            #[cfg(target_os = "windows")]
+            continue;
+            #[cfg(not(target_os = "windows"))]
+            {
+                //check if this is indeed the executable name
+                if arg.ends_with("distillation_shortcut_unit_editor") || arg.ends_with("distillation_shortcut_unit_editor.exe") {
+                    continue;
+                }
+            }
+        }
+        if server_name.is_some() {
+            msg=Some("Multiple server names specified".to_string());
+        }
+        server_name = Some(arg);
+    }
+    let tx : Option<IpcSender<InputMessage>>=match server_name {
+        Some(ref name) => {
+            match IpcSender::connect(name.clone()) {
+                Ok(sender) => Some(sender),
+                Err(ee) => {
+                    msg=Some(format!("Failed to connect to server: {}", ee));
+                    None
+                }
+            }
+        },
+        None => {
+            msg=Some("No server name specified".to_string());
+            None
+        }
+    };
+    let mut rx: Option<IpcReceiver<UpdateMessage>> = None;
+    if msg.is_none() {
+        //create receiver
+        match ipc::channel() {
+            Ok((tx1, rx1)) => {
+                rx=Some(rx1);
+                match tx.as_ref().unwrap().send(InputMessage::SetChannel{channel: tx1}) {
+                    Ok(_) => {},
+                    Err(e) => {
+                        msg=Some(format!("Failed to send message to server: {}", e));
+                    }
+                }
+            },
+            Err(e) => {
+                msg=Some(format!("Failed to create IPC channel: {}", e));
+            }
+        };
+    }
+    if let Some(msg) = msg {
+        let msg=format!("{}\n\nUsage: unitoperationrunner [--run] [filename]\n\n--run: Run the specified file without showing the UI\nfilename: The file to run (optional, required for --run)", msg);
+        #[cfg(target_os = "windows")]
+        {
+            use windows::{
+                Win32::UI::WindowsAndMessaging::{MessageBoxW, MB_OK,MB_ICONHAND},
+                core::HSTRING
+            };
+            unsafe {
+                MessageBoxW(None,&HSTRING::from(msg),&HSTRING::from("Unit Operation Runner"), MB_OK|MB_ICONHAND);
+            }
+        }
+        #[cfg(not(target_os = "windows"))]
+        {
+            eprintln!("Error: {}", msg);
+        }
+        std::process::exit(-1);
+    }
+    let tx= tx.unwrap();
+    let rx= rx.unwrap();
+    //set up app
+    let app=tauri::Builder::default()
+        .setup(move |app| {
+            app.manage(Mutex::new(EditData::new(tx)));
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![request_update,data_entry])
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application");
+    let apph=app.handle().clone();
+    //a thread to receive messages from the server and send them to the Tauri app
+    let _thread_handle = std::thread::spawn(move || {
+        //process incoming messages
+        while let Ok(msg) = rx.recv() {
+            match msg {
+                UpdateMessage::UpdateStatus{status} => {
+                    let _=apph.emit("update-status", status);
+                },
+                UpdateMessage::UpdateContent{content} => {
+                    let _=apph.emit("update-content", content);
+                },
+                UpdateMessage::UpdateStreams{streams} => {
+                    let _=apph.emit("update-streams", streams);
+                },
+                UpdateMessage::ParentWindow{parent_window} => {
+
+                    #[cfg(target_os = "windows")]
+                    if  let Some(hwnd) = parent_window.windows_hwnd {
+                        let apph1=apph.clone();
+                        let _thread_handle = std::thread::spawn(move || {
+                            //loop until the main window is created and we can get its window handle
+                            let tauri_hwnd= loop {
+                                if let Some(wnd) = apph1.get_window("main") { //this requires "unstable" feature in the current Tauri version
+                                    if let Ok(rawwnd)=wnd.window_handle() {
+                                        if let raw_window_handle::RawWindowHandle::Win32(raw) = rawwnd.as_raw() {
+                                            break windows::Win32::Foundation::HWND{0:raw.hwnd.get() as *mut _};
+                                        }
+                                    }
+                                }
+                            };
+                            //we would like to make the window be a owned by the parent window, using
+                            //SetWindowLongPtrW with GWLP_HWNDPARENT, so that the window always stays on top of
+                            //its owner. This seems to cause dead locks, so we stay away from it. Instead we put
+                            //bring the window to the foreground each time we find the parent or one of its
+                            //ancestors on top of the z-order. This check is done periodically in a separate thread.
+                            struct HashWindow(windows::Win32::Foundation::HWND);
+                            impl HashWindow {
+                                fn new(hwnd: windows::Win32::Foundation::HWND) -> Self {
+                                    Self(hwnd)
+                                }
+                            }
+                            impl std::hash::Hash for HashWindow {
+                                fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+                                    state.write_usize(self.0 .0 as usize);
+                                }
+                            }
+                            impl PartialEq for HashWindow {
+                                fn eq(&self, other: &Self) -> bool {
+                                    self.0 .0 == other.0 .0
+                                }
+                            }
+                            impl Eq for HashWindow {}
+                            let mut ancestors=std::collections::HashSet::new();
+                            let mut current = windows::Win32::Foundation::HWND{0:hwnd as *mut _};
+                            ancestors.insert(HashWindow::new(current));
+                            loop {
+                                if let Ok(parent)=unsafe { windows::Win32::UI::WindowsAndMessaging::GetParent(current) } {
+                                    current=parent;
+                                    ancestors.insert(HashWindow::new(current));
+                                    continue;
+                                }
+                                if let Ok(owner)=unsafe { windows::Win32::UI::WindowsAndMessaging::GetWindow(current, windows::Win32::UI::WindowsAndMessaging::GW_OWNER) } {
+                                    current=owner;
+                                    ancestors.insert(HashWindow::new(current));
+                                    continue;
+                                }
+                                break;
+                            }
+                            //now periodically check if the foreground window is one of the ancestors, and if so, bring the Tauri window to the foreground
+                            loop {
+                                std::thread::sleep(std::time::Duration::from_millis(300));
+                                let foreground = unsafe { windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow() };
+                                if ancestors.contains(&HashWindow::new(foreground)) {
+                                    unsafe {
+                                        let _=windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow(tauri_hwnd);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    #[cfg(not(target_os = "windows"))]
+                    if parent_window.x11_display.is_some() && parent_window.x11_window_id.is_some() {
+                        let apph1=apph.clone();
+                        let _thread_handle = std::thread::spawn(move || {
+                            //loop until the main window is created and we can get its window handle
+                            loop {
+                                if let Some(wnd) = apph1.get_window("main") { //this requires "unstable" feature in the current Tauri version
+                                    if let Ok(rawwnd)=wnd.window_handle() {
+                                        if let raw_window_handle::RawWindowHandle::Xlib(raw) = rawwnd.as_raw() {
+                                            if let Ok(rawdispl)=wnd.display_handle() {
+                                                if let raw_window_handle::RawDisplayHandle::Xlib(rawdispl) = rawdispl.as_raw() {
+                                                    if let Some(display_handle) = rawdispl.display {
+                                                        unsafe {
+                                                            x11::xlib::XSetTransientForHint(display_handle.as_ptr() as _, raw.window as u64,parent_window.x11_window_id.unwrap() as u64);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+
+
+                                // XWindowAttributes att_parent{};
+                                // XWindowAttributes att_child{};
+                                // if (XGetWindowAttributes(x11_display,xid_parent,&att_parent)) {
+                                //     if (XGetWindowAttributes(x11_display,xid,&att_child)) {
+                                //         int x=(att_parent.width-att_child.width)>>1;
+                                //         int y=(att_parent.height-att_child.height)>>1;
+                                //         if (!XMoveWindow(x11_display,xid, att_parent.x+x, att_parent.y+y)) {
+                                //             //std::cout<<"Failed to center window...\n";
+                                //         }
+                                //     }
+                                // }
+
+
+
+                        });
+                    }
+
+
+
+
+
+
+
+                }
+            }
+        }
+    });
+    app.run( |_app_handle, _event| {
+        //no event processing needed
+    });
+}
+
+
+
