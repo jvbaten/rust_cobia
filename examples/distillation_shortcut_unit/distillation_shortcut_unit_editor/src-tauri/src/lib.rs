@@ -265,27 +265,25 @@ pub fn show_dialog()  {
                     }
                     #[cfg(not(target_os = "windows"))]
                     if parent_window.x11_display.is_some() && parent_window.x11_window_id.is_some() {
-                        let apph1=apph.clone();
-                        let _thread_handle = std::thread::spawn(move || {
-                            //loop until the main window is created and we can get its window handle
-                            loop {
-                                if let Some(wnd) = apph1.get_window("main") { //this requires "unstable" feature in the current Tauri version
-                                    if let Ok(rawwnd)=wnd.window_handle() {
-                                        if let raw_window_handle::RawWindowHandle::Xlib(raw) = rawwnd.as_raw() {
-                                            if let Ok(rawdispl)=wnd.display_handle() {
-                                                if let raw_window_handle::RawDisplayHandle::Xlib(rawdispl) = rawdispl.as_raw() {
-                                                    if let Some(display_handle) = rawdispl.display {
-                                                        unsafe {
-                                                            x11::xlib::XSetTransientForHint(display_handle.as_ptr() as _, raw.window as u64,parent_window.x11_window_id.unwrap() as u64);
-                                                        }
+                        //loop until the main window is created and we can get its window handle
+                        loop {
+                            if let Some(wnd) = apph.get_window("main") { //this requires "unstable" feature in the current Tauri version
+                                if let Ok(rawwnd)=wnd.window_handle() {
+                                    if let raw_window_handle::RawWindowHandle::Xlib(raw) = rawwnd.as_raw() {
+                                        if let Ok(rawdispl)=wnd.display_handle() {
+                                            if let raw_window_handle::RawDisplayHandle::Xlib(rawdispl) = rawdispl.as_raw() {
+                                                if let Some(display_handle) = rawdispl.display {
+                                                    unsafe {
+                                                        x11::xlib::XSetTransientForHint(display_handle.as_ptr() as _, raw.window as u64,parent_window.x11_window_id.unwrap() as u64);
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                    break;
                                 }
+                                break;
                             }
+                        }
 
 
                                 // XWindowAttributes att_parent{};
@@ -301,8 +299,6 @@ pub fn show_dialog()  {
                                 // }
 
 
-
-                        });
                     }
 
 
