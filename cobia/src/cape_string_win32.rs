@@ -200,6 +200,8 @@ impl<'a, T: CapeStringConstProvider> PartialEq<T> for CapeStringIn<'a> {
 	}
 }
 
+const NULLSTR: [C::CapeCharacter; 1] = [0u16];
+
 impl<'a> CapeStringConstProvider for CapeStringIn<'a> {
 
 	///Return as CapeCharacter const pointer with length
@@ -222,7 +224,7 @@ impl<'a> CapeStringConstProvider for CapeStringIn<'a> {
 	/// ```
 	fn as_capechar_const_with_length(&self) -> (*const C::CapeCharacter, C::CapeSize) {
 		if self.slice.is_empty() {
-			("\0\0".as_ptr() as *const C::CapeCharacter, 0 as C::CapeSize)
+			(&NULLSTR as *const C::CapeCharacter, 0 as C::CapeSize)
 		} else {
 			(self.slice.as_ptr(), (self.slice.len() - 1) as C::CapeSize)
 		}
