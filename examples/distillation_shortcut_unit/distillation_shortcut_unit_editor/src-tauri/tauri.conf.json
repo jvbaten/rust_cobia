@@ -9,14 +9,7 @@
   "app": {
     "withGlobalTauri": true,
     "enableGTKAppId": true,
-    "windows": [
-      {
-        "title": "Distillation Shortcut Unit",
-        "width": 600,
-        "height": 600,
-        "minimizable": false
-      }
-    ],
+    "windows": [],
     "security": {
       "csp": null
     }

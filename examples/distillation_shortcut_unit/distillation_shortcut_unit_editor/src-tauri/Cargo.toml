@@ -27,7 +27,7 @@ ipc-channel = "0.22.0"
 raw-window-handle = "0.6.2"
 
 [target.'cfg(windows)'.dependencies]
-windows = { version = "0.62.2", features = ["Win32", "Win32_UI", "Win32_UI_WindowsAndMessaging"] }
+windows = { version = "0.62.2", features = ["Win32", "Win32_UI", "Win32_UI_WindowsAndMessaging", "Win32_System", "Win32_System_LibraryLoader"] }
 
 [target.'cfg(unix)'.dependencies]
 x11 = { version = "2.21.0" }

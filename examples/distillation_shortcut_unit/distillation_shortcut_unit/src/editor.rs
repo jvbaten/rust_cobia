@@ -449,21 +449,15 @@ fn data_entry(unit: &mut DistillationShortcutUnit, entry: &DataEntry) -> Result<
 /// # Arguments
 /// * `unit` - The unit being edited; may be updated by a `DataEntry` message.
 /// * `msg` - The message received from the editor process.
-/// * `tx` - The reply channel to the editor. `None` until the `SetChannel` handshake
-///   message is processed, after which it holds the sender used for all replies.
+/// * `tx` - The reply channel to the editor.
 /// * `modified` - Accumulator set to `true` whenever a `DataEntry` message actually
 ///   changes a unit parameter; left untouched otherwise.
-/// * `parent` - The flowsheet host's window handle, forwarded to the editor in
-///   response to `InitialUpdate` so its dialog can track the host window.
 ///
 /// # Returns
 /// Nothing; effects are applied to `unit`, `tx`, and `modified` in place, and
 /// replies are pushed to the editor over `tx`.
-fn handle_input_message(unit: &mut DistillationShortcutUnit, msg: InputMessage, tx: &mut Option<IpcSender<UpdateMessage>>, modified: &mut bool, parent: &CapeWindowId) {
+fn handle_input_message(unit: &mut DistillationShortcutUnit, msg: InputMessage, tx: &IpcSender<UpdateMessage>, modified: &mut bool) {
     match msg {
-        InputMessage::SetChannel{channel} => {
-                *tx = Some(channel);
-        },
         InputMessage::DataEntry(entry) => {
             match data_entry(unit, &entry) {
                 Ok(modified_entry) => {
@@ -471,45 +465,31 @@ fn handle_input_message(unit: &mut DistillationShortcutUnit, msg: InputMessage, 
                         *modified = true;
                     }
                     //send status
-                    tx.as_ref().unwrap().send(UpdateMessage::UpdateStatus { status: get_status(unit) }).unwrap();
+                    tx.send(UpdateMessage::UpdateStatus { status: get_status(unit) }).unwrap();
                 }
                 Err(e) => {
                     let status = Status { text: e, error: true };
                     let update_msg = UpdateMessage::UpdateStatus { status };
-                    if let Some(tx) = &tx {
-                        let _ = tx.send(update_msg);
-                    }
+                    let _ = tx.send(update_msg);
                 }
             }
             //send content
-            tx.as_ref().unwrap().send(UpdateMessage::UpdateContent { content: get_content(unit) }).unwrap();
-        }
+            tx.send(UpdateMessage::UpdateContent { content: get_content(unit) }).unwrap();
+        },
         InputMessage::InitialUpdate => {
-            #[cfg(target_os = "windows")]
-            if parent.h_wnd != std::ptr::null_mut() {
-                let _=tx.as_ref().unwrap().send(UpdateMessage::ParentWindow { parent_window: ParentWindow { windows_hwnd: Some(parent.h_wnd as usize as u32), x11_display: None, x11_window_id: None, wayland_external_id: None } });
-            }
-            #[cfg(not(target_os = "windows"))]
-            match parent {
-                CapeWindowId::CapeWindow_X11{display_string, xid} => {
-                    if (!display_string.is_empty()) && (*xid!=0) {
-                        let _=tx.as_ref().unwrap().send(UpdateMessage::ParentWindow { parent_window: ParentWindow { windows_hwnd: None, x11_display: Some(display_string.clone()), x11_window_id: Some(*xid), wayland_external_id: None } });
-                    }
-                },
-                CapeWindowId::CapeWindow_Wayland{handle, protocol: _} => {
-                    if !handle.is_empty() {
-                        let _=tx.as_ref().unwrap().send(UpdateMessage::ParentWindow { parent_window: ParentWindow { windows_hwnd: None, x11_display: None, x11_window_id: None, wayland_external_id: Some(handle.clone()) } });
-                    }
-                },
-                _ => {}
-            };
             //send streams
-            let _=tx.as_ref().unwrap().send(UpdateMessage::UpdateStreams { streams: get_streams(unit) });
+            let _=tx.send(UpdateMessage::UpdateStreams { streams: get_streams(unit) });
             //send content
-            let _=tx.as_ref().unwrap().send(UpdateMessage::UpdateContent { content: get_content(unit) });
+            let _=tx.send(UpdateMessage::UpdateContent { content: get_content(unit) });
             //send status
-            let _=tx.as_ref().unwrap().send(UpdateMessage::UpdateStatus { status: get_status(unit) });
+            let _=tx.send(UpdateMessage::UpdateStatus { status: get_status(unit) });
+        },
+        _ => {
+            //unexpected, assert when running in debug mode
+            #[cfg(debug_assertions)]
+            panic!("Unexpected message received from editor");
         }
+
     }
 }
 
@@ -576,11 +556,38 @@ pub fn edit(unit: &mut DistillationShortcutUnit, parent: CapeWindowId) -> Result
     };
     //accept the connection from the editor process
     let (rx,msg)=server.accept()?;
-    let mut tx=None;
     let mut modified=false;
-    //handle initial message
-    handle_input_message(unit, msg, &mut tx, &mut modified, &parent);
-
+    //the first messsage we receive is the transmit channel
+    let tx=match msg {
+        InputMessage::SetChannel{channel} => {
+            channel
+        },
+        _ => {
+            return Err("Expected SetChannel message from editor".into());
+        }
+    };
+    //the first message we send is the parent window
+    let mut parent_wnd : ParentWindow = Default::default();
+    #[cfg(target_os = "windows")]
+    if parent.h_wnd != std::ptr::null_mut() {
+        parent_wnd.windows_hwnd = Some(parent.h_wnd as usize as u32);
+    }
+    #[cfg(not(target_os = "windows"))]
+    match parent {
+        CapeWindowId::CapeWindow_X11{display_string, xid} => {
+            if (!display_string.is_empty()) && (*xid!=0) {
+                parent_wnd.x11_display = Some(display_string.clone());
+                parent_wnd.x11_window_id = Some(*xid);
+            }
+        },
+        CapeWindowId::CapeWindow_Wayland{handle, protocol: _} => {
+            if !handle.is_empty() {
+                parent_wnd.wayland_external_id = Some(handle.clone());
+            }
+        },
+        _ => {}
+    };
+    let _=tx.send(UpdateMessage::ParentWindow{parent_window:parent_wnd});
     //For Windows, we enable/disable the parent if there is one, and in addition if the parent is in the current thread, we pump messages while waiting for the editor to finish.
     #[cfg(target_os = "windows")]  //must include message pump
     {
@@ -609,7 +616,7 @@ pub fn edit(unit: &mut DistillationShortcutUnit, parent: CapeWindowId) -> Result
             loop {
                 match rx.try_recv() {
                     Ok(msg) => {
-                        handle_input_message(unit, msg, &mut tx, &mut modified, &parent);
+                        handle_input_message(unit, msg, &tx, &mut modified);
                     },
                     Err(TryRecvError::IpcError(_)) => {
                         break;
@@ -634,14 +641,14 @@ pub fn edit(unit: &mut DistillationShortcutUnit, parent: CapeWindowId) -> Result
         } else {
             //no message pump needed, just receive messages
             while let Ok(msg) = rx.recv() {
-                handle_input_message(unit, msg, &mut tx, &mut modified, &parent);
+                handle_input_message(unit, msg, &tx, &mut modified);
             }
         }
     }
 
     #[cfg(not(target_os = "windows"))]  //no  message pump
     while let Ok(msg) = rx.recv() {
-        handle_input_message(unit, msg, &mut tx, &mut modified, &parent);
+        handle_input_message(unit, msg, &tx, &mut modified);
     }
 
     Ok(if modified {cape_open_1_2::CapeEditResult::CapeModified} else {cape_open_1_2::CapeEditResult::CapeNotModified})

@@ -6,10 +6,9 @@
 //! ("client") communicate over an `ipc_channel` connection using the message types
 //! defined here.
 //!
-//! This module is duplicated verbatim in both the `distillation_shortcut_unit` crate
+//! This module is used in both the `distillation_shortcut_unit` crate
 //! (server side) and the `distillation_shortcut_unit_editor` crate (client side), so
-//! that both ends agree on the wire format without sharing a crate dependency. Any
-//! change here must be mirrored in the other copy.
+//! it is stored in this shared folder.
 //!
 //! The initial handshake works as follows: the server starts the editor process,
 //! passing the name of an [`IpcOneShotServer`](ipc_channel::ipc::IpcOneShotServer) on
@@ -65,7 +64,7 @@ pub struct Status {
 /// Native handle of the flowsheet host's window, used by the editor so it can keep
 /// its dialog on top of the window that owns it. Exactly one field is populated,
 /// depending on the platform/windowing system the host is running under.
-#[derive(Serialize,Deserialize)]
+#[derive(Serialize,Deserialize,Default)]
 pub struct ParentWindow {
     /// The host window handle (`HWND`), on Windows.
     pub windows_hwnd : Option<u32>,
