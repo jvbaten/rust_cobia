@@ -557,7 +557,14 @@ pub fn edit(unit: &mut DistillationShortcutUnit, parent: CapeWindowId) -> Result
         Some(path) => path,
         None => return Err("Unable to locate editor path".into()),
     };
-    editor_path=editor_path.parent().unwrap().join("distillation_shortcut_unit_editor.exe");
+    #[cfg(target_os = "windows")]
+    {
+        editor_path=editor_path.parent().unwrap().join("distillation_shortcut_unit_editor.exe");
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        editor_path=editor_path.parent().unwrap().join("distillation_shortcut_unit_editor");
+    }
     //create a one shot IPC server
     let (server, server_name) = IpcOneShotServer::<InputMessage>::new().unwrap();
     //launch the editor process, passing the server name as arguments

@@ -273,9 +273,16 @@ pub fn show_dialog()  {
                                         if let Ok(rawdispl)=wnd.display_handle() {
                                             if let raw_window_handle::RawDisplayHandle::Xlib(rawdispl) = rawdispl.as_raw() {
                                                 if let Some(display_handle) = rawdispl.display {
-                                                    unsafe {
-                                                        x11::xlib::XSetTransientForHint(display_handle.as_ptr() as _, raw.window as u64,parent_window.x11_window_id.unwrap() as u64);
-                                                    }
+                                                    let child_xid=raw.window as u64;
+                                                    let parent_xid=parent_window.x11_window_id.unwrap() as u64;
+                                                    let _ = apph.run_on_main_thread(move || {
+                                                        let xdisplay=unsafe{x11::xlib::XOpenDisplay(parent_window.x11_display.unwrap().as_ptr() as *const i8)};
+
+                                                        let res=unsafe {
+                                                            x11::xlib::XSetTransientForHint(xdisplay, child_xid, parent_xid)
+                                                        };
+                                                        println!("XSetTransientForHint for {} and {} returned {}", child_xid, parent_xid, res);
+                                                    });
                                                 }
                                             }
                                         }
@@ -283,6 +290,7 @@ pub fn show_dialog()  {
                                 }
                                 break;
                             }
+                            std::thread::sleep(std::time::Duration::from_millis(300));
                         }
 
 

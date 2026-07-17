@@ -189,6 +189,11 @@ impl<'a, T: CapeStringConstProvider> PartialEq<T> for CapeStringIn<'a> {
 	/// test_string(&CapeStringInFromProvider::from(&s1).as_cape_string_in())
 	/// ```
 	fn eq(&self, other: &T) -> bool {
+		if self.slice.is_empty() {
+			//compare to empty string
+			let (_other_ptr, other_len) = other.as_capechar_const_with_length();
+			return other_len == 0;
+		}
 		let my_slice = unsafe {
 			std::slice::from_raw_parts(self.slice.as_ptr() as *const u8, self.slice.len() - 1)
 		};
@@ -200,7 +205,7 @@ impl<'a, T: CapeStringConstProvider> PartialEq<T> for CapeStringIn<'a> {
 
 }
 
-const NULLSTRING : &[C::CapeCharacter] = &[0i8];
+const NULLSTRING : C::CapeCharacter = 0i8;
 
 impl<'a> CapeStringConstProvider for CapeStringIn<'a> {
 
@@ -224,7 +229,7 @@ impl<'a> CapeStringConstProvider for CapeStringIn<'a> {
 	/// ```
 	fn as_capechar_const_with_length(&self) -> (*const C::CapeCharacter, C::CapeSize) {
 		if self.slice.is_empty() {
-			(NULLSTRING as *const C::CapeCharacter, 0 as C::CapeSize)
+			(&NULLSTRING, 0 as C::CapeSize)
 		} else {
 			(self.slice.as_ptr(), (self.slice.len() - 1) as C::CapeSize)
 		}
@@ -275,6 +280,9 @@ impl<'a> std::fmt::Display for CapeStringIn<'a> {
 	/// test_format(&CapeStringInFromProvider::from(&s1).as_cape_string_in())
 	/// ```
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+		if self.slice.is_empty() {
+			return write!(f, "");
+		}
 		let slice = unsafe {
 			std::slice::from_raw_parts(self.slice.as_ptr() as *const u8, self.slice.len() - 1)
 		}; //exclude null
@@ -644,9 +652,13 @@ impl<'a> std::fmt::Display for CapeStringOut<'a> {
 	/// check_format(&mut CapeStringOutFromProvider::from(&mut s1).as_cape_string_out());
 	/// ```
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-		let (ptr, sz) = self.as_capechar_const_with_length();
-		let slice = unsafe { std::slice::from_raw_parts(ptr as *const u8, sz as usize) };
-		write!(f, "{}", String::from_utf8_lossy(slice))
+		if self.interface.is_null() {
+			write!(f,"")
+		} else {
+			let (ptr, sz) = self.as_capechar_const_with_length();
+			let slice = unsafe { std::slice::from_raw_parts(ptr as *const u8, sz as usize) };
+			write!(f, "{}", String::from_utf8_lossy(slice))
+		}
 	}
 }
 
