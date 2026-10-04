@@ -15,8 +15,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 cobia = { path = "../../cobia"}
-strum = "0.27"
-strum_macros = "0.27"
+strum = "0.28"
+strum_macros = "0.28"
 
 [build-dependencies]
 winres = "0.1"

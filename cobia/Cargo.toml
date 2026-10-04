@@ -18,6 +18,6 @@ process_path = "0.1.4"
 fxhash = "0.2.1"
 
 [build-dependencies]
-bindgen = "0.71.1"
+bindgen = "0.73.2"
 regex = "1.10.4"
 

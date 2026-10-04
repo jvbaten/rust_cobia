@@ -44,8 +44,8 @@ impl XMLReader {
 pub(crate) struct XMLNode {
     /// Shared reader state backing this cursor.
     reader: std::rc::Rc<std::cell::RefCell<XMLReader>>,
-    /// Raw element name bytes.
-    name: Vec<u8>,
+    /// Element name.
+    name: String,
     /// Decoded `(key, value)` attribute pairs from the element start tag.
     attributes: Vec<(String, String)>,
     /// Scratch buffer reused for pull parsing events.
@@ -93,15 +93,9 @@ impl XMLReader {
                                 return Err(format!("Error reading XML attribute: {}", e).into());
                             }
                             Ok(a) => {
-                                let key = a
-                                    .key
-                                    .as_ref()
-                                    .to_vec()
-                                    .into_iter()
-                                    .map(|b| b as char)
-                                    .collect::<String>();
+                                let key = a.key.as_ref().to_string();
                                 let value = a
-                                    .decode_and_unescape_value(e.decoder())
+                                    .normalized_value(quick_xml::XmlVersion::Implicit1_0)
                                     .map_err(|e| {
                                         format!("Error reading XML attribute value: {}", e)
                                     })?
@@ -112,7 +106,7 @@ impl XMLReader {
                     }
                     return Ok(Some(XMLNode {
                         reader: reader.clone(),
-                        name: e.name().as_ref().to_vec(),
+                        name: e.name().as_ref().to_string(),
                         buf: Vec::new(),
                         end_read,
                         attributes,
@@ -122,12 +116,7 @@ impl XMLReader {
                     //unexpected
                     return Err(format!(
                         "Unexpected end in xml: {}",
-                        e.name()
-                            .as_ref()
-                            .to_vec()
-                            .into_iter()
-                            .map(|b| b as char)
-                            .collect::<String>()
+                        e.name().as_ref()
                     )
                     .into());
                 }
@@ -143,7 +132,7 @@ impl XMLNode {
     /// # Returns
     /// Slice containing the element name as UTF-8 bytes from the XML stream.
     pub fn get_name(&self) -> &[u8] {
-        self.name.as_slice()
+        self.name.as_bytes()
     }
 
     /// Returns all decoded attributes of this node.
@@ -184,15 +173,15 @@ impl XMLNode {
                     return Ok(text);
                 }
                 Ok(quick_xml::events::Event::Text(e)) => {
-                    text.push_str(&e.decode()?);
+                    text.push_str(&e.xml10_content());
                 }
                 Ok(quick_xml::events::Event::GeneralRef(e)) => {
                     match e.into_inner().as_ref() {
-                        b"lt" => text.push('<'),
-                        b"gt" => text.push('>'),
-                        b"amp" => text.push('&'),
-                        b"apos" => text.push('\''),
-                        b"quot" => text.push('"'),
+                        "lt" => text.push('<'),
+                        "gt" => text.push('>'),
+                        "amp" => text.push('&'),
+                        "apos" => text.push('\''),
+                        "quot" => text.push('"'),
                         _ => {}
                     };
                 }
@@ -204,12 +193,7 @@ impl XMLNode {
                     //unexpected
                     return Err(format!(
                         "Unexpected end in xml: {}",
-                        e.name()
-                            .as_ref()
-                            .to_vec()
-                            .into_iter()
-                            .map(|b| b as char)
-                            .collect::<String>()
+                        e.name().as_ref()
                     )
                     .into());
                 }
@@ -256,15 +240,9 @@ impl XMLNode {
                                 return Err(format!("Error reading XML attribute: {}", e).into());
                             }
                             Ok(a) => {
-                                let key = a
-                                    .key
-                                    .as_ref()
-                                    .to_vec()
-                                    .into_iter()
-                                    .map(|b| b as char)
-                                    .collect::<String>();
+                                let key = a.key.as_ref().to_string();
                                 let value = a
-                                    .decode_and_unescape_value(e.decoder())
+                                    .normalized_value(quick_xml::XmlVersion::Implicit1_0)
                                     .map_err(|e| {
                                         format!("Error reading XML attribute value: {}", e)
                                     })?
@@ -275,7 +253,7 @@ impl XMLNode {
                     }
                     return Ok(Some(XMLNode {
                         reader: self.reader.clone(),
-                        name: e.name().as_ref().to_vec(),
+                        name: e.name().as_ref().to_string(),
                         buf: Vec::new(),
                         end_read,
                         attributes,
@@ -289,12 +267,7 @@ impl XMLNode {
                     //unexpected
                     return Err(format!(
                         "Unexpected end in xml: {}",
-                        e.name()
-                            .as_ref()
-                            .to_vec()
-                            .into_iter()
-                            .map(|b| b as char)
-                            .collect::<String>()
+                        e.name().as_ref()
                     )
                     .into());
                 }

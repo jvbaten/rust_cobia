@@ -324,6 +324,7 @@ bitflags! {
         const Default = 0;
         const AllowRestrictedThreading = 1;
         const IsolatedProcess = 2;
+        const Delegated = 1073741824;
     }
 }
 

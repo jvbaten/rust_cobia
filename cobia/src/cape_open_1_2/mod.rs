@@ -15,6 +15,9 @@ pub const LIBRARY_ID:CapeUUID=CapeUUID::from_slice(&[0x8du8,0x1du8,0x72u8,0x4fu8
 /// Category ID that identifies CAPE-OPEN PMCs compliant with CAPE-OPEN version 1.2.
 pub const CATEGORYID_COMPONENT_1_2:CapeUUID=CapeUUID::from_slice(&[0x37u8,0xe0u8,0x30u8,0x33u8,0x63u8,0xb9u8,0x4fu8,0x55u8,0xb5u8,0xc4u8,0x80u8,0x7bu8,0xedu8,0xe0u8,0x3du8,0xebu8]);
 
+/// Category ID that identifies that a CAPE-OPEN component \(e.g. a unit operation\) is compatible with ICapeThermoEquilibriumRoutineEx and will function if ICapeThermoEquilibriumRoutine does not.
+pub const CATEGORYID_CAPETHERMOEQUILIBRIUMROUTINEEXCOMPATIBLE:CapeUUID=CapeUUID::from_slice(&[0x5du8,0x92u8,0x73u8,0x4eu8,0x82u8,0xf7u8,0x4fu8,0x51u8,0xb9u8,0x43u8,0xa2u8,0x41u8,0xe8u8,0xc6u8,0xd8u8,0x37u8]);
+
 //Interface IDs
 
 /// UUID for ICapeIdentification
@@ -345,7 +348,7 @@ pub enum CapeDimensionality {
 	CapeRadian = 7,
 	/// A non-zero value at this index identifies a difference, such as a temperature- or pressure difference
 	CapeDifferenceFlag = 8,
-	/// Maximum length of dimensianality array
+	/// Maximum length of dimensionality array
 	CapeDimensionalityLength = 9,
 }
 

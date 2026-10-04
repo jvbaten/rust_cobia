@@ -21,7 +21,7 @@ winres = "0.1"
 [dependencies]
 chrono = "0.4.41"
 bitflags = "2.11.1"
-ipc-channel = "0.22.0"
+ipc-channel = "0.23.0"
 process_path = "0.1.4"
 serde = "1.0.228"
 cobia = { path = "../../../cobia"}

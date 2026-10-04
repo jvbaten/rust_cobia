@@ -17,7 +17,7 @@ impl syn::parse::Parse for CapeOpenObjectMacroArg {
 			let content;
 			syn::braced!(content in input);
 			let paths: syn::punctuated::Punctuated<syn::Path, syn::Token![,]> =
-				content.parse_terminated(syn::Path::parse)?;
+				content.parse_terminated(syn::Path::parse, syn::Token![,])?;
 			//convert paths to vector
 			let mut items: Vec<syn::Path> = Vec::with_capacity(paths.len());
 			for p in paths {
@@ -28,7 +28,7 @@ impl syn::parse::Parse for CapeOpenObjectMacroArg {
 			let content;
 			syn::braced!(content in input);
 			let idents: syn::punctuated::Punctuated<syn::Ident, syn::Token![,]> =
-				content.parse_terminated(syn::Ident::parse)?;
+				content.parse_terminated(syn::Ident::parse, syn::Token![,])?;
 			//convert idents to vector
 			let mut items: Vec<syn::Ident> = Vec::with_capacity(idents.len());
 			for p in idents {
@@ -39,7 +39,7 @@ impl syn::parse::Parse for CapeOpenObjectMacroArg {
 			let content;
 			syn::braced!(content in input);
 			let idents: syn::punctuated::Punctuated<syn::Ident, syn::Token![,]> =
-				content.parse_terminated(syn::Ident::parse)?;
+				content.parse_terminated(syn::Ident::parse, syn::Token![,])?;
 			//convert idents to vector
 			let mut items: Vec<syn::Ident> = Vec::with_capacity(idents.len());
 			for p in idents {
@@ -50,7 +50,7 @@ impl syn::parse::Parse for CapeOpenObjectMacroArg {
 			let content;
 			syn::braced!(content in input);
 			let assigns: syn::punctuated::Punctuated<syn::ExprAssign, syn::Token![,]> =
-				content.parse_terminated(syn::ExprAssign::parse)?;
+				content.parse_terminated(syn::ExprAssign::parse, syn::Token![,])?;
 			//convert expressions to vector
 			let mut items: Vec<syn::ExprAssign> = Vec::with_capacity(assigns.len());
 			for p in assigns {
@@ -695,8 +695,8 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 					match field.ty {
 						syn::Type::Ptr(ref type_ptr) => {
 							match type_ptr.mutability {
-								Some(_) => {}
-								None => {
+								syn::PointerMutability::Mut(_) => {}
+								syn::PointerMutability::Const(_) => {
 									return TokenStream::from(
 										syn::Error::new(
 											syn::spanned::Spanned::span(&field),
@@ -780,7 +780,6 @@ pub fn cape_smart_pointer(attr: TokenStream, item: TokenStream) -> TokenStream {
 				type_param.attrs.clear();
 				type_param.colon_token = None;
 				type_param.bounds = syn::punctuated::Punctuated::new();
-				type_param.eq_token = None;
 				type_param.default = None;
 			}
 		});

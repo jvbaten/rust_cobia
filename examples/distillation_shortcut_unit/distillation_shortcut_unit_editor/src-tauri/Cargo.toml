@@ -23,7 +23,7 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = ["unstable"] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
-ipc-channel = "0.22.0"
+ipc-channel = "0.23.0"
 raw-window-handle = "0.6.2"
 
 [target.'cfg(windows)'.dependencies]
