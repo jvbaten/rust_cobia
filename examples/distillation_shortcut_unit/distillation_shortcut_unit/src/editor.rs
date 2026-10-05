@@ -612,12 +612,12 @@ pub fn edit(unit: &mut DistillationShortcutUnit, parent: CapeWindowId) -> Result
             do_process_messages= thread_id==current_thread_id;
             Some(hwnd)
         };
-        if let Some(hwnd) = parent_hwnd {
-            unsafe {
-                let _ = EnableWindow(hwnd, true);
-            }
-        }
         if do_process_messages {
+            if let Some(hwnd) = parent_hwnd {
+                unsafe {
+                    let _ = EnableWindow(hwnd, false);
+                }
+            }
             loop {
                 match rx.try_recv() {
                     Ok(msg) => {
