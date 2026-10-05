@@ -57,6 +57,11 @@ cargo tauri build --debug
 cargo tauri build
 ```
 
+`cargo tauri build` also creates the installer bundles. To build just the
+executable, a plain `cargo build` (or `cargo build --release`) from this
+folder suffices. The executable ends up in `target/debug` or `target/release`,
+or under `$CARGO_TARGET_DIR` if that is set.
+
 ### Documentation
 
 ```

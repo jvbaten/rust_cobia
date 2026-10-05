@@ -17,14 +17,14 @@
 //! `data_entry` Tauri commands.
 
 mod edit_dialog_messages;
+#[cfg(not(target_os = "windows"))]
+mod parent_window_posix;
 use edit_dialog_messages::*;
 use ipc_channel::ipc::{self, IpcReceiver, IpcSender};
+#[cfg(target_os = "windows")]
 use raw_window_handle::HasWindowHandle;
 use std::sync::Mutex;
 use tauri::{Emitter, Manager, State};
-
-#[cfg(not(target_os = "windows"))]
-use raw_window_handle::HasDisplayHandle;
 
 /// Tauri-managed state holding the channel back to the server process. Shared with
 /// the frontend's command handlers via [`tauri::State`].
@@ -291,43 +291,15 @@ pub fn show_dialog() {
 				}
 			}
 
+			//make the window a child of the host window
 			#[cfg(not(target_os = "windows"))]
-			if parent_window.x11_display.is_some() && parent_window.x11_window_id.is_some() {
-			    //loop until the main window is created and we can get its window handle
-                if let Ok(rawwnd)=wnd.window_handle() {
-                    if let raw_window_handle::RawWindowHandle::Xlib(raw) = rawwnd.as_raw() {
-                        if let Ok(rawdispl)=wnd.display_handle() {
-                            if let raw_window_handle::RawDisplayHandle::Xlib(rawdispl) = rawdispl.as_raw() {
-                                if let Some(display_handle) = rawdispl.display {
-                                    let child_xid=raw.window as u64;
-                                    let parent_xid=parent_window.x11_window_id.unwrap() as u64;
-                                    let _ = apph.run_on_main_thread(move || {
-                                        let xdisplay=unsafe{x11::xlib::XOpenDisplay(parent_window.x11_display.unwrap().as_ptr() as *const i8)};
-                                        let res=unsafe {
-                                            x11::xlib::XSetTransientForHint(xdisplay, child_xid, parent_xid)
-                                        };
-                                        println!("XSetTransientForHint for {} and {} returned {}", child_xid, parent_xid, res);
-                                    });
-                                }
-                            }
-                        }
-                    }
-                }
-		    }
-
-			//             // XWindowAttributes att_parent{};
-			//             // XWindowAttributes att_child{};
-			//             // if (XGetWindowAttributes(x11_display,xid_parent,&att_parent)) {
-			//             //     if (XGetWindowAttributes(x11_display,xid,&att_child)) {
-			//             //         int x=(att_parent.width-att_child.width)>>1;
-			//             //         int y=(att_parent.height-att_child.height)>>1;
-			//             //         if (!XMoveWindow(x11_display,xid, att_parent.x+x, att_parent.y+y)) {
-			//             //             //std::cout<<"Failed to center window...\n";
-			//             //         }
-			//             //     }
-			//             // }
+			parent_window_posix::set_parent_window_before_show(&window, &window_msg);
 
 			window.show()?;
+
+			#[cfg(not(target_os = "windows"))]
+			parent_window_posix::set_parent_window_after_show(window, window_msg);
+
 			Ok(())
 		})
 		.invoke_handler(tauri::generate_handler![request_update, data_entry])

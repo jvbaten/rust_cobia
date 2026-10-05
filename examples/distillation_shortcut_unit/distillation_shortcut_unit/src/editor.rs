@@ -575,14 +575,19 @@ pub fn edit(unit: &mut DistillationShortcutUnit, parent: CapeWindowId) -> Result
     #[cfg(not(target_os = "windows"))]
     match parent {
         CapeWindowId::CapeWindow_X11{display_string, xid} => {
-            if (!display_string.is_empty()) && (*xid!=0) {
+            if (!display_string.is_empty()) && (xid!=0) {
                 parent_wnd.x11_display = Some(display_string.clone());
-                parent_wnd.x11_window_id = Some(*xid);
+                parent_wnd.x11_window_id = Some(xid);
             }
         },
-        CapeWindowId::CapeWindow_Wayland{handle, protocol: _} => {
+        CapeWindowId::CapeWindow_Wayland{handle, protocol} => {
             if !handle.is_empty() {
                 parent_wnd.wayland_external_id = Some(handle.clone());
+                if protocol == cobia::C::eWaylandForeignProtocol_XDG_foreign_v1 {
+                    parent_wnd.wayland_foreign_protocol_version = Some(1);
+                } else if protocol == cobia::C::eWaylandForeignProtocol_XDG_foreign_v2 {
+                    parent_wnd.wayland_foreign_protocol_version = Some(2);
+                }
             }
         },
         _ => {}

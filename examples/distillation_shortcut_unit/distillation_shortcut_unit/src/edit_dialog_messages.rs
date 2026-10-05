@@ -74,6 +74,9 @@ pub struct ParentWindow {
     pub x11_window_id: Option<u64>,
     /// The external window handle/identifier, when running under Wayland.
     pub wayland_external_id: Option<String>,
+    /// The version (1 or 2) of the XDG foreign protocol under which
+    /// `wayland_external_id` was exported, when running under Wayland.
+    pub wayland_foreign_protocol_version: Option<u32>,
 }
 
 /// Messages sent from the unit (server) to the editor process (client).
