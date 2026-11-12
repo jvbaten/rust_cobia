@@ -186,6 +186,17 @@ fn main() {
 		file.write_all(contents.as_bytes()).unwrap();
 	}
 
+	//COBIA_SKIP_CODEGEN: do not regenerate src/cobia_enums.rs, src/cobia_enums_posix.rs,
+	//src/cape_open/mod.rs and src/cape_open_1_2/mod.rs. These files are part of the
+	//source tree. Regenerating them requires building and running the cidl2rs host
+	//tool against an installed COBIA runtime, which is not possible when
+	//cross-compiling (cidl2rs would be built for the host but treated as a target
+	//executable), and not wanted when the source tree is read-only.
+	println!("cargo:rerun-if-env-changed=COBIA_SKIP_CODEGEN");
+	if env::var_os("COBIA_SKIP_CODEGEN").is_some_and(|v| !v.is_empty() && v != "0") {
+		return;
+	}
+
 	//Generate enumerations
 	{
 		let enums = vec![
