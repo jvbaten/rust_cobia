@@ -62,17 +62,41 @@ fn main() {
 	// Run `clang` to compile the `C.c` file into a `C.o` object file.
 	// Unwrap if it is not possible to spawn the process.
 
+	//COBIA_CC and COBIA_AR override the C compiler and archiver used for the C
+	//binding, which must produce objects for the target. This is needed when
+	//cross-compiling, e.g. to Windows with MinGW-w64 from Linux or macOS:
+	//  COBIA_CC=x86_64-w64-mingw32-gcc COBIA_AR=x86_64-w64-mingw32-ar
+	println!("cargo:rerun-if-env-changed=COBIA_CC");
+	println!("cargo:rerun-if-env-changed=COBIA_AR");
+	let cc_override = env::var_os("COBIA_CC").map(PathBuf::from);
+	let ar_override = env::var_os("COBIA_AR").map(PathBuf::from);
+
 	let (clang, clangpp, ar, rc) = match std::env::var_os("CARGO_CFG_WINDOWS") {
-		Some(_) => {
-			//windows:
-			let clang_path = env::var("LIBCLANG_PATH").unwrap();
-			(
-				PathBuf::from(clang_path.clone()).join("clang"),
-				PathBuf::from(clang_path.clone()).join("clang++"),
-				PathBuf::from(clang_path.clone()).join("llvm-ar"),
-				Some(PathBuf::from(clang_path).join("llvm-rc")),
-			)
-		}
+		Some(_) => match env::var("LIBCLANG_PATH") {
+			Ok(clang_path) => {
+				//windows:
+				(
+					PathBuf::from(clang_path.clone()).join("clang"),
+					PathBuf::from(clang_path.clone()).join("clang++"),
+					PathBuf::from(clang_path.clone()).join("llvm-ar"),
+					Some(PathBuf::from(clang_path).join("llvm-rc")),
+				)
+			}
+			Err(_) if cc_override.is_some() => {
+				//cross-compiling to windows: the C binding is built with COBIA_CC
+				//and COBIA_AR; there is no llvm-rc, so cidl2rs cannot be built
+				//(set COBIA_SKIP_CODEGEN)
+				(
+					PathBuf::from("clang"),
+					PathBuf::from("clang++"),
+					PathBuf::from("ar"),
+					None,
+				)
+			}
+			Err(_) => panic!(
+				"LIBCLANG_PATH must be set when building for Windows (or set COBIA_CC and COBIA_AR when cross-compiling)"
+			),
+		},
 		None => {
 			//on other platforms we assume clang is in the path
 			(
@@ -83,6 +107,8 @@ fn main() {
 			)
 		}
 	};
+	let clang = cc_override.unwrap_or(clang);
+	let ar = ar_override.unwrap_or(ar);
 
 	let mut clang_cmd = std::process::Command::new(clang.clone());
 	clang_cmd
@@ -98,15 +124,17 @@ fn main() {
 			clang_cmd.arg("-m32");
 		}
 	}
-	if !clang_cmd
+	let compile_output = clang_cmd
 		.arg("-o")
 		.arg(&obj_path)
 		.arg(cdir_path.join("C.c"))
 		.output()
-		.expect("could not spawn `clang`")
-		.status
-		.success()
-	{
+		.expect("could not spawn C compiler");
+	if !compile_output.status.success() {
+		//print compile output
+		print!("{}", String::from_utf8_lossy(&compile_output.stdout));
+		//print compile error output
+		eprint!("{}", String::from_utf8_lossy(&compile_output.stderr));
 		// Panic if the command was not successful.
 		panic!("could not compile object file: {:?}", clang_cmd);
 	}
@@ -163,18 +191,25 @@ fn main() {
 	bindings
 		.write_to_file(out_path.clone())
 		.expect("Couldn't write bindings!");
-	{
+	let bindings_formatted = {
 		//replace
 		// ::std::os::raw::c_int  with i32
 		// ::std::os::raw::c_uint with u32
 		// ::std::os::raw::c_uchar with u8
-		let contents = fs::read_to_string(out_path.clone())
-			.unwrap()
-			.replace("::std::os::raw::c_int", "i32")
-			.replace("::std::os::raw::c_uint", "u32")
-			.replace("::std::os::raw::c_uchar", "u8");
+		//bindgen formats its output with rustfmt when that is installed; otherwise the
+		//output is a single line with spaced paths (:: std :: os :: raw :: c_int), so
+		//neither the paths nor the line anchors below may be assumed
+		let re_raw = Regex::new(r"::\s*std\s*::\s*os\s*::\s*raw\s*::\s*c_(int|uint|uchar)\b").unwrap();
+		let contents = fs::read_to_string(out_path.clone()).unwrap();
+		//formatted output has one item per line, which the enumeration parser below needs
+		let formatted = !contents.lines().any(|l| l.matches("pub ").count() > 1);
+		let contents = re_raw.replace_all(&contents, |cap: &regex::Captures| match &cap[1] {
+			"int" => "i32",
+			"uint" => "u32",
+			_ => "u8",
+		});
 		//replace enumerations: should be i32, compiles as u32 at some systems (as there is no fixed ANSI-C definition)
-		let re_enumdef = Regex::new(r"(?m)^\s*pub type e([a-zA-Z_0-9]+)\s*=\s*u32;$").unwrap();
+		let re_enumdef = Regex::new(r"pub type e([a-zA-Z_0-9]+)\s*=\s*u32\s*;").unwrap();
 		let contents = re_enumdef.replace_all(&contents, "pub type e$1 = i32;");
 		let mut file = OpenOptions::new()
 			.write(true)
@@ -182,6 +217,26 @@ fn main() {
 			.open(out_path.clone())
 			.unwrap();
 		file.write_all(contents.as_bytes()).unwrap();
+		formatted
+	};
+
+	//COBIA_SKIP_CODEGEN: do not regenerate src/cobia_enums.rs, src/cobia_enums_posix.rs,
+	//src/cape_open/mod.rs and src/cape_open_1_2/mod.rs. These files are part of the
+	//source tree. Regenerating them requires building and running the cidl2rs host
+	//tool against an installed COBIA runtime, which is not possible when
+	//cross-compiling (cidl2rs would be built for the host but treated as a target
+	//executable), and not wanted when the source tree is read-only.
+	println!("cargo:rerun-if-env-changed=COBIA_SKIP_CODEGEN");
+	if env::var_os("COBIA_SKIP_CODEGEN").is_some_and(|v| !v.is_empty() && v != "0") {
+		return;
+	}
+
+	//the enumerations are parsed line by line from the bindgen output; on unformatted
+	//output this would overwrite src/cobia_enums*.rs with empty enumerations
+	if !bindings_formatted {
+		panic!(
+			"bindgen output is not formatted (rustfmt not found?), so src/cobia_enums.rs cannot be regenerated; install rustfmt (rustup component add rustfmt) or set COBIA_SKIP_CODEGEN=1"
+		);
 	}
 
 	//Generate enumerations
@@ -513,7 +568,10 @@ impl fmt::Display for {} {{
 		let mut cidl2rs_resource_path: PathBuf = PathBuf::new();
 		if std::env::var_os("CARGO_CFG_WINDOWS").is_some() {
 			cidl2rs_resource_path = cidl2rs_intermediate_path.join("cidl2rs.res");
-			let output = std::process::Command::new(rc.unwrap())
+			let rc = rc.expect(
+				"llvm-rc is needed to build cidl2rs for Windows; set COBIA_SKIP_CODEGEN=1 when cross-compiling",
+			);
+			let output = std::process::Command::new(rc)
 				.arg(cidl2rs_path.join("cidl2rs.rc"))
 				.output()
 				.expect("could not spawn `cidl2rs.rc`");
