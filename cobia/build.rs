@@ -62,17 +62,41 @@ fn main() {
 	// Run `clang` to compile the `C.c` file into a `C.o` object file.
 	// Unwrap if it is not possible to spawn the process.
 
+	//COBIA_CC and COBIA_AR override the C compiler and archiver used for the C
+	//binding, which must produce objects for the target. This is needed when
+	//cross-compiling, e.g. to Windows with MinGW-w64 from Linux or macOS:
+	//  COBIA_CC=x86_64-w64-mingw32-gcc COBIA_AR=x86_64-w64-mingw32-ar
+	println!("cargo:rerun-if-env-changed=COBIA_CC");
+	println!("cargo:rerun-if-env-changed=COBIA_AR");
+	let cc_override = env::var_os("COBIA_CC").map(PathBuf::from);
+	let ar_override = env::var_os("COBIA_AR").map(PathBuf::from);
+
 	let (clang, clangpp, ar, rc) = match std::env::var_os("CARGO_CFG_WINDOWS") {
-		Some(_) => {
-			//windows:
-			let clang_path = env::var("LIBCLANG_PATH").unwrap();
-			(
-				PathBuf::from(clang_path.clone()).join("clang"),
-				PathBuf::from(clang_path.clone()).join("clang++"),
-				PathBuf::from(clang_path.clone()).join("llvm-ar"),
-				Some(PathBuf::from(clang_path).join("llvm-rc")),
-			)
-		}
+		Some(_) => match env::var("LIBCLANG_PATH") {
+			Ok(clang_path) => {
+				//windows:
+				(
+					PathBuf::from(clang_path.clone()).join("clang"),
+					PathBuf::from(clang_path.clone()).join("clang++"),
+					PathBuf::from(clang_path.clone()).join("llvm-ar"),
+					Some(PathBuf::from(clang_path).join("llvm-rc")),
+				)
+			}
+			Err(_) if cc_override.is_some() => {
+				//cross-compiling to windows: the C binding is built with COBIA_CC
+				//and COBIA_AR; there is no llvm-rc, so cidl2rs cannot be built
+				//(set COBIA_SKIP_CODEGEN)
+				(
+					PathBuf::from("clang"),
+					PathBuf::from("clang++"),
+					PathBuf::from("ar"),
+					None,
+				)
+			}
+			Err(_) => panic!(
+				"LIBCLANG_PATH must be set when building for Windows (or set COBIA_CC and COBIA_AR when cross-compiling)"
+			),
+		},
 		None => {
 			//on other platforms we assume clang is in the path
 			(
@@ -83,6 +107,8 @@ fn main() {
 			)
 		}
 	};
+	let clang = cc_override.unwrap_or(clang);
+	let ar = ar_override.unwrap_or(ar);
 
 	let mut clang_cmd = std::process::Command::new(clang.clone());
 	clang_cmd
@@ -526,7 +552,10 @@ impl fmt::Display for {} {{
 		let mut cidl2rs_resource_path: PathBuf = PathBuf::new();
 		if std::env::var_os("CARGO_CFG_WINDOWS").is_some() {
 			cidl2rs_resource_path = cidl2rs_intermediate_path.join("cidl2rs.res");
-			let output = std::process::Command::new(rc.unwrap())
+			let rc = rc.expect(
+				"llvm-rc is needed to build cidl2rs for Windows; set COBIA_SKIP_CODEGEN=1 when cross-compiling",
+			);
+			let output = std::process::Command::new(rc)
 				.arg(cidl2rs_path.join("cidl2rs.rc"))
 				.output()
 				.expect("could not spawn `cidl2rs.rc`");
