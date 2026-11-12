@@ -98,15 +98,17 @@ fn main() {
 			clang_cmd.arg("-m32");
 		}
 	}
-	if !clang_cmd
+	let compile_output = clang_cmd
 		.arg("-o")
 		.arg(&obj_path)
 		.arg(cdir_path.join("C.c"))
 		.output()
-		.expect("could not spawn `clang`")
-		.status
-		.success()
-	{
+		.expect("could not spawn C compiler");
+	if !compile_output.status.success() {
+		//print compile output
+		print!("{}", String::from_utf8_lossy(&compile_output.stdout));
+		//print compile error output
+		eprint!("{}", String::from_utf8_lossy(&compile_output.stderr));
 		// Panic if the command was not successful.
 		panic!("could not compile object file: {:?}", clang_cmd);
 	}
